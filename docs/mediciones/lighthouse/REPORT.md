@@ -80,6 +80,55 @@ Cumulative Layout Shift.
 
 ---
 
+# Medición pública contra el despliegue vigente — 2026-09-16 (r2rs)
+
+- **Fecha:** 2026-09-16
+- **Herramienta:** Lighthouse v12 (API de Node), Chrome-for-Testing
+  153 headless-shell (`--use-angle=swiftshader`, sin `--disable-gpu`:
+  con GPU desactivada la página no pinta, `NO_FCP`)
+- **URL medida:** `https://sged-frontend-r2rs.onrender.com/` (despliegue
+  público vigente declarado en el README; las seis evidencias tienen
+  `requestedUrl` en esa URL). Ruta raíz pública `/` (pantalla de login,
+  sin sesión: las credenciales `LH_USER`/`LH_PASS` de las rutas
+  autenticadas viven como secrets del CI y no se usan fuera de él).
+- **Corridas:** 3 independientes por perfil (6 en total):
+  `public-mobile-r2rs-home-run{1,2,3}.report.json`,
+  `public-desktop-r2rs-home-run{1,2,3}.report.json`.
+- **Nota de alcance:** las corridas `public-*-2026-09-08` de la sección
+  anterior apuntan a `sged-frontend-jofa.onrender.com`, sufijo anterior
+  del mismo servicio; se conservan como bitácora fechada, pero la
+  medición vigente contra el despliegue declarado es esta.
+
+## Resultados por categoría (r2rs, 2026-09-16)
+
+### Perfil móvil
+
+| Categoría | Run 1 | Run 2 | Run 3 | Media | Umbral | Estado |
+|---|---|---|---|---|---|---|
+| Rendimiento | 98 | 91 | 74 | **87,7** | ≥ 80 | ✅ Cumple |
+| Accesibilidad | 100 | 100 | 100 | **100** | ≥ 90 | ✅ Cumple |
+| Buenas prácticas | 96 | 96 | 96 | **96** | ≥ 90 | ✅ Cumple |
+| SEO | 63 | 63 | 63 | **63** | ≥ 90 (*warn*) | ⚠️ Ver nota |
+
+### Perfil escritorio
+
+| Categoría | Run 1 | Run 2 | Run 3 | Media | Umbral | Estado |
+|---|---|---|---|---|---|---|
+| Rendimiento | 53 | 54 | 54 | **53,7** | ≥ 80 | ❌ Bajo en este entorno |
+| Accesibilidad | 100 | 100 | 100 | **100** | ≥ 90 | ✅ Cumple |
+| Buenas prácticas | 96 | 96 | 96 | **96** | ≥ 90 | ✅ Cumple |
+| SEO | 63 | 63 | 63 | **63** | ≥ 90 (*warn*) | ⚠️ Ver nota |
+
+El rendimiento de escritorio (53–54) se mide con renderizado por
+software (SwiftShader, sin GPU) sobre CPU compartida de sandbox:
+TBT ≈ 500 ms y Speed Index ≈ 5 s con respuesta del servidor en 21 ms —
+el costo está en el hilo principal del cliente de medición, no en el
+despliegue (la misma ruta en móvil da 74–98 y en la medición CI del
+2026-09-08 las rutas autenticadas daban 80–100). SEO 63 en ambas, igual
+que en todas las mediciones (ver nota `is-crawlable` más arriba).
+
+---
+
 # Medición pública en despliegue real — 2026-09-08 (opción A, CI)
 
 - **Fecha:** 2026-09-08

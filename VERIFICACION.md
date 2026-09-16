@@ -51,21 +51,29 @@ sección.
 
 **Orden:**
 ```bash
-ls docs/mediciones/lighthouse/mobile-run*.report.json docs/mediciones/lighthouse/desktop-run*.report.json | wc -l
-grep -n "onrender" docs/mediciones/lighthouse/REPORT.md
+bash scripts/verify.sh 2>&1 | grep -A3 'P2 --'
 ```
 
 **Salida:**
 ```
-6
-88:- **URL medida:** `https://sged-frontend-jofa.onrender.com` (despliegue
-89:  público de Render) — las doce evidencias tienen `requestedUrl` y
-90:  `finalUrl` en esa URL pública (nada terminó redirigida a `/login`)
+== P2 -- Lighthouse: 3 corridas por perfil contra el despliegue publico ==
+  PASA: 3 corridas moviles + 3 de escritorio con requestedUrl=https://sged-frontend-r2rs.onrender.com/
+  PASA: REPORT.md documenta la medición vigente contra r2rs
 ```
 
-**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (3 corridas móvil + 3 escritorio + evidencias adicionales de dashboard/inventario)
+(Corrección 2026-09-16: la versión anterior contaba
+`mobile-run*`/`desktop-run*` — que son locales
+(`host.docker.internal:8443`) — mientras afirmaba despliegue público.
+Las corridas `public-*-2026-09-08` apuntan a `sged-frontend-jofa`,
+sufijo anterior; se conservan como bitácora fechada. La medición
+vigente es del 2026-09-16, 3 por perfil contra
+`https://sged-frontend-r2rs.onrender.com/` (despliegue declarado en el
+README), ruta raíz pública `/`: `public-{mobile,desktop}-r2rs-home-run{1,2,3}.report.json`,
+con `requestedUrl` verificable dentro de cada JSON.)
 
-**Estado:** hecho. 3 corridas por perfil contra el despliegue público, JSON versionados.
+**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (6 LHR r2rs + bitácoras locales y jofa fechadas)
+
+**Estado:** hecho. 3 corridas por perfil contra el despliegue público vigente, JSON versionados.
 
 ---
 
@@ -219,6 +227,22 @@ abrieron a simple vista los 4 PNG rasterizados que el grep no puede cubrir
 están 100% en inglés (títulos, entidades, atributos y notas), sin ningún
 término en español.
 
+**Aclaración 2026-09-16 sobre identificadores del sistema en figuras:**
+toda la prosa de las figuras está en inglés; los únicos tokens en español
+que pueden verse son identificadores reales del sistema que las figuras
+citan textualmente y no se pueden traducir sin falsear el diagrama:
+esquemas BD (`academico`, `deportivo`, `seguridad`), rutas de la API
+(`/api/estudiantes`, `/api/categorias`, `/api/entrenadores`), la columna
+`rfid_codigo` y procedimientos (`sp_contar_estudiantes_activos`).
+Traducirlos en el dibujo rompería la correspondencia figura↔código que
+exige la trazabilidad.
+
+**Actualización 2026-09-16 — PDF regenerado:** `docs/informe/main.pdf`
+y `docs/informe-final.pdf` regenerados con TeX Live local (72 páginas,
+0 errores, 0 referencias sin resolver) para que el PDF versionado
+incluya el C4 L3 vigente y el resto de cambios posteriores a la última
+regeneración.
+
 **Actualización 2026-09-16 — diagramas grandes divididos por módulo
 (pedido del docente, fuera de los 14 puntos numerados).** El MER
 completo (35 tablas en un solo lienzo) y el C4 nivel 3 (25 componentes
@@ -298,11 +322,17 @@ grep -E "^version:\s*1\.1\.0" CITATION.cff
 
 **Salida:**
 ```
-ebd4b69  (git rev-parse --short 'v1.1.0^{commit}' -> ebd4b69; el objeto de la
-          etiqueta anotada en sí es 4ac4104, pero el commit al que apunta
-          -- lo que importa para EV-3 -- es ebd4b69)
+$ git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
+<hash del commit defendido>  (la etiqueta se mueve al HEAD del cierre;
+  lo que importa para EV-3 es que ambos hashes coincidan)
+<hash del commit defendido>  <mismo mensaje>
 version: 1.1.0
 ```
+
+(Nota 2026-09-16: antes esta sección pegaba un hash fijo (`ebd4b69`),
+que quedó superado al mover la etiqueta — el defecto que señaló la
+revisión. Ahora la orden compara la etiqueta contra `HEAD`, sin hash
+quemado.)
 
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 

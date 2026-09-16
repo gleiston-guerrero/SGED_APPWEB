@@ -30,17 +30,32 @@ echo "  Nota: P1 tambien exige consentimiento de cada participante -- ver P13."
 
 # ---------------------------------------------------------------------
 section "P2 -- Lighthouse: 3 corridas por perfil contra el despliegue publico"
-mobile_runs=$(ls docs/mediciones/lighthouse/mobile-run*.report.json 2>/dev/null | wc -l)
-desktop_runs=$(ls docs/mediciones/lighthouse/desktop-run*.report.json 2>/dev/null | wc -l)
+# (Corrección 2026-09-16: antes contaba mobile-run*/desktop-run*, que son
+# locales (host.docker.internal), mientras REPORT.md hablaba del despliegue
+# público. Ahora se exige requestedUrl = despliegue vigente dentro del JSON.)
+R2RS="https://sged-frontend-r2rs.onrender.com/"
+mobile_runs=0; desktop_runs=0
+for f in docs/mediciones/lighthouse/public-mobile-*.report.json; do
+    [ -f "$f" ] || continue
+    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
+        mobile_runs=$((mobile_runs + 1))
+    fi
+done
+for f in docs/mediciones/lighthouse/public-desktop-*.report.json; do
+    [ -f "$f" ] || continue
+    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
+        desktop_runs=$((desktop_runs + 1))
+    fi
+done
 if [ "$mobile_runs" -ge 3 ] && [ "$desktop_runs" -ge 3 ]; then
-    pass "$mobile_runs corridas moviles + $desktop_runs de escritorio"
+    pass "$mobile_runs corridas moviles + $desktop_runs de escritorio con requestedUrl=$R2RS"
 else
-    fail "$mobile_runs corridas moviles + $desktop_runs de escritorio (se exigen >=3 y >=3)"
+    fail "$mobile_runs corridas moviles + $desktop_runs de escritorio con requestedUrl publica vigente (se exigen >=3 y >=3)"
 fi
-if grep -q "onrender.com" docs/mediciones/lighthouse/REPORT.md 2>/dev/null; then
-    pass "REPORT.md confirma URL objetivo = despliegue publico de Render"
+if grep -q "sged-frontend-r2rs.onrender.com" docs/mediciones/lighthouse/REPORT.md 2>/dev/null; then
+    pass "REPORT.md documenta la medición vigente contra r2rs"
 else
-    fail "REPORT.md no confirma la URL objetivo publica"
+    fail "REPORT.md no documenta la medición contra r2rs"
 fi
 
 # ---------------------------------------------------------------------
