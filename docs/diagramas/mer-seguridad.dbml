@@ -1,0 +1,61 @@
+// Module diagram: SECURITY schema (seguridad) only. Split out of
+// mer-profutbol.dbml (the full diagram, kept as reference) per the
+// docente's feedback: large diagrams should be split by module for
+// readability. Rendered with `npx @softwaretechnik/dbml-renderer`.
+//
+// All 6 tables here are self-contained: none of their foreign keys
+// point outside this schema, so this file needs no external stubs.
+
+Table Person {
+  id_person INTEGER [pk, increment]
+  first_name VARCHAR(100) [not null]
+  last_name VARCHAR(100) [not null]
+  id_number CHAR(10) [unique, note: 'nullable: anonymized on student deletion']
+  email VARCHAR(200) [not null, unique]
+  phone VARCHAR(15)
+  address VARCHAR(255)
+  photo TEXT
+  birth_date DATE [not null]
+  active BOOLEAN [not null, default: true]
+  email_verified BOOLEAN [not null, default: false]
+}
+
+Table Role {
+  id_role INTEGER [pk, increment]
+  name VARCHAR(50) [not null]
+  description VARCHAR(255)
+}
+
+Table GeneralStatus {
+  id_general_status INTEGER [pk, increment]
+  name VARCHAR(100) [not null]
+}
+
+Table UserAccount {
+  id_user_account INTEGER [pk, increment]
+  id_person INTEGER [not null, ref: - Person.id_person]
+  id_general_status INTEGER [not null, ref: > GeneralStatus.id_general_status]
+  username VARCHAR(50) [not null, unique]
+  password_hash TEXT [not null]
+  last_access TIMESTAMPTZ
+  active BOOLEAN [not null, default: true]
+}
+
+Table UserRole {
+  id_user_role INTEGER [pk, increment]
+  id_user_account INTEGER [not null, ref: > UserAccount.id_user_account]
+  id_role INTEGER [not null, ref: > Role.id_role]
+}
+
+Table AuditLog {
+  id_audit_log INTEGER [pk, increment]
+  date TIMESTAMPTZ [not null]
+  id_user_account INTEGER [ref: > UserAccount.id_user_account, note: 'ON DELETE SET NULL']
+  username_snapshot VARCHAR(150) [not null]
+  role VARCHAR(50)
+  action VARCHAR(30) [not null]
+  entity VARCHAR(100)
+  entity_id INTEGER
+  description TEXT [not null]
+  ip VARCHAR(45)
+}

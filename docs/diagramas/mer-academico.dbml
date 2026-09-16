@@ -1,0 +1,101 @@
+// Module diagram: ACADEMIC schema (academico) only. Split out of
+// mer-profutbol.dbml (the full diagram, kept as reference) per the
+// docente's feedback: large diagrams should be split by module for
+// readability. Rendered with `npx @softwaretechnik/dbml-renderer`.
+//
+// Tables marked "external" below are stubs (PK only) for foreign keys
+// that point to another module's schema -- full definition lives in
+// that module's own file (mer-seguridad.dbml / mer-deportivo.dbml).
+
+Table Student {
+  id_student INTEGER [pk, increment]
+  id_person INTEGER [not null, unique, ref: - "Person (seguridad)".id_person]
+  id_category INTEGER [not null, ref: > "Category (deportivo)".id_category]
+  id_general_status INTEGER [not null, ref: > "GeneralStatus (seguridad)".id_general_status]
+  id_position INTEGER [ref: > "Position (deportivo)".id_position]
+  id_user_account INTEGER [unique, ref: - "UserAccount (seguridad)".id_user_account, note: 'nullable: guardian-only students may have no login']
+  student_code VARCHAR(30) [not null, unique]
+  enrollment_date DATE [not null]
+  weight DECIMAL(5,2)
+  height DECIMAL(5,2)
+  rfid_code VARCHAR(100) [unique]
+  active BOOLEAN [not null, default: true]
+}
+
+Table Guardian {
+  id_guardian INTEGER [pk, increment]
+  id_person INTEGER [not null, unique, ref: - "Person (seguridad)".id_person]
+  id_user_account INTEGER [not null, unique, ref: - "UserAccount (seguridad)".id_user_account]
+  relationship VARCHAR(30)
+  contact_phone VARCHAR(20)
+  active BOOLEAN [not null, default: true]
+}
+
+Table GuardianStudent {
+  id_guardian_student INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  relationship VARCHAR(50)
+  primary_contact BOOLEAN [not null, default: false]
+  active BOOLEAN [not null, default: true]
+
+  indexes {
+    (id_guardian, id_student) [unique]
+  }
+}
+
+Table Consent {
+  id_consent INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  scope VARCHAR(50) [not null, note: 'e.g. PHYSICAL_SPORTS_DATA']
+  granted_at TIMESTAMPTZ [not null]
+  granted_by_user_account INTEGER [ref: > "UserAccount (seguridad)".id_user_account]
+  revoked_at TIMESTAMPTZ
+  revoked_by_user_account INTEGER [ref: > "UserAccount (seguridad)".id_user_account]
+}
+
+Table Payment {
+  id_payment INTEGER [pk, increment]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  type VARCHAR(20) [not null, note: 'MEMBERSHIP | DAILY']
+  year SMALLINT [note: 'required for MEMBERSHIP, null for DAILY']
+  month SMALLINT [note: 'required for MEMBERSHIP, null for DAILY']
+  amount DECIMAL(8,2) [not null]
+  payment_date DATE [not null]
+  registered_by_user_account INTEGER [not null, ref: > "UserAccount (seguridad)".id_user_account]
+  canceled_at TIMESTAMPTZ
+  canceled_by_user_account INTEGER [ref: > "UserAccount (seguridad)".id_user_account]
+  cancellation_reason VARCHAR(255)
+}
+
+Table Notification {
+  id_notification INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  type VARCHAR(20) [not null, note: 'ATTENDANCE | INJURY']
+  message TEXT [not null]
+  read BOOLEAN [not null, default: false]
+}
+
+// ---- External stubs (owned by other modules; shown here PK-only) ----
+
+Table "Person (seguridad)" {
+  id_person INTEGER [pk]
+}
+
+Table "UserAccount (seguridad)" {
+  id_user_account INTEGER [pk]
+}
+
+Table "GeneralStatus (seguridad)" {
+  id_general_status INTEGER [pk]
+}
+
+Table "Category (deportivo)" {
+  id_category INTEGER [pk]
+}
+
+Table "Position (deportivo)" {
+  id_position INTEGER [pk]
+}

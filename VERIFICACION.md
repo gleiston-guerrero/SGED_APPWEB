@@ -198,6 +198,27 @@ abrieron a simple vista los 4 PNG rasterizados que el grep no puede cubrir
 están 100% en inglés (títulos, entidades, atributos y notas), sin ningún
 término en español.
 
+**Actualización 2026-09-16 — diagramas grandes divididos por módulo
+(pedido del docente, fuera de los 14 puntos numerados).** El MER
+completo (35 tablas en un solo lienzo) y el C4 nivel 3 (25 componentes
+de 3 dominios en un solo lienzo) eran ilegibles como diagrama único. Se
+mantienen como registro (`mer-profutbol.png`, `L3-componentes.png`) y se
+agregan divididos por módulo: `mer-seguridad/academico/deportivo/
+inventario.png` (uno por esquema real de PostgreSQL) y
+`L3-seguridad/academico/deportivo.png` (uno por dominio). Los 8 PNG
+nuevos están en inglés (mismo criterio que los anteriores) y se
+verificaron visualmente al generarlos, no solo por grep.
+
+De paso, al reconstruir el MER contra `db/schema.sql` (la fuente real)
+para poder dividirlo con exactitud, se encontró que la versión anterior
+de `mer-profutbol.dbml` modelaba solo 25 de las 35 tablas reales y
+predataba varias funcionalidades (cuentas de usuario como entidad
+propia, todo el módulo de representantes/consentimiento, categorías
+como tabla, movimientos de stock de inventario). El archivo completo se
+regeneró para reflejar las 35 tablas reales; no es un cambio pedido por
+la guía del examen suspenso (el MER no aparece en los 14 puntos) pero sí
+corrige un dato desactualizado que convenía no dejar pasar.
+
 ---
 
 ## P7 — SRS firmado, con MoSCoW (peso 0,8)

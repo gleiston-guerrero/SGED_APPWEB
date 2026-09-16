@@ -1,4 +1,5 @@
-// https://dbdiagram.io/d
+// Rendered locally with `npx @softwaretechnik/dbml-renderer` (Graphviz), no
+// external service needed -- see `make mer` in the Makefile.
 // SGED ProFutbol - Entity-Relationship Diagram (conceptual model)
 // Engine: PostgreSQL 16
 //
@@ -7,286 +8,406 @@
 // database columns stay in Spanish on purpose (@Column mappings are
 // protected, since they are the actual production schema) - this
 // diagram is documentation, not a 1:1 mirror of physical column names.
+//
+// FULL diagram (registro / reference), regenerated from db/schema.sql
+// (the real, current schema -- 35 tables across 4 schemas) on
+// 2026-09-16. The previous version of this file only modeled 25 tables
+// and predated several features (accounts as their own entity, the
+// guardian/consent module, inventory stock movements, categories as a
+// first-class table); it is superseded by this one, not merged into it.
+//
+// Too dense to read as one diagram (30+ tables, one canvas) -- per the
+// docente's feedback, it now also exists split by module, one file and
+// one rendered diagram per real PostgreSQL schema:
+//   mer-seguridad.dbml   (6 tables:  Person, Role, GeneralStatus,
+//                          UserAccount, UserRole, AuditLog)
+//   mer-academico.dbml   (6 tables:  Student, Guardian, GuardianStudent,
+//                          Consent, Payment, Notification)
+//   mer-deportivo.dbml   (18 tables: everything sport-operations related)
+//   mer-inventario.dbml  (3 tables:  Item, Assignment, StockMovement)
+// Each module file includes a lightweight "external" stub (PK only, no
+// other columns) for tables it references by foreign key but doesn't
+// own, so the relationship arrow is still visible without pulling in
+// unrelated columns. This file has no stubs: every table is complete.
 
 // ============================================
-// BASE TABLES
+// SECURITY SCHEMA (seguridad)
 // ============================================
 
 Table Person {
   id_person INTEGER [pk, increment]
   first_name VARCHAR(100) [not null]
   last_name VARCHAR(100) [not null]
-  id_number CHAR(10) [not null, unique]
-  email VARCHAR(200) [not null]
-  phone CHAR(10) [not null]
-  address VARCHAR(255) [not null]
-  birth_date DATE [not null]
+  id_number CHAR(10) [unique, note: 'nullable: anonymized on student deletion']
+  email VARCHAR(200) [not null, unique]
+  phone VARCHAR(15)
+  address VARCHAR(255)
   photo TEXT
+  birth_date DATE [not null]
+  active BOOLEAN [not null, default: true]
+  email_verified BOOLEAN [not null, default: false]
 }
 
 Table Role {
   id_role INTEGER [pk, increment]
-  name VARCHAR(255) [not null]
+  name VARCHAR(50) [not null]
+  description VARCHAR(255)
+}
+
+Table GeneralStatus {
+  id_general_status INTEGER [pk, increment]
+  name VARCHAR(100) [not null]
+}
+
+Table UserAccount {
+  id_user_account INTEGER [pk, increment]
+  id_person INTEGER [not null, ref: - Person.id_person]
+  id_general_status INTEGER [not null, ref: > GeneralStatus.id_general_status]
+  username VARCHAR(50) [not null, unique]
+  password_hash TEXT [not null]
+  last_access TIMESTAMPTZ
+  active BOOLEAN [not null, default: true]
+}
+
+Table UserRole {
+  id_user_role INTEGER [pk, increment]
+  id_user_account INTEGER [not null, ref: > UserAccount.id_user_account]
+  id_role INTEGER [not null, ref: > Role.id_role]
+}
+
+Table AuditLog {
+  id_audit_log INTEGER [pk, increment]
+  date TIMESTAMPTZ [not null]
+  id_user_account INTEGER [ref: > UserAccount.id_user_account, note: 'ON DELETE SET NULL']
+  username_snapshot VARCHAR(150) [not null]
+  role VARCHAR(50)
+  action VARCHAR(30) [not null]
+  entity VARCHAR(100)
+  entity_id INTEGER
   description TEXT [not null]
-}
-
-Table Position {
-  id_position INTEGER [pk, increment]
-  name VARCHAR(255) [not null]
-  description TEXT [not null]
-}
-
-Table EvaluationCriterion {
-  id_criterion INTEGER [pk, unique]
-  name VARCHAR(255)
-  description TEXT
-  max_score INTEGER
-  status VARCHAR(255)
-}
-
-Table Equipment {
-  id_equipment INTEGER [pk, increment]
-  name VARCHAR(255)
-  category VARCHAR(255)
-  total_quantity INTEGER
-  available_quantity INTEGER
-  status VARCHAR(255)
-  description TEXT
+  ip VARCHAR(45)
 }
 
 // ============================================
-// ROLES / STAFF
-// ============================================
-
-Table Administrator {
-  id_administrator INTEGER [pk, increment]
-  id_person INTEGER [not null, ref: > Person.id_person]
-  id_role INTEGER [not null, ref: > Role.id_role]
-  hire_date DATE [not null]
-  status BOOLEAN
-}
-
-Table Receptionist {
-  id_receptionist INTEGER [pk, increment]
-  id_person INTEGER [not null, ref: > Person.id_person]
-  id_role INTEGER [not null, ref: > Role.id_role]
-  hire_date DATE [not null]
-  status BOOLEAN [not null]
-}
-
-Table Coach {
-  id_coach INTEGER [pk, increment]
-  id_person INTEGER [not null, ref: > Person.id_person]
-  id_role INTEGER [not null, ref: > Role.id_role]
-  specialty VARCHAR(255) [not null]
-}
-
-// ============================================
-// STUDENTS
+// ACADEMIC SCHEMA (academico)
 // ============================================
 
 Table Student {
   id_student INTEGER [pk, increment]
-  id_person INTEGER [not null, ref: > Person.id_person]
-  id_position INTEGER [not null, ref: > Position.id_position]
-  category VARCHAR(25)
-  enrollment_date DATE
-  status VARCHAR(100)
-  rfid_code TEXT
+  id_person INTEGER [not null, unique, ref: - Person.id_person]
+  id_category INTEGER [not null, ref: > Category.id_category]
+  id_general_status INTEGER [not null, ref: > GeneralStatus.id_general_status]
+  id_position INTEGER [ref: > Position.id_position]
+  id_user_account INTEGER [unique, ref: - UserAccount.id_user_account, note: 'nullable: guardian-only students may have no login']
+  student_code VARCHAR(30) [not null, unique]
+  enrollment_date DATE [not null]
+  weight DECIMAL(5,2)
+  height DECIMAL(5,2)
+  rfid_code VARCHAR(100) [unique]
+  active BOOLEAN [not null, default: true]
+}
+
+Table Guardian {
+  id_guardian INTEGER [pk, increment]
+  id_person INTEGER [not null, unique, ref: - Person.id_person]
+  id_user_account INTEGER [not null, unique, ref: - UserAccount.id_user_account]
+  relationship VARCHAR(30)
+  contact_phone VARCHAR(20)
+  active BOOLEAN [not null, default: true]
+}
+
+Table GuardianStudent {
+  id_guardian_student INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  relationship VARCHAR(50)
+  primary_contact BOOLEAN [not null, default: false]
+  active BOOLEAN [not null, default: true]
+
+  indexes {
+    (id_guardian, id_student) [unique]
+  }
+}
+
+Table Consent {
+  id_consent INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  scope VARCHAR(50) [not null, note: 'e.g. PHYSICAL_SPORTS_DATA']
+  granted_at TIMESTAMPTZ [not null]
+  granted_by_user_account INTEGER [ref: > UserAccount.id_user_account]
+  revoked_at TIMESTAMPTZ
+  revoked_by_user_account INTEGER [ref: > UserAccount.id_user_account]
+}
+
+Table Payment {
+  id_payment INTEGER [pk, increment]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  type VARCHAR(20) [not null, note: 'MEMBERSHIP | DAILY']
+  year SMALLINT [note: 'required for MEMBERSHIP, null for DAILY']
+  month SMALLINT [note: 'required for MEMBERSHIP, null for DAILY']
+  amount DECIMAL(8,2) [not null]
+  payment_date DATE [not null]
+  registered_by_user_account INTEGER [not null, ref: > UserAccount.id_user_account]
+  canceled_at TIMESTAMPTZ
+  canceled_by_user_account INTEGER [ref: > UserAccount.id_user_account]
+  cancellation_reason VARCHAR(255)
+}
+
+Table Notification {
+  id_notification INTEGER [pk, increment]
+  id_guardian INTEGER [not null, ref: > Guardian.id_guardian]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  type VARCHAR(20) [not null, note: 'ATTENDANCE | INJURY']
+  message TEXT [not null]
+  read BOOLEAN [not null, default: false]
 }
 
 // ============================================
-// TRAINING
+// SPORTS SCHEMA (deportivo)
 // ============================================
+
+Table Category {
+  id_category INTEGER [pk, increment]
+  name VARCHAR(100) [not null]
+  min_age SMALLINT [not null]
+  max_age SMALLINT [not null]
+  description VARCHAR(255)
+  active BOOLEAN [not null, default: true]
+}
+
+Table Position {
+  id_position INTEGER [pk, increment]
+  name VARCHAR(50) [not null, unique]
+  abbreviation VARCHAR(5)
+  description VARCHAR(255)
+  active BOOLEAN [not null, default: true]
+}
+
+Table Specialty {
+  id_specialty INTEGER [pk, increment]
+  name VARCHAR(100) [not null, unique]
+  active BOOLEAN [not null, default: true]
+}
+
+Table Coach {
+  id_coach INTEGER [pk, increment]
+  id_person INTEGER [not null, unique, ref: - Person.id_person]
+  id_user_account INTEGER [not null, unique, ref: - UserAccount.id_user_account]
+  id_specialty INTEGER [ref: > Specialty.id_specialty]
+  years_experience SMALLINT
+  certification VARCHAR(255)
+  active BOOLEAN [not null, default: true]
+}
+
+Table Team {
+  id_team INTEGER [pk, increment]
+  id_category INTEGER [ref: > Category.id_category]
+  id_general_status INTEGER [ref: > GeneralStatus.id_general_status]
+  team_name VARCHAR(100) [not null]
+  initials VARCHAR(10)
+  logo_url TEXT
+  active BOOLEAN [default: true]
+
+  note: 'Not used by the backend yet (no JPA entity references deportivo.equipos) -- kept for schema fidelity, same status as the RFID reader in the C4 diagrams: modeled in the DB, not yet wired to the API.'
+}
 
 Table TrainingSchedule {
   id_schedule INTEGER [pk, increment]
   id_coach INTEGER [not null, ref: > Coach.id_coach]
-  weekday VARCHAR(100) [not null]
+  id_category INTEGER [not null, ref: > Category.id_category]
+  weekday SMALLINT [not null, note: '1-7']
   start_time TIME [not null]
   end_time TIME [not null]
-  field TEXT
-  description TEXT
-  status BOOLEAN
+  field VARCHAR(100)
+  description VARCHAR(255)
+  active BOOLEAN [not null, default: true]
 }
 
 Table TrainingSession {
   id_session INTEGER [pk, increment]
   id_schedule INTEGER [ref: > TrainingSchedule.id_schedule]
-  id_coach INTEGER [ref: > Coach.id_coach]
+  id_coach INTEGER [not null, ref: > Coach.id_coach]
+  id_category INTEGER [not null, ref: > Category.id_category]
+  date DATE [not null]
   start_time TIME
   end_time TIME
-  field TEXT
-  status VARCHAR(100)
+  field VARCHAR(100)
+  status VARCHAR(20) [not null, note: 'SCHEDULED | IN_PROGRESS | FINISHED | CANCELED']
 }
 
-// ============================================
-// ATTENDANCE
-// ============================================
+Table Exercise {
+  id_exercise INTEGER [pk, increment]
+  name VARCHAR(255) [not null]
+  description TEXT
+  duration_min SMALLINT [not null]
+  level VARCHAR(50)
+
+  note: 'Not used by the backend yet (no JPA entity references deportivo.ejercicios) -- same status as Team above.'
+}
+
+Table TrainingExercise {
+  id_training_exercise INTEGER [pk, increment]
+  id_session INTEGER [ref: > TrainingSession.id_session]
+  id_exercise INTEGER [ref: > Exercise.id_exercise]
+  notes TEXT
+
+  note: 'Not used by the backend yet -- join table for the Exercise roadmap feature above.'
+}
 
 Table Attendance {
   id_attendance INTEGER [pk, increment]
-  id_session INTEGER [ref: > TrainingSession.id_session]
-  id_student INTEGER [ref: > Student.id_student]
+  id_session INTEGER [not null, ref: > TrainingSession.id_session]
+  id_student INTEGER [not null, ref: > Student.id_student]
   check_in_time TIME
-  method VARCHAR(255)
-  status VARCHAR(55)
+  method VARCHAR(10) [not null, default: 'MANUAL', note: 'QR | RFID | MANUAL']
+  status VARCHAR(15) [not null, note: 'PRESENT | LATE | ABSENT | EXCUSED']
+  observation VARCHAR(255)
+
+  indexes {
+    (id_session, id_student) [unique]
+  }
 }
 
-// ============================================
-// EVALUATIONS
-// ============================================
+Table EvaluationCriterion {
+  id_criterion INTEGER [pk, increment]
+  name VARCHAR(100) [not null, unique]
+  description VARCHAR(255)
+  max_score SMALLINT [not null, default: 10]
+  active BOOLEAN [not null, default: true]
+}
 
 Table DailyEvaluation {
   id_evaluation INTEGER [pk, increment]
-  id_session INTEGER [not null, ref: > TrainingSession.id_session]
+  id_session INTEGER [not null, unique, ref: - TrainingSession.id_session]
   id_coach INTEGER [not null, ref: > Coach.id_coach]
   date DATE [not null]
   general_observation TEXT
+  status VARCHAR(15) [not null, default: 'DRAFT', note: 'DRAFT | FINISHED']
+}
+
+Table StudentEvaluation {
+  id_student_evaluation INTEGER [pk, increment]
+  id_evaluation INTEGER [not null, ref: > DailyEvaluation.id_evaluation]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  id_category_of_day INTEGER [not null, ref: > Category.id_category]
+  id_position_played INTEGER [ref: > Position.id_position]
+  id_injury INTEGER [ref: > Injury.id_injury]
+
+  indexes {
+    (id_evaluation, id_student) [unique]
+  }
 }
 
 Table EvaluationDetail {
   id_detail INTEGER [pk, increment]
-  id_evaluation INTEGER [ref: > DailyEvaluation.id_evaluation]
-  id_student INTEGER [ref: > Student.id_student]
-  id_criterion INTEGER [ref: > EvaluationCriterion.id_criterion]
-  id_position_played INTEGER [ref: > Position.id_position]
-  score INTEGER
-  total_average INTEGER
+  id_student_evaluation INTEGER [not null, ref: > StudentEvaluation.id_student_evaluation]
+  id_criterion INTEGER [not null, ref: > EvaluationCriterion.id_criterion]
+  score DECIMAL(4,1) [not null]
+
+  indexes {
+    (id_student_evaluation, id_criterion) [unique]
+  }
 }
 
 Table StudentObservation {
   id_observation INTEGER [pk, increment]
-  id_detail INTEGER [ref: > EvaluationDetail.id_detail]
-  id_student INTEGER [ref: > Student.id_student]
-  id_coach INTEGER [ref: > Coach.id_coach]
-  text TEXT
-  date DATE
+  id_evaluation INTEGER [not null, ref: > DailyEvaluation.id_evaluation]
+  id_student INTEGER [not null, ref: > Student.id_student]
+  id_coach INTEGER [not null, ref: > Coach.id_coach]
+  text TEXT [not null]
 }
-
-// ============================================
-// INJURIES
-// ============================================
 
 Table Injury {
   id_injury INTEGER [pk, increment]
-  id_student INTEGER [ref: > Student.id_student]
-  id_coach INTEGER [ref: > Coach.id_coach]
-  type VARCHAR(255)
-  severity VARCHAR(255)
-  description TEXT
-  start_date DATE
-  end_date DATE
-  status VARCHAR(255)
+  id_student INTEGER [not null, ref: > Student.id_student]
+  id_coach INTEGER [not null, ref: > Coach.id_coach]
+  description TEXT [not null]
+  injury_date DATE [not null]
+  expected_return_date DATE
+  discharge_date DATE
 }
-
-// ============================================
-// MATCHES
-// ============================================
 
 Table Match {
   id_match INTEGER [pk, increment]
-  id_coach INTEGER [ref: > Coach.id_coach]
-  opponent VARCHAR(255)
-  date DATE
+  id_category INTEGER [not null, ref: > Category.id_category]
+  date DATE [not null]
   time TIME
-  venue VARCHAR(255)
-  type VARCHAR(255)
-  own_score VARCHAR(255)
-  opponent_score VARCHAR(255)
-  status VARCHAR(255)
+  goals_for SMALLINT
+  goals_against SMALLINT
+  observation VARCHAR(500)
+  closed BOOLEAN [not null, default: false]
+  closed_at TIMESTAMPTZ
+  closed_by_user_account INTEGER [ref: > UserAccount.id_user_account]
 }
 
 Table MatchLineup {
   id_lineup INTEGER [pk, increment]
-  id_match INTEGER [ref: > Match.id_match]
-  id_coach INTEGER [ref: > Coach.id_coach]
-  ai_generated BOOLEAN
-  formation VARCHAR(255)
-  generation_date DATE
-  status VARCHAR(255)
+  id_match INTEGER [not null, unique, ref: - Match.id_match]
+  rating SMALLINT [note: '1-5']
+  observation VARCHAR(500)
 }
 
 Table LineupPlayer {
   id_lineup_player INTEGER [pk, increment]
-  id_lineup INTEGER [ref: > MatchLineup.id_lineup]
+  id_lineup INTEGER [not null, ref: > MatchLineup.id_lineup]
+  id_student INTEGER [not null, ref: > Student.id_student]
   id_position INTEGER [ref: > Position.id_position]
-  starter BOOLEAN
-  id_student INTEGER [ref: > Student.id_student]
+  starter BOOLEAN [not null, default: true]
+
+  indexes {
+    (id_lineup, id_student) [unique]
+  }
 }
 
 Table MatchStatistic {
   id_statistic INTEGER [pk, increment]
   id_match INTEGER [ref: > Match.id_match]
   id_student INTEGER [ref: > Student.id_student]
-  goals INTEGER
-  assists INTEGER
-  shots INTEGER
-  fouls INTEGER
-  yellow_cards BOOLEAN
-  red_cards BOOLEAN
-  minutes_played DECIMAL
+  goals SMALLINT [default: 0]
+  assists SMALLINT [default: 0]
+  yellow_cards SMALLINT [default: 0]
+  red_cards SMALLINT [default: 0]
+  minutes_played SMALLINT [default: 0]
 }
 
 // ============================================
-// MEMBERSHIPS AND PAYMENTS
+// INVENTORY SCHEMA (inventario)
 // ============================================
 
-Table Membership {
-  id_membership INTEGER [pk, increment]
-  id_student INTEGER [not null, ref: > Student.id_student]
-  start_date DATE
-  end_date DATE
-  total_amount DECIMAL
-  status VARCHAR(255)
+Table Item {
+  id_item INTEGER [pk, increment]
+  name VARCHAR(150) [not null]
+  type VARCHAR(20) [not null, note: 'UNIFORM | BALL | GEAR | OTHER']
+  size VARCHAR(20)
+  description VARCHAR(255)
+  current_stock INTEGER [not null, default: 0]
+  minimum_stock INTEGER [not null, default: 0]
+  unit VARCHAR(20) [not null, default: 'unit']
+  active BOOLEAN [not null, default: true]
 }
 
-Table Payments {
-  id_payment INTEGER [pk, increment]
-  id_membership INTEGER [ref: > Membership.id_membership]
-  id_receptionist INTEGER [ref: > Receptionist.id_receptionist]
-  amount_paid DECIMAL
-  pending_balance DECIMAL
-  payment_method VARCHAR(255)
-  payment_date DATE
-  observation TEXT
-}
-
-// ============================================
-// EQUIPMENT LOANS
-// ============================================
-
-Table EquipmentLoan {
-  id_loan INTEGER [pk, increment]
-  id_equipment INTEGER [ref: > Equipment.id_equipment]
-  id_student INTEGER [ref: > Student.id_student]
-  id_receptionist INTEGER [ref: > Receptionist.id_receptionist]
-  loan_date DATE
+Table Assignment {
+  id_assignment INTEGER [pk, increment]
+  id_item INTEGER [not null, ref: > Item.id_item]
+  quantity INTEGER [not null]
+  recipient_type VARCHAR(15) [not null, note: 'STUDENT | COACH']
+  id_student INTEGER [ref: > Student.id_student, note: 'set when recipient_type = STUDENT']
+  id_coach INTEGER [ref: > Coach.id_coach, note: 'set when recipient_type = COACH']
+  assignment_date DATE [not null]
   expected_return_date DATE
   actual_return_date DATE
-  status VARCHAR(255)
-  observation TEXT
+  status VARCHAR(15) [not null, default: 'ASSIGNED', note: 'ASSIGNED | RETURNED | LOST']
+  registered_by_user_account INTEGER [not null, ref: > UserAccount.id_user_account]
+  observations VARCHAR(255)
 }
 
-// ============================================
-// REPORTS AND NOTIFICATIONS
-// ============================================
-
-Table Report {
-  id_report INTEGER [pk, increment]
-  id_user INTEGER [ref: > Person.id_person]
-  type VARCHAR(255)
-  generation_date DATE
-  format TEXT
-  file_path TEXT
-}
-
-Table Notification {
-  id_notification INTEGER [pk, increment]
-  id_user INTEGER [ref: > Person.id_person]
-  title VARCHAR(255)
-  message TEXT
-  type VARCHAR(255)
-  sent_date DATE
-  read BOOLEAN
+Table StockMovement {
+  id_movement INTEGER [pk, increment]
+  id_item INTEGER [not null, ref: > Item.id_item]
+  movement_type VARCHAR(10) [not null, note: 'IN | OUT | ADJUSTMENT']
+  quantity INTEGER [not null]
+  reason VARCHAR(255)
+  registered_by_user_account INTEGER [not null, ref: > UserAccount.id_user_account]
+  movement_date TIMESTAMPTZ [not null]
 }

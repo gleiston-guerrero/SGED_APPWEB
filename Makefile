@@ -124,8 +124,25 @@ diagrams:
 	  mv -f structurizr-C4_Nivel1_Contexto.png L1-contexto.png && \
 	  mv -f structurizr-C4_Nivel2_Contenedores.png L2-contenedores.png && \
 	  mv -f structurizr-C4_Nivel3_Componentes_API.png L3-componentes.png && \
+	  mv -f structurizr-C4_Nivel3_Seguridad.png L3-seguridad.png && \
+	  mv -f structurizr-C4_Nivel3_Academico.png L3-academico.png && \
+	  mv -f structurizr-C4_Nivel3_Deportivo.png L3-deportivo.png && \
 	  rm -f structurizr-*.puml
-	@echo "Diagramas C4 regenerados en docs/arquitectura/"
+	@echo "Diagramas C4 regenerados en docs/arquitectura/ (L3 completo + 3 modulos)"
+
+## Regenera el diagrama entidad-relacion (MER) desde docs/diagramas/*.dbml:
+## el completo (mer-profutbol, registro/referencia) y los 4 modulos por
+## esquema real de PostgreSQL (seguridad/academico/deportivo/inventario),
+## separados por pedido del docente para mejor visualizacion -- el
+## completo es demasiado denso como diagrama unico. No depende de
+## dbdiagram.io: se renderiza localmente con Graphviz (via el paquete
+## npm @softwaretechnik/dbml-renderer) y se rasteriza con resvg-cli.
+mer:
+	@for f in mer-profutbol mer-seguridad mer-academico mer-deportivo mer-inventario; do \
+	  npx --yes @softwaretechnik/dbml-renderer -i docs/diagramas/$$f.dbml -o docs/diagramas/$$f.svg && \
+	  npx --yes resvg-cli --background white --fit-width 4800 docs/diagramas/$$f.svg docs/diagramas/$$f.png ; \
+	done
+	@echo "MER regenerado en docs/diagramas/ (1 completo + 4 modulos)"
 
 ## db/schema.sql se mantiene A MANO -- no se regenera
 schema:

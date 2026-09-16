@@ -5,6 +5,13 @@
 // docs/diagramas/ were removed for duplicating this model with outdated
 // content. docs/diagramas/ only keeps the ER diagram, which is not
 // modeled here.
+//
+// L3-componentes is kept as the full record, but per the docente's
+// feedback (large diagrams should be split by module for readability)
+// it's also split by domain: L3-seguridad, L3-academico, L3-deportivo.
+// All four render from the views below -- add a component here and
+// remember to add it to its domain's view too, or it silently drops out
+// of the split diagrams while still showing in the full one.
 workspace "SGED - ProFútbol" "Management System for the ProFútbol Youth Football Academy. C4 model (levels 1-3) in Structurizr DSL." {
 
     !identifiers hierarchical
@@ -157,8 +164,44 @@ workspace "SGED - ProFútbol" "Management System for the ProFútbol Youth Footba
         component sged.api "C4_Nivel3_Componentes_API" {
             include *
             autoLayout lr
-            title "Level 3 - Components of the Spring Boot API Container"
-            description "Controllers, services, repositories and security filters of the three domains: academico, deportivo and seguridad."
+            title "Level 3 - Components of the Spring Boot API Container (full, reference)"
+            description "Controllers, services, repositories and security filters of the three domains: academico, deportivo and seguridad. Split by domain below for readability -- this one is kept as the complete record."
+        }
+
+        # ------------------------------------------------------------
+        # Level 3, split by domain (readability -- feedback from the
+        # docente: large diagrams should be split by module). Each view
+        # includes the cross-cutting components (error handling, cache
+        # config) that every domain's controllers actually use, plus the
+        # security components a non-security domain depends on for auth.
+        # ------------------------------------------------------------
+
+        component sged.api "C4_Nivel3_Seguridad" {
+            include sged.api.authController sged.api.usuarioController sged.api.personaController sged.api.estadoGeneralController
+            include sged.api.jwtAuthFilter sged.api.jwtService sged.api.loginAttemptService sged.api.redisBlacklistService sged.api.userDetailsService sged.api.securityConfig
+            include sged.api.usuarioService sged.api.personaService sged.api.estadoGeneralService sged.api.seguridadRepository
+            include sged.api.globalExceptionHandler
+            autoLayout lr
+            title "Level 3 - Security domain components"
+            description "Auth, accounts, people and general-status catalog: controllers, JWT filter chain and their repository."
+        }
+
+        component sged.api "C4_Nivel3_Academico" {
+            include sged.api.estudianteController sged.api.estudianteService sged.api.estudianteRepository
+            include sged.api.deportivoRepository sged.api.seguridadRepository
+            include sged.api.globalExceptionHandler sged.api.redisCacheConfig
+            autoLayout lr
+            title "Level 3 - Academic domain components"
+            description "Students: controller, service and repository, plus the sports/security repositories it reads for category and account coherence."
+        }
+
+        component sged.api "C4_Nivel3_Deportivo" {
+            include sged.api.categoriaController sged.api.entrenadorController sged.api.categoriaService sged.api.entrenadorService sged.api.deportivoRepository
+            include sged.api.seguridadRepository
+            include sged.api.globalExceptionHandler
+            autoLayout lr
+            title "Level 3 - Sports domain components"
+            description "Categories and coaches: controllers, services and their repository, plus the security repository coaches are verified against."
         }
 
         styles {

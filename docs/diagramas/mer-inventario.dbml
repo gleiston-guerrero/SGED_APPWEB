@@ -1,0 +1,60 @@
+// Module diagram: INVENTORY schema (inventario) only. Split out of
+// mer-profutbol.dbml (the full diagram, kept as reference) per the
+// docente's feedback: large diagrams should be split by module for
+// readability. Rendered with `npx @softwaretechnik/dbml-renderer`.
+//
+// Tables marked "external" below are stubs (PK only) for foreign keys
+// that point to another module's schema -- full definition lives in
+// that module's own file (mer-seguridad.dbml / mer-academico.dbml /
+// mer-deportivo.dbml).
+
+Table Item {
+  id_item INTEGER [pk, increment]
+  name VARCHAR(150) [not null]
+  type VARCHAR(20) [not null, note: 'UNIFORM | BALL | GEAR | OTHER']
+  size VARCHAR(20)
+  description VARCHAR(255)
+  current_stock INTEGER [not null, default: 0]
+  minimum_stock INTEGER [not null, default: 0]
+  unit VARCHAR(20) [not null, default: 'unit']
+  active BOOLEAN [not null, default: true]
+}
+
+Table Assignment {
+  id_assignment INTEGER [pk, increment]
+  id_item INTEGER [not null, ref: > Item.id_item]
+  quantity INTEGER [not null]
+  recipient_type VARCHAR(15) [not null, note: 'STUDENT | COACH']
+  id_student INTEGER [ref: > "Student (academico)".id_student, note: 'set when recipient_type = STUDENT']
+  id_coach INTEGER [ref: > "Coach (deportivo)".id_coach, note: 'set when recipient_type = COACH']
+  assignment_date DATE [not null]
+  expected_return_date DATE
+  actual_return_date DATE
+  status VARCHAR(15) [not null, default: 'ASSIGNED', note: 'ASSIGNED | RETURNED | LOST']
+  registered_by_user_account INTEGER [not null, ref: > "UserAccount (seguridad)".id_user_account]
+  observations VARCHAR(255)
+}
+
+Table StockMovement {
+  id_movement INTEGER [pk, increment]
+  id_item INTEGER [not null, ref: > Item.id_item]
+  movement_type VARCHAR(10) [not null, note: 'IN | OUT | ADJUSTMENT']
+  quantity INTEGER [not null]
+  reason VARCHAR(255)
+  registered_by_user_account INTEGER [not null, ref: > "UserAccount (seguridad)".id_user_account]
+  movement_date TIMESTAMPTZ [not null]
+}
+
+// ---- External stubs (owned by other modules; shown here PK-only) ----
+
+Table "Student (academico)" {
+  id_student INTEGER [pk]
+}
+
+Table "Coach (deportivo)" {
+  id_coach INTEGER [pk]
+}
+
+Table "UserAccount (seguridad)" {
+  id_user_account INTEGER [pk]
+}
