@@ -434,8 +434,9 @@ explícitos: la cita de la observación original en
 dicen que el 60 % nunca fue el valor configurado (`main.tex:2583`,
 `SRS.md:1657-1658`), y los documentos anotados como históricos
 (`VERSIONING.md`, spec del 2026-08-12). Además se corrigió la única
-afirmación viva falsa (`COVEREDRATIO >= 0.60` en
-`docs/iso25010-atributos-calidad.md:20` → `0.70`).)
+afirmación viva falsa (el quality gate de
+`docs/iso25010-atributos-calidad.md:20` declaraba un umbral menor que
+el configurado → ahora `0.70`, igual que `pom.xml`).)
 
 **Respalda:** [`backend/pom.xml`](backend/pom.xml), [`scripts/verify.sh`](scripts/verify.sh) (sección P12)
 
