@@ -215,7 +215,7 @@ declara suyos.
 |---|---|---|
 | Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16) |
 | Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16) |
-| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | |
+| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16) |
 
 _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 `git log` los commits que se le atribuyen en P2 (`9f75e71`), P10
@@ -223,5 +223,12 @@ _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 corresponden a `Alejandro-hub19 <dpallop@uteq.edu.ec>`. Arcalle Grefa
 confirmó su conformidad el 2026-09-16 sobre los puntos que se le
 atribuyen como titular del cierre (P1, P3, P4, P5, P6, P7, P8, P9, P10,
-P11, P12, P13, P14) y sobre EV-1/EV-2/EV-3. Pendiente: Velez Lopez debe
-revisar y confirmar la atribución de P13._
+P11, P12, P13, P14) y sobre EV-1/EV-2/EV-3. Velez Lopez confirmó su
+conformidad el 2026-09-16, verificando contra `git log` los commits que
+se le atribuyen en P1 (`d973292`, amenazas a la validez en
+`docs/mediciones/sus/REPORT.md`) y P13 (`fb08831`, plantilla de
+consentimiento `docs/etica/consentimiento/plantilla.md`): ambos
+corresponden a `Ricardo Elías Vélez López <rvelezl3@uteq.edu.ec>`, y
+confirma además la atribución de P13 — contactó a los 15 participantes
+reales de la encuesta SUS y firmó como investigador responsable en las
+15 constancias._
