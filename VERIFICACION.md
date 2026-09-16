@@ -544,6 +544,21 @@ pasada de `pdflatex` al objetivo `docs` para eliminarla del todo.
 antes idéntica byte a byte a la de `docs/`) quedan regenerados y
 comprometidos junto con este expediente.
 
+**Actualización 2026-09-16 — regeneración por el diagrama de caja del
+SUS.** Se agregó `docs/mediciones/sus/sus-boxplot.png` (faltaba: la
+Tabla `sus-perfil` del informe solo daba promedios por perfil, sin
+visualizar la distribución bimodal que describe
+`docs/mediciones/sus/INTERPRETACION.md`). Se incrustó como Figura~5 en
+`docs/informe/main.tex`, justo después de esa tabla, y se corrió de
+nuevo el mismo pipeline de Docker de arriba: cero errores fatales, cero
+referencias sin resolver, `Output written on main.pdf (72 pages,
+1402664 bytes)`. Verificado visualmente rindiendo la página del PDF a
+PNG (`pdftoppm`): la figura se ve completa y legible, con su leyenda y
+la línea del umbral de industria (SUS=68). `docs/informe-final.pdf`,
+`docs/informe/main.pdf` e `informe-final.pdf` (copia raíz) regenerados
+y comprometidos junto con este cambio; `caratula-standalone.pdf` no se
+tocó porque no incluye esta sección.
+
 **Nota sobre P13.** Las constancias de consentimiento firmado no se
 pueden generar de forma automática ni por IA: exigen que cada uno de los
 15 participantes reales de la encuesta SUS acepte y firme. Inventar esa
