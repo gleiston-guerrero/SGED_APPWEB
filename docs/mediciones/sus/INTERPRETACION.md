@@ -36,6 +36,13 @@ se buscaba reducir la incertidumbre.
 
 ## Patrón por perfil — el hallazgo principal
 
+![Distribución de puntuaciones SUS por perfil](sus-boxplot.png)
+
+_Diagrama de caja generado por `scripts/sus-boxplot.py` a partir de
+`respuestas.csv`. Los dos bloques (Coach/Student por encima de la media
+de la industria; Receptionist/Guardian por debajo) se ven de un vistazo
+sin necesidad de leer la tabla de abajo._
+
 La distribución es marcadamente bimodal y se explica por el **rol** del
 participante, no por variación individual:
 

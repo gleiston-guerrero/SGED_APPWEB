@@ -66,6 +66,7 @@ bench:
 ## Regenera reportes derivados que no dependen de contenedores (SUS, Bloque C.3)
 reports:
 	python3 scripts/sus-analysis.py
+	python3 scripts/sus-boxplot.py
 
 ## Auditoría OWASP (Bloque C.2) + auditoría de SQL dinámico
 audit:

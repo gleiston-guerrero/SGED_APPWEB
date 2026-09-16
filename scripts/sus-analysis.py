@@ -172,6 +172,11 @@ def main():
     add(f"Umbral objetivo del proyecto: SUS >= 68 (media de la industria). "
         f"Resultado: **{umbral}**.\n")
 
+    add("## Distribucion por perfil (diagrama de caja)\n")
+    add("![Distribución de puntuaciones SUS por perfil](sus-boxplot.png)\n")
+    add("Generado por `scripts/sus-boxplot.py`; ver la lectura completa del "
+        "patrón bimodal en [INTERPRETACION.md](INTERPRETACION.md).\n")
+
     add("## Distribucion por grado\n")
     add("| Grado | Participantes |")
     add("|---|---|")

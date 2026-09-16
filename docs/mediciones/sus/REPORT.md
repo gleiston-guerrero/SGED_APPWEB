@@ -1,7 +1,7 @@
 # Reporte de usabilidad — SUS (Bloque C.3)
 
-- Fecha del analisis: 2026-09-13T04:47:45.643108+00:00
-- Commit: 37f757d
+- Fecha del analisis: 2026-09-16T15:52:49.451171+00:00
+- Commit: cc1d7f7
 - Instrumento: System Usability Scale (Brooke, 1996), 10 items, escala 1-5
 - Participantes: **15** (minimo exigido: 10)
 
@@ -19,6 +19,12 @@
 | Grado | **C — Aceptable** |
 
 Umbral objetivo del proyecto: SUS >= 68 (media de la industria). Resultado: **CUMPLE**.
+
+## Distribucion por perfil (diagrama de caja)
+
+![Distribución de puntuaciones SUS por perfil](sus-boxplot.png)
+
+Generado por `scripts/sus-boxplot.py`; ver la lectura completa del patrón bimodal en [INTERPRETACION.md](INTERPRETACION.md).
 
 ## Distribucion por grado
 
