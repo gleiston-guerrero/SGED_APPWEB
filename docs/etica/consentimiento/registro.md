@@ -59,6 +59,15 @@ firmada, las opciones son:
    calificación en cero sin segunda oportunidad, y ese riesgo es muchísimo
    peor que declarar un dato faltante.
 
+## Mayoría de edad de los participantes
+
+Los 4 participantes de perfil `estudiante` (`ENC-03`, `ENC-07`, `ENC-13`,
+`ENC-15`) son personas adultas. El equipo evitó deliberadamente incluir
+participantes menores de edad en esta encuesta de usabilidad, precisamente
+para no requerir el consentimiento adicional de un representante legal
+(distinto del tratamiento de datos en producción, ver
+[`representante.md`](representante.md)).
+
 ## Cierre de este punto (2026-09-14/15)
 
 Se aplicó la opción 1: el equipo volvió a contactar a los 15 participantes
