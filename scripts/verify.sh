@@ -53,15 +53,25 @@ if python3 scripts/javadoc-coverage.py 90; then pass "cobertura de Javadoc >=90%
 
 # ---------------------------------------------------------------------
 section "P5 -- validate-traceability.sh propaga el codigo de salida"
-if bash scripts/validate-traceability.sh /ruta/inexistente.csv /ruta/inexistente.md >/dev/null 2>&1; then
-    fail "el script no fallo con una ruta invalida (deberia)"
+# Ruptura real: copia temporal de la matriz con una fila sin trazabilidad.
+# (Corrección 2026-09-16: antes se pasaban rutas inexistentes, lo que solo
+# probaba el manejo de archivos faltantes, no la validación de contenido.)
+TMP_P5="$(mktemp -d)"
+trap 'rm -rf "$TMP_P5"' EXIT
+cp docs/trazabilidad/matriz.csv "$TMP_P5/rota.csv"
+echo 'RF-DEMOSTRACION,CRUD-ORM,fila deliberadamente sin trazabilidad,,,GET /api/nada,backend/Nada.java,,,Planificado,' >> "$TMP_P5/rota.csv"
+salida_p5="$(bash scripts/validate-traceability.sh "$TMP_P5/rota.csv" 2>&1)"; codigo_p5=$?
+if [ "$codigo_p5" -eq 0 ]; then
+    fail "el validador acepto una fila sin trazabilidad (deberia fallar)"
+elif printf '%s\n' "$salida_p5" | grep -q 'VIOLACIÓN: RF-DEMOSTRACION'; then
+    pass "el validador imprime la VIOLACIÓN y sale con codigo $codigo_p5 ante fila rota real"
 else
-    pass "el script sale con codigo distinto de cero ante una entrada invalida"
+    fail "el validador fallo pero no imprimio la VIOLACIÓN esperada"
 fi
 if [ -f scripts/test-validate-traceability.sh ] && bash scripts/test-validate-traceability.sh >/dev/null 2>&1; then
     pass "scripts/test-validate-traceability.sh (autotest de regresion) pasa"
 else
-    fail "scripts/test-validate-traceability.sh no existe o falla"
+    fail "scripts/test-validate-traceability.sh falla"
 fi
 
 # ---------------------------------------------------------------------
@@ -146,11 +156,18 @@ fi
 
 # ---------------------------------------------------------------------
 section "P12 -- una sola cifra de umbral de cobertura en todo el entregable"
+# (Corrección 2026-09-16: antes solo revisaba main.tex y README y no
+# reconocía el formato LaTeX 60\,\%. Ahora barre todos los archivos de
+# texto versionados, reconoce 60 % / 60\% / 60\,\% / 0.60 / 0,60, y
+# excluye únicamente los contextos históricos explícitos: la cita de la
+# observación original en OBSERVACIONES.md, las notas de corrección que
+# dicen que el 60 % nunca fue el valor configurado, y los documentos
+# anotados como históricos.)
 pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -u)
-stray=$(grep -noE 'umbral[^.]{0,40}[0-9]{2}(,[0-9]+)?\s*%|[0-9]{2}(,[0-9]+)?\s*%[^.]{0,40}umbral' docs/informe/main.tex README.md 2>/dev/null | grep -v "70\b\|70,0\|70\.0" || true)
+stray=$(git grep -n -E 'COVEREDRATIO\s*>=\s*0\.60|umbral[^.]{0,60}(60|0[.,]60)\s*(\\?,\s*\\?%|%)|(60|0[.,]60)\s*(\\?,\s*\\?%|%)[^.]{0,60}umbral|≥\s*60\s*%|>=?\s*0\.60' -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
-    pass "no se encontraron menciones de umbral con una cifra distinta de 70% en informe/README"
+    pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"
 else
     fail "menciones de umbral con otra cifra: $stray"
 fi

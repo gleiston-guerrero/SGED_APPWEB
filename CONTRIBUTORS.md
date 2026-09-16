@@ -6,9 +6,9 @@ del historial de `git log` (no auto-declarados).
 
 | Integrante | Correo institucional | Roles (CRediT) |
 |---|---|---|
-| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Software, Formal analysis, Validation, Data curation, Writing – original draft, Visualization |
+| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Conceptualization, Software, Formal analysis, Investigation, Methodology, Validation, Data curation, Writing – original draft, Writing – review & editing, Visualization |
 | Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Conceptualization, Software, Validation, Methodology, Resources, Writing – review & editing |
-| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Conceptualization, Software, Investigation, Project administration, Supervision |
+| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Conceptualization, Software, Investigation, Validation, Data curation, Project administration, Supervision |
 
 La taxonomía CRediT completa define catorce roles; en este proyecto todos
 quedan cubiertos por el equipo de la siguiente manera. **El conteo junto a
@@ -23,20 +23,24 @@ vez `Software` y `Validation`).
 
 | Rol CRediT | Integrante(s) | Cobertura |
 |---|---|---|
-| Conceptualization | Darwin (40), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
+| Conceptualization | Darwin (43), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
 | Data curation | Alejandro (49), Darwin (27), Ricardo (6) | Diseño del esquema, procedimientos almacenados y limpieza de los datos crudos de medición. |
-| Formal analysis | Alejandro (11), Darwin (4), Ricardo (3) | Análisis estadístico de los datos de rendimiento y usabilidad (intervalos, distribución t). |
+| Formal analysis | Alejandro (11), Darwin (5), Ricardo (3) | Análisis estadístico de los datos de rendimiento y usabilidad (intervalos, distribución t). |
 | Funding acquisition | — | No aplica (proyecto académico sin financiación externa). |
-| Investigation | Darwin (2)¹ | Relevamiento de requisitos con la escuela ProFútbol y recolección de evidencia empírica — trabajo de campo, no solo edición de archivos; ver nota ¹. |
-| Methodology | Ricardo (2)¹ | Proceso de investigación (DSR) y protocolo de medición; ver nota ¹. |
-| Project administration | Darwin¹ | Administración del proyecto, calendario y gestión de entregas — no se refleja en rutas de archivo; ver nota ¹. |
-| Resources | Ricardo (7), Darwin (14) | Configuración del entorno de despliegue (Render), contenedores Docker y base de datos. |
-| Software | Alejandro (128), Darwin (50), Ricardo (11) | Implementación de backend (Spring Boot), frontend (Angular) y procedimientos almacenados. |
-| Supervision | Darwin¹ | Coordinación del equipo y seguimiento del repositorio — no se refleja en rutas de archivo; ver nota ¹. |
+| Investigation | Alejandro (3), Darwin (2)¹ | Relevamiento de requisitos con la escuela ProFútbol y recolección de evidencia empírica — trabajo de campo, no solo edición de archivos; ver nota ¹. |
+| Methodology | Alejandro (4), Ricardo (2), Darwin (2)¹ | Proceso de investigación (DSR) y protocolo de medición; ver nota ¹. |
+| Project administration | Darwin¹ | Administración del proyecto, calendario y gestión de entregas: gestión de las etiquetas de release (`v1.0.1`/`v1.0.2`/`v1.0.3`/`v1.1.0` movidas por Darwin), coordinación del expediente de verificación EV-1/EV-2/EV-3 y del acta de aprobación — no se refleja en rutas de archivo; ver nota ¹. |
+| Resources | Alejandro (12), Darwin (14), Ricardo (7) | Configuración del entorno de despliegue (Render), contenedores Docker y base de datos. |
+| Software | Alejandro (128), Darwin (51), Ricardo (11) | Implementación de backend (Spring Boot), frontend (Angular) y procedimientos almacenados. |
+| Supervision | Darwin¹ | Coordinación del equipo y seguimiento del repositorio (revisión e integración del trabajo de los tres integrantes en `main`, expediente `CONTRIBUCIONES.md`) — no se refleja en rutas de archivo; ver nota ¹. |
 | Validation | Alejandro (72), Darwin (41), Ricardo (9) | Pruebas de cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. |
-| Visualization | Darwin (6), Alejandro (4), Ricardo (3) | Diagramas C4 y de arquitectura del sistema. |
-| Writing – original draft | Darwin (55), Alejandro (60), Ricardo (14) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
-| Writing – review & editing | Alejandro (87), Darwin (87), Ricardo (24) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
+| Visualization | Darwin (7), Alejandro (4), Ricardo (3) | Diagramas C4 y de arquitectura del sistema. |
+| Writing – original draft | Alejandro (60), Darwin (59), Ricardo (14) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
+| Writing – review & editing | Darwin (97), Alejandro (87), Ricardo (24) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
+
+*(Conteos regenerados el 2026-09-16 con `scripts/credit-counts.py` sobre
+`main` actual; cambian ligeramente con cada commit porque corren sobre
+el historial vivo — ver nota metodológica en "Conteo por rol".)*
 
 ¹ Investigation, Methodology, Project administration y Supervision incluyen
 trabajo real que no deja huella en el árbol de archivos (reuniones con la

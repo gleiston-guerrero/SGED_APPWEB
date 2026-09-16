@@ -192,12 +192,17 @@ def a12(a, b):
 
 def holm_bonferroni(log10p_vals, alfa=0.05):
     """Correccion descendente de Holm (1979) sobre log10(p).
-    Devuelve (rechazos, p_ajustados_log10)."""
+    Devuelve (rechazos, p_ajustados_log10). Los p ajustados imponen la
+    monotonía del procedimiento escalonado (máximo acumulado en el
+    orden) — corrección 2026-09-16."""
     n = len(log10p_vals)
-    orden = sorted(range(n), key=lambda i: -log10p_vals[i])  # p mas grande (log10 mayor)
+    orden = sorted(range(n), key=lambda i: log10p_vals[i])  # p menor primero (procedimiento escalonado de Holm)
     p_aj = [1.0] * n
+    corrido = float("-inf")
     for pos, i in enumerate(orden):
-        p_aj[i] = min(0.0, log10p_vals[i] + math.log10(n - pos))
+        crudo = min(0.0, log10p_vals[i] + math.log10(n - pos))
+        corrido = max(corrido, crudo)
+        p_aj[i] = corrido
     rechasos = [False] * n
     log10alfa = math.log10(alfa)
     for pos, i in enumerate(orden):
@@ -327,13 +332,19 @@ def main():
                 f"{n_pool_b} fría). Tamaño de efecto: delta de Cliff (dominancia) y\n"
                 "estadístico A12 de Vargha y Delaney. Corrección por comparaciones\n"
                 "múltiples de Holm-Bonferroni sobre las cuatro corridas.\n\n")
-        f.write("| Comparación | U | z | p | δ Cliff | A12 | Holm (α=0,05) |\n")
-        f.write("|---|---|---|---|---|---|---|\n")
+        f.write("| Comparación | U | z | p | p Holm-aj. | δ Cliff | A12 | Holm (α=0,05) |\n")
+        f.write("|---|---|---|---|---|---|---|---|\n")
         for k in sorted(pares):
             e = pares[k]
             idx = sorted(pares).index(k)
             color = "**rechaza**" if rechasos[idx] else "no rechaza"
-            f.write(f"| {k} | {e['u']:.0f} | {e['z']:.1f} | {e['p']} "
+            log10_aj = p_aj[idx]
+            if log10_aj <= -300:
+                mantisa = 10 ** (log10_aj - math.floor(log10_aj))
+                p_ajustado = f"{mantisa:.2f}e{int(math.floor(log10_aj))}"
+            else:
+                p_ajustado = fmt_p(10 ** log10_aj)
+            f.write(f"| {k} | {e['u']:.0f} | {e['z']:.1f} | {e['p']} | {p_ajustado} "
                     f"| {e['delta']:+.3f} | {e['a12']:.3f} | {color} |\n")
         f.write(f"| pool global | {u_pool:.0f} | {z_pool:.1f} | {p_pool} "
                 f"| {d_pool:+.3f} | {a12(pool_a, pool_b):.3f} | — |\n")

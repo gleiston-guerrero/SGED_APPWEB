@@ -50,7 +50,8 @@ antes que la integración GitHub↔Zenodo siga habilitada para
   #5–#9).
 - `./mvnw test`: 101 pruebas, 0 fallos, 0 errores.
 - Cobertura JaCoCo: 72,5 % al momento de taguear (por encima del umbral del
-  60 %). **La cifra era correcta, pero la medición no era válida:** se hizo
+  60 % vigente en ese momento; el umbral actual es 70 %, ver `backend/pom.xml`).
+  **La cifra era correcta, pero la medición no era válida:** se hizo
   con `./mvnw test` sobre un `target/` que conservaba `.class` previos a la
   reestructuración, y el reporte archivado llegó a listar paquetes que ya no
   existen en el código fuente. Vuelta a medir con `./mvnw clean test` sobre

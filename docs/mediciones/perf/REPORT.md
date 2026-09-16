@@ -1,7 +1,7 @@
 # Reporte de rendimiento — k6 (Bloque C.1)
 
-- Fecha: 2026-09-07T05:04:18.744300+00:00
-- Commit: b1bdb76
+- Fecha: 2026-09-16T22:44:16.944701+00:00
+- Commit: 2c2c7cf1
 - Herramienta: k6 v2.2.0 (go1.26.5, linux/amd64)
 - Escenarios: caché cálida y caché fría; 5 corridas independientes cada uno (50 VUs, 30 s; seed análisis = 42)
 - Endpoint: autenticado `GET /api/estudiantes`
@@ -41,12 +41,12 @@ contraste usa por tanto las corridas 2--5 de cada escenario
 estadístico A12 de Vargha y Delaney. Corrección por comparaciones
 múltiples de Holm-Bonferroni sobre las cuatro corridas.
 
-| Comparación | U | z | p | δ Cliff | A12 | Holm (α=0,05) |
-|---|---|---|---|---|---|---|
-| corrida-2 | 121675593 | 17.4 | 6.93e-68 | -0.117 | 0.441 | **rechaza** |
-| corrida-3 | 155061192 | 49.9 | 2.25e-543 | -0.330 | 0.335 | **rechaza** |
-| corrida-4 | 174960074 | 75.1 | 1.42e-1227 | -0.496 | 0.252 | **rechaza** |
-| corrida-5 | 171094482 | 73.3 | 3.90e-1168 | -0.486 | 0.257 | **rechaza** |
+| Comparación | U | z | p | p Holm-aj. | δ Cliff | A12 | Holm (α=0,05) |
+|---|---|---|---|---|---|---|---|
+| corrida-2 | 121675593 | 17.4 | 6.93e-68 | 6.93e-68 | -0.117 | 0.441 | **rechaza** |
+| corrida-3 | 155061192 | 49.9 | 2.25e-543 | 4.49e-543 | -0.330 | 0.335 | **rechaza** |
+| corrida-4 | 174960074 | 75.1 | 1.42e-1227 | 5.67e-1227 | -0.496 | 0.252 | **rechaza** |
+| corrida-5 | 171094482 | 73.3 | 3.90e-1168 | 1.17e-1167 | -0.486 | 0.257 | **rechaza** |
 | pool global | 2479872504 | 106.9 | 1.75e-2483 | -0.355 | 0.323 | — |
 
 El pool combinado (corridas 2--5) da un valor p de 1.75e-2483 (z = 106.9) con A12 = 0.323 (delta de Cliff -0.355); A12 < 0,5 indica que la

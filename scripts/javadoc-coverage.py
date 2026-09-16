@@ -32,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "backend" / "src" / "main" / "java"
 
-TOP_TYPE_RE = re.compile(r"^(public\s+)?(final\s+|abstract\s+)*(class|interface|enum|@interface)\s+\w+")
+TOP_TYPE_RE = re.compile(r"^(public\s+)?(final\s+|abstract\s+)*(class|interface|enum|record|@interface)\s+\w+")
 INTERFACE_RE = re.compile(r"\binterface\s+\w+")
 
 
@@ -125,15 +125,29 @@ def find_class_public_methods(lines):
     return methods
 
 
+ANNOTATION_DECL_RE = re.compile(r"@interface\s+\w+")
+
+
 def find_interface_implicit_methods(lines):
     methods = []
     depth = 0
     interface_depths = set()
+    annotation_type_depths = set()
     in_annotation = False
     annotation_paren_balance = 0
 
     for i, raw in enumerate(lines):
         stripped = raw.strip()
+
+        if ANNOTATION_DECL_RE.search(stripped) and "{" in stripped:
+            annotation_type_depths.add(depth + brace_delta(stripped))
+            depth += brace_delta(stripped)
+            continue
+
+        if depth in annotation_type_depths:
+            depth += brace_delta(stripped)
+            annotation_type_depths = {d for d in annotation_type_depths if d <= depth}
+            continue
 
         if in_annotation:
             annotation_paren_balance += stripped.count("(") - stripped.count(")")

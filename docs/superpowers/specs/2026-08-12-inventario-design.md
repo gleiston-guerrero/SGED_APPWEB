@@ -218,5 +218,8 @@ JUnit 5 por service, siguiendo el patrón `*ServiceTest.java` existente
 - `AsignacionServiceTest`: asignar resta stock, devolver repone stock,
   no se puede devolver dos veces, constraint de destinatario único.
 
-Objetivo: no bajar la cobertura JaCoCo actual (≥60%, ver RNF-09 en la
-matriz de trazabilidad).
+Objetivo: no bajar la cobertura JaCoCo actual (≥60% según el umbral
+vigente el 2026-08-12; el umbral actual es 70 %, ver `backend/pom.xml` y
+RNF-09 en la matriz de trazabilidad). *(Nota 2026-09-16: documento de
+diseño histórico, se conserva con su redacción original más esta
+aclaración.)*

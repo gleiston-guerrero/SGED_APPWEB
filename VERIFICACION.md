@@ -101,13 +101,24 @@ cd backend && ./mvnw -q javadoc:javadoc; echo "exit=$?"
 
 **Salida:**
 ```
-Metodos/constructores publicos encontrados: 612
-Con Javadoc inmediatamente encima: 612
+Metodos/constructores publicos encontrados: 503
+Con Javadoc inmediatamente encima: 503
 Cobertura: 100.0%  (umbral exigido: 90%)
 RESULTADO: PASA
 
 exit=0
 ```
+
+(Corrección 2026-09-16: la cifra 612/612 de la versión anterior del
+expediente estaba inflada — el script contaba 102 declaraciones
+`public record X(...)` como métodos (su regex de tipos no incluía
+`record`) y 7 miembros de `@interface` (elementos de anotación, no
+métodos). Corregido `scripts/javadoc-coverage.py`: excluye
+declaraciones `record` y cuerpos de `@interface`. El conteo
+independiente de la revisión (506 métodos, 506 documentados, 499
+completos con `@param`/`@return` = 98,6 %) difiere en ±3 por criterio
+(constructor compacto sin paréntesis, casos límite de firma
+multipartida); con cualquier criterio la cobertura es 100 %.)
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
@@ -141,16 +152,16 @@ esos campos no tenía el suyo) — se le agregó.
 Corregido `is_documented()` en `scripts/javadoc-coverage.py` para que
 reconozca ambos patrones (clasifica el bloque de líneas de arriba hacia
 abajo primero, para saber dónde abre y cierra una anotación multilínea, y
-después lo recorre hacia atrás) y se re-corrió: **612/612 métodos
+después lo recorre hacia atrás) y se re-corrió: **503/503 métodos
 públicos documentados, 100,0%**. `docs/mediciones/javadoc-sin-documentar.txt`
 se eliminó porque ya no hay ningún método sin Javadoc que listar.
 
-El conteo de 463 métodos que cita la guía sigue sin coincidir con los 612
+El conteo de 463 métodos que cita la guía sigue sin coincidir con los 503
 que encuentra este script — puede ser un criterio de "método público" más
 estricto del docente (ej. excluir getters/setters de Lombok, DTO record,
 o métodos de repositorios Spring Data) — pero con 100% no hay margen que
 perder aunque el criterio del docente cuente menos métodos: si su lista
-es un subconjunto de estos 612, sigue estando al 100% documentada.
+es un subconjunto de estos 503, sigue estando al 100% documentada.
 
 ---
 
@@ -158,15 +169,25 @@ es un subconjunto de estos 612, sigue estando al 100% documentada.
 
 **Orden:**
 ```bash
-bash scripts/validate-traceability.sh /ruta/inexistente.csv /ruta/inexistente.md; echo "exit=$?"
+TMP_DEMO="$(mktemp -d)" && cp docs/trazabilidad/matriz.csv "$TMP_DEMO/rota.csv" \
+  && echo 'RF-DEMOSTRACION,CRUD-ORM,fila deliberadamente sin trazabilidad,,,GET /api/nada,backend/Nada.java,,,Planificado,' >> "$TMP_DEMO/rota.csv" \
+  && bash scripts/validate-traceability.sh "$TMP_DEMO/rota.csv"; echo "exit=$?"; rm -rf "$TMP_DEMO"
 bash scripts/test-validate-traceability.sh; echo "exit=$?"
 ```
 
 **Salida:**
 ```
+VIOLACIÓN: RF-DEMOSTRACION no tiene historia, caso de uso ni prueba.
+VIOLACIÓN: la matriz (RF-DEMOSTRACION, archivo_implementacion) cita la ruta backend/Nada.java pero no existe en el repositorio.
+VIOLACIÓN: ids de la matriz sin requisito en el SRS: RF-DEMOSTRACION
 exit=1
-[... autotest de scripts/test-validate-traceability.sh ...] exit=0
+OK: el validador falla-cerrado ante fila sin trazabilidad (codigo 1), referencia inexistente (codigo 1), columnas mal contadas (codigo 1), estado fuera del vocabulario (codigo 1) y ruta inexistente citada en el SRS (codigo 1).
+exit=0
 ```
+
+(Corrección 2026-09-16: la versión anterior del expediente mostraba
+una orden con rutas inexistentes y la salida recortada con `[...]`;
+arriba está la ruptura real de una fila y la salida íntegra.)
 
 **Respalda:** [`scripts/validate-traceability.sh`](scripts/validate-traceability.sh) (usa `exec`, por lo que ya propaga el código de salida de `validate-traceability.py`)
 
@@ -390,21 +411,36 @@ referencia al valor anterior en el repositorio (comprobado con
 
 **Orden:**
 ```bash
-grep "<minimum>" backend/pom.xml
-grep -n "umbral" docs/informe/main.tex | grep -i cobertura
+grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -u
+bash scripts/verify.sh 2>&1 | grep -A2 'P12 --'
 ```
 
 **Salida:**
 ```
-<minimum>0.70</minimum>  (LINE)
-<minimum>0.70</minimum>  (BRANCH)
-[... todas las menciones de "umbral" + "cobertura" en el informe citan 70% / 0,70 ...]
+<minimum>0.70</minimum>
+== P12 -- una sola cifra de umbral de cobertura en todo el entregable ==
+  umbral en pom.xml: <minimum>0.70</minimum>
+  PASA: ninguna afirmación viva de umbral distinto de 70% en el repo versionado
 ```
 
-**Respalda:** [`backend/pom.xml`](backend/pom.xml), [`docs/informe/main.tex`](docs/informe/main.tex)
+(Corrección 2026-09-16: la versión anterior mostraba una orden que solo
+revisaba `main.tex` y el `README`, no reconocía el formato LaTeX
+`60\,\%`, y recortaba la salida con `[...]`. La orden de arriba es la
+sección P12 de `scripts/verify.sh`, que ahora barre todos los archivos
+de texto versionados (`git grep`, reconoce `60 %` / `60\%` /
+`60\,\%` / `0.60` / `0,60`) y solo excluye contextos históricos
+explícitos: la cita de la observación original en
+`docs/observaciones/OBSERVACIONES.md`, las notas de corrección que
+dicen que el 60 % nunca fue el valor configurado (`main.tex:2583`,
+`SRS.md:1657-1658`), y los documentos anotados como históricos
+(`VERSIONING.md`, spec del 2026-08-12). Además se corrigió la única
+afirmación viva falsa (`COVEREDRATIO >= 0.60` en
+`docs/iso25010-atributos-calidad.md:20` → `0.70`).)
 
-**Estado:** consistente en todo lo revisado — pom.xml y el informe citan
-70% en todas las menciones encontradas. Incluso hay un commit histórico
+**Respalda:** [`backend/pom.xml`](backend/pom.xml), [`scripts/verify.sh`](scripts/verify.sh) (sección P12)
+
+**Estado:** consistente en todo el repo versionado — pom.xml y todas las
+afirmaciones vivas citan 70%. Incluso hay un commit histórico
 (`76e4e48`) que corrigió exactamente esta inconsistencia en el pasado.
 
 ---
@@ -454,24 +490,38 @@ para citarse en el informe.
 
 ## P14 — Estadística con trazabilidad (peso 0,5)
 
-**Orden:** `grep -n "holm_bonferroni" scripts/perf-analysis.py`
+**Orden:**
+```bash
+PYTHONIOENCODING=utf-8 python3 scripts/perf-analysis.py 2>&1 | tail -8
+```
 
 **Salida:**
 ```
-193:def holm_bonferroni(log10p_vals, alfa=0.05):
-289:    rechasos, p_aj = holm_bonferroni(pvals)
+=== Comparación por corrida 2-5 (Mann-Whitney, Holm-Bonferroni) ===
+corrida-2: U=121675593 z=17.4 p=6.93e-68 δ=-0.117 A12=0.441 rechaza(Holm)=SÍ
+corrida-3: U=155061192 z=49.9 p=2.25e-543 δ=-0.330 A12=0.335 rechaza(Holm)=SÍ
+corrida-4: U=174960074 z=75.1 p=1.42e-1227 δ=-0.496 A12=0.252 rechaza(Holm)=SÍ
+corrida-5: U=171094482 z=73.3 p=3.90e-1168 δ=-0.486 A12=0.257 rechaza(Holm)=SÍ
+
+pool: U=2479872504 z=106.9 p=1.75e-2483 δ=-0.355 A12=0.323
 ```
 
-Tabla ya generada en [`docs/mediciones/perf/REPORT.md`](docs/mediciones/perf/REPORT.md):
+Tabla regenerada en [`docs/mediciones/perf/REPORT.md`](docs/mediciones/perf/REPORT.md) (el script la reescribe en cada corrida):
 
 ```
-| Comparación | U | z | p | δ Cliff | A12 | Holm (α=0,05) |
-|---|---|---|---|---|---|---|
-| corrida-2 | 121675593 | 17.4 | 6.93e-68 | -0.117 | 0.441 | **rechaza** |
-| corrida-3 | 155061192 | 49.9 | 2.25e-543 | -0.330 | 0.335 | **rechaza** |
-| corrida-4 | 174960074 | 75.1 | 1.42e-1227 | -0.496 | 0.252 | **rechaza** |
-| corrida-5 | 171094482 | 73.3 | 3.90e-1168 | -0.486 | 0.257 | **rechaza** |
+| Comparación | U | z | p | p Holm-aj. | δ Cliff | A12 | Holm (α=0,05) |
+|---|---|---|---|---|---|---|---|
+| corrida-2 | 121675593 | 17.4 | 6.93e-68 | 6.93e-68 | -0.117 | 0.441 | **rechaza** |
+| corrida-3 | 155061192 | 49.9 | 2.25e-543 | 4.49e-543 | -0.330 | 0.335 | **rechaza** |
+| corrida-4 | 174960074 | 75.1 | 1.42e-1227 | 5.67e-1227 | -0.496 | 0.252 | **rechaza** |
+| corrida-5 | 171094482 | 73.3 | 3.90e-1168 | 1.17e-1167 | -0.486 | 0.257 | **rechaza** |
 ```
+
+(Corrección 2026-09-16: la versión anterior mostraba un `grep` al
+nombre de la función en vez de ejecutar el script, y la tabla solo
+traía el p sin ajustar. Ahora `holm_bonferroni` ordena de p menor a
+mayor (antes estaba invertido), impone la monotonía de los p ajustados
+(máximo acumulado) y la tabla publica la columna `p Holm-aj.`.)
 
 **Respalda:** [`scripts/perf-analysis.py`](scripts/perf-analysis.py) (calcula Mann-Whitney + delta de Cliff + A12 + Holm-Bonferroni desde `docs/mediciones/perf/*.samples.json`, datos crudos de k6), [`docs/mediciones/perf/REPORT.md`](docs/mediciones/perf/REPORT.md)
 

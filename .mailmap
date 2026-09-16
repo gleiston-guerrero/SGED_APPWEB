@@ -1,0 +1,9 @@
+# Unifica las identidades de git sin reescribir el historial (los hashes
+# citados en DATA-PROVENANCE.md, VERIFICACION.md y CONTRIBUCIONES.md deben
+# seguir siendo válidos).
+#
+# Arcalle Grefa usó dos correos (uno no institucional). Con este archivo,
+# `git log` y `git shortlog -sne` muestran una sola identidad canónica:
+# la institucional darcalleg@uteq.edu.ec.
+Arcalle Grefa Darwin Orlando <darcalleg@uteq.edu.ec> DarwinSM21 <darwinarcalle@gmail.com>
+Arcalle Grefa Darwin Orlando <darcalleg@uteq.edu.ec> darcalleg <darcalleg@uteq.edu.ec>

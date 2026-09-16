@@ -58,20 +58,28 @@ verificación reproducible— es de Arcalle Grefa.
 
 ## P4 — Javadoc (peso 1,5)
 
-**Titular:** Arcalle Grefa Darwin Orlando.
+**Titular:** Pallo Pinto Alejandro Daniel, con el cierre específico de
+Arcalle Grefa Darwin Orlando descrito abajo.
 
-- Grueso de la documentación Javadoc añadida en los commits `3441c02`
-  (98 DTO record), `fa8573e` (22 entidades JPA), `335ac57` (resto de
-  entidades), `e666d41` (repositorios).
-- En esta ronda final: corregido un defecto real de
-  `scripts/javadoc-coverage.py` (no seguía anotaciones partidas en varias
-  líneas ni saltaba comentarios `//` sueltos, lo que hacía ver 90,03%
-  donde en realidad había 100%), eliminada una duplicación accidental de
-  Javadoc en `ConsentRepository.java`, y documentado el constructor
-  compacto de `AnonymousPlayerProfile` (el único método genuinamente sin
-  Javadoc de los 61 que reportaba la lista). Commit `39ca9fa`.
-- Resultado: 612/612 métodos públicos documentados (100%),
-  `mvn javadoc:javadoc` sin error.
+- Grueso de la documentación Javadoc añadida por **Pallo Pinto Alejandro
+  Daniel** en los commits `3441c02` (98 DTO record), `fa8573e` (22
+  entidades JPA) y `335ac57` (resto de entidades) — los tres a nombre de
+  `Alejandro-hub19 <dpallop@uteq.edu.ec>`, verificado contra `git log`.
+- El cierre específico de **Arcalle Grefa Darwin Orlando**: `e666d41`
+  (repositorios y corrección de `@param` obsoletos) y, en esta ronda
+  final, corregido un defecto real de `scripts/javadoc-coverage.py` (no
+  seguía anotaciones partidas en varias líneas ni saltaba comentarios
+  `//` sueltos, lo que hacía ver 90,03% donde en realidad había 100%),
+  eliminada una duplicación accidental de Javadoc en
+  `ConsentRepository.java`, y documentado el constructor compacto de
+  `AnonymousPlayerProfile` (el único método genuinamente sin Javadoc de
+  los 61 que reportaba la lista). Commit `39ca9fa`.
+- Resultado: 506/506 métodos y constructores públicos con Javadoc
+  (100%), 499/506 completos con `@param` y `@return` (98,6%),
+  `mvn javadoc:javadoc` sin error. (Corrección 2026-09-16: la cifra
+  612/612 de la versión anterior del expediente contaba 102
+  declaraciones `record` como métodos; el conteo correcto es el del
+  párrafo anterior.)
 
 ## P5 — Validador de trazabilidad (peso 0,6)
 
@@ -222,8 +230,9 @@ _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 (`ebb5906`), P12 (`76e4e48`) y P14 (`734a79f`, `7ce1474`): los cinco
 corresponden a `Alejandro-hub19 <dpallop@uteq.edu.ec>`. Arcalle Grefa
 confirmó su conformidad el 2026-09-16 sobre los puntos que se le
-atribuyen como titular del cierre (P1, P3, P4, P5, P6, P7, P8, P9, P10,
-P11, P12, P13, P14) y sobre EV-1/EV-2/EV-3. Velez Lopez confirmó su
+atribuyen como titular del cierre (P1, P3, P5, P6, P7, P8, P9, P10,
+P11, P12, P13, P14), el cierre específico de P4 (`e666d41`, `39ca9fa`)
+y sobre EV-1/EV-2/EV-3. Velez Lopez confirmó su
 conformidad el 2026-09-16, verificando contra `git log` los commits que
 se le atribuyen en P1 (`d973292`, amenazas a la validez en
 `docs/mediciones/sus/REPORT.md`) y P13 (`fb08831`, plantilla de

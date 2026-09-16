@@ -10,7 +10,15 @@ import java.time.LocalDate;
 public final class InjuryDtos {
     private InjuryDtos() {}
 
-    /** Datos para registrar una lesión nueva. */
+    /**
+     * Datos para registrar una lesión nueva.
+     *
+     * @param studentId identificador del estudiante lesionado
+     * @param coachId identificador del entrenador que reporta, si aplica
+     * @param description descripción de la lesión
+     * @param injuryDate fecha en que ocurrió la lesión
+     * @param estimatedReturnDate fecha estimada de retorno, si se conoce
+     */
     public record RegisterInjuryRequest(
             @NotNull Long studentId,
             Long coachId,
@@ -19,10 +27,25 @@ public final class InjuryDtos {
             LocalDate estimatedReturnDate
     ) {}
 
-    /** Fecha de alta médica que cierra una lesión activa. */
+    /**
+     * Fecha de alta médica que cierra una lesión activa.
+     *
+     * @param dischargeDate fecha del alta médica
+     */
     public record DischargeRequest(LocalDate dischargeDate) {}
 
-    /** Vista de una lesión para el cliente. */
+    /**
+     * Vista de una lesión para el cliente.
+     *
+     * @param injuryId identificador de la lesión
+     * @param studentId identificador del estudiante lesionado
+     * @param student nombre del estudiante lesionado
+     * @param description descripción de la lesión
+     * @param injuryDate fecha en que ocurrió la lesión
+     * @param estimatedReturnDate fecha estimada de retorno, si se conoce
+     * @param dischargeDate fecha del alta médica, si ya se dio
+     * @param active si la lesión sigue activa
+     */
     public record InjuryResponse(
             Long injuryId,
             Long studentId,
