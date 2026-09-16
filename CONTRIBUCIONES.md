@@ -214,9 +214,11 @@ declara suyos.
 | Integrante | Correo institucional | Conforme |
 |---|---|---|
 | Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | |
-| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | |
+| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16) |
 | Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | |
 
-_Pendiente: Pallo Pinto y Velez Lopez deben revisar esta declaración y
-confirmar su conformidad (columna "Conforme") antes del cierre, en
-particular la atribución de P12/P14/P2 (Pallo Pinto) y P13 (Velez Lopez)._
+_Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
+`git log` los commits que se le atribuyen en P2 (`9f75e71`), P10
+(`ebb5906`), P12 (`76e4e48`) y P14 (`734a79f`, `7ce1474`): los cinco
+corresponden a `Alejandro-hub19 <dpallop@uteq.edu.ec>`. Pendiente:
+Velez Lopez debe revisar y confirmar la atribución de P13._
