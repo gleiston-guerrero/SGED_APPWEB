@@ -102,11 +102,17 @@ const NOMBRES_MES = [
           </section>
         }
 
-        @if (esAdministrador() && historico() && alertas(); as a) {
-          <app-graficos-ingresos
-            [datos]="historico()!"
-            [estudiantesActivos]="a.activeStudents"
-            [pendientes]="a.withPendingMembership" />
+        @if (esAdministrador()) {
+          @if (historico() && alertas(); as a) {
+            <app-graficos-ingresos
+              [datos]="historico()!"
+              [estudiantesActivos]="a.activeStudents"
+              [pendientes]="a.withPendingMembership" />
+          } @else {
+            <section class="card graficos-marcador">
+              <app-cargando [retardoMs]="0" />
+            </section>
+          }
         }
 
         @if (esOperativo()) {
@@ -298,6 +304,10 @@ const NOMBRES_MES = [
     .kpi__etiqueta { font-size: .78rem; color: var(--color-text-muted); margin-top: .15rem; }
     .mapa-marcador {
       min-height: 208px; margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .graficos-marcador {
+      min-height: 405px; margin-bottom: 1.5rem;
       display: flex; align-items: center; justify-content: center;
     }
     .lista { padding: 1.25rem; }
