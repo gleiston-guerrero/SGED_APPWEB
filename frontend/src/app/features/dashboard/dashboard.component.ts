@@ -109,8 +109,14 @@ const NOMBRES_MES = [
             [pendientes]="a.withPendingMembership" />
         }
 
-        @if (esOperativo() && mapa(); as m) {
-          <app-mapa-asistencia [datos]="m" />
+        @if (esOperativo()) {
+          @if (mapa(); as m) {
+            <app-mapa-asistencia [datos]="m" />
+          } @else {
+            <section class="card mapa-marcador">
+              <app-cargando [retardoMs]="0" />
+            </section>
+          }
         }
 
         @if (esAdministrador() && alertas(); as a) {
@@ -290,6 +296,10 @@ const NOMBRES_MES = [
     .kpi__icono--neutral { background: var(--color-neutral-bg); color: var(--color-text-faint); }
     .kpi__valor { font-size: 1.4rem; font-weight: 700; line-height: 1.1; }
     .kpi__etiqueta { font-size: .78rem; color: var(--color-text-muted); margin-top: .15rem; }
+    .mapa-marcador {
+      min-height: 208px; margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+    }
     .lista { padding: 1.25rem; }
     .lista__cabecera { margin-bottom: .9rem; }
     .lista__cabecera h2 { font-size: 1rem; }
@@ -323,7 +333,7 @@ export class DashboardComponent implements OnInit {
   readonly usuario = this.authService.currentUser;
 
   readonly sesiones = signal<SesionHoy[]>([]);
-  readonly cargandoSesiones = signal(false);
+  readonly cargandoSesiones = signal(true);
   readonly lesionesActivas = signal<number | null>(null);
   readonly activeStudents = signal<number | null>(null);
   readonly alertas = signal<PanelAlertas | null>(null);
