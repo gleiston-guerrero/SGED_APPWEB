@@ -1654,12 +1654,13 @@ igual o superior al 70 %, verificada automáticamente en la construcción.*
 - **Método de verificación:** Análisis
 
 > **Corrección (2026-09-07).** El enunciado y la cifra de abajo citaban
-> 60 % de instrucciones — ese nunca fue el valor configurado en `pom.xml`
-> (que exige **70 %**, no 60 %, en `LINE` y en `BRANCH`, sin excepciones
-> de paquete) y la cifra estaba fechada 2026-07-30, mucho antes del
-> estado actual del código. **Cifra vigente y única de todo este
-> documento**, regenerada el 2026-09-11 (tras completar el rename a
-> inglés fuera de `deportivo`): **88,38 % de
+> 60 % de instrucciones — ese sí fue el valor configurado en `pom.xml`,
+> pero solo entre el 07-jul-2026 (`00969f5`) y el 14-ago-2026
+> (`72175eb`, que lo subió a **70 %**, sin excepciones de paquete, en
+> `LINE` y en `BRANCH`, umbral vigente desde entonces) y la cifra estaba
+> fechada 2026-07-30, mucho antes del estado actual del código. **Cifra
+> vigente y única de todo este documento**, regenerada el 2026-09-11
+> (tras completar el rename a inglés fuera de `deportivo`): **88,38 % de
 > líneas (3013/3409) y 74,20 % de branches (791/1066), 665 pruebas en
 > 216 clases — CUMPLE el 70 % en ambas métricas.** Las corridas
 > intermedias de esta misma semana quedan documentadas por fecha (no por
@@ -2047,11 +2048,13 @@ sobre la que el docente-director firmó el acta de aprobación de la
 sección anterior. Tras el examen suspenso (Guía del examen suspenso,
 UTEQ, cierre 2026-09-18), el docente pidió una etiqueta nueva para el
 corte que revisa: **`v1.1.0`** (`git rev-parse v1.1.0^{commit}` resuelve
-el commit defendido vigente). `v1.0.0`, `v1.0.1`, `v1.0.2` y `v1.0.3` son
-ahora puntos de referencia históricos que ya no se mueven; `v1.1.0` es,
-por diseño (ver [`VERSIONING.md`](../../VERSIONING.md)), el único tag que
-se reasigna cada vez que se corrige algo crítico después de un corte
-anterior, siguiendo el mismo criterio que `v1.0.0` tuvo antes de él.
+el commit defendido vigente). `v1.0.0` es ahora un punto de referencia
+histórico que ya no se mueve; `v1.0.1`, `v1.0.2` y `v1.0.3` se retiraron
+el 2026-09-17 para no convivir con el corte vigente (ver
+[`VERSIONING.md`](../../VERSIONING.md)). `v1.1.0` es, por diseño, el
+único tag que se reasigna cada vez que se corrige algo crítico después
+de un corte anterior, siguiendo el mismo criterio que `v1.0.0` tuvo antes
+de él.
 
 | Rol | Nombre | Firma | Fecha |
 |---|---|---|---|
