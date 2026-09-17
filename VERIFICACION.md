@@ -407,37 +407,37 @@ grep -E "^version:\s*1\.1\.0" CITATION.cff
 **Salida:**
 ```
 $ git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
-<hash del commit defendido>  (la etiqueta se mueve al HEAD del cierre;
-  lo que importa para EV-3 es que ambos hashes coincidan)
-<hash del commit defendido>  <mismo mensaje>
+aaffcc2914a6af15f20a454be8c3abaf3b5c5f9a
+aaffcc2 fix(estudiantes): corrige el sort por defecto, rompia 500 en 6 paginas del frontend
+aaffcc2 fix(estudiantes): corrige el sort por defecto, rompia 500 en 6 paginas del frontend
 version: 1.1.0
 ```
 
-(Nota 2026-09-16: antes esta sección pegaba un hash fijo (`ebd4b69`),
-que quedó superado al mover la etiqueta — el defecto que señaló la
-revisión. Ahora la orden compara la etiqueta contra `HEAD`, sin hash
-quemado.)
+Los tres hashes coinciden: la etiqueta `v1.1.0` apunta exactamente al
+commit `HEAD`.
+
+(Nota 2026-09-17: la evaluación integral del 17-sep encontró esta
+sección con el marcador literal `<hash del commit defendido>` sin
+rellenar, y el texto seguía citando `ebd4b69` como el commit de la
+etiqueta pese a que la etiqueta ya se había movido dos veces desde
+entonces. Se pegó la salida real de la orden de arriba.)
 
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 
-**Estado:** hecho, con una advertencia importante. `v1.1.0` (etiqueta
-anotada) existe sobre el commit `ebd4b69`, siguiendo el mismo criterio
-que `VERSIONING.md` ya documentaba para `v1.0.0` (el único tag de esta
-familia que se reasigna a propósito): `v1.1.0` es ahora ese tag para el
-examen suspenso, y `v1.0.0` queda fijo como punto histórico. La
-portada, `CITATION.cff`, el README y el encabezado/§7 del SRS ya citan
-`v1.1.0`.
+**Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD`
+(`aaffcc2`), el commit final que se defiende, siguiendo el mismo
+criterio que `VERSIONING.md` ya documentaba para `v1.0.0` (el único tag
+de esta familia que se reasigna a propósito). La portada,
+`CITATION.cff`, el README y el encabezado/§7 del SRS ya citan `v1.1.0`.
 
-**Pero esto NO es el commit final** — se creó ahora, en paralelo a que
-el equipo gestiona P13, para poder avanzar. **Hay que moverla de nuevo**
-(`git tag -f -a v1.1.0 -m "..." <commit final>` + `git push -f origin
-v1.1.0`) cuando: (a) cierre P13, (b) se genere `SRS-v1.1.0.pdf` (P7), y
-(c) se regenere el PDF del informe una última vez con `make docs` sobre
-el commit realmente final. El DOI de Zenodo (P3) sigue anclado a
-`v1.0.0` — republicarlo sobre el `v1.1.0` definitivo es la última
-acción, después de mover la etiqueta, y antes hay que confirmar que la
-integración GitHub↔Zenodo sigue habilitada para
-`gleiston-guerrero/SGED_APPWEB` tras la transferencia de propiedad.
+Las etiquetas `v1.0.1`, `v1.0.2` y `v1.0.3` (pre-final, superadas por
+`v1.1.0`) se retiraron del repositorio — ya no coexisten con la
+etiqueta vigente, que era la observación de la guía y de la evaluación
+integral. El DOI de Zenodo (P3) sigue anclado a `v1.0.0`; republicarlo
+sobre `v1.1.0` queda fuera del alcance de este examen suspenso (no lo
+exige la guía) y depende de que la integración GitHub↔Zenodo siga
+habilitada para `gleiston-guerrero/SGED_APPWEB` tras la transferencia
+de propiedad.
 
 ---
 
@@ -668,11 +668,11 @@ cierran los pendientes.
 | P1 | Hecho |
 | P2 | Hecho |
 | P3 | Hecho |
-| P4 | Hecho — 100% real (612/612), tras corregir un defecto del script de conteo |
+| P4 | Hecho — 100% real (503/503), tras corregir un defecto del script de conteo que contaba `record` y `@interface` como métodos (antes daba 612/612) |
 | P5 | Hecho |
 | P6 | Hecho — revisión visual de los 4 PNG completada (2026-09-15) |
 | P7 | Hecho |
-| P8 | Hecho — etiqueta `v1.1.0` creada, **se moverá de nuevo** al commit final |
+| P8 | Hecho — etiqueta `v1.1.0` sobre `HEAD` (`aaffcc2`), commit final defendido |
 | P9 | Hecho — revisión manual de los 277 tipos completada (2026-09-15) |
 | P10 | Hecho |
 | P11 | Hecho |
