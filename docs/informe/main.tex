@@ -1396,10 +1396,19 @@ decisiones arquitectónicas (ADR)~\cite{nygard2011adr} se mantienen en
 \ruta{docs/arquitectura/} y \ruta{docs/adr/}.
 
 El modelo C4 completo (niveles 1 a 3) vive en un único archivo
-\ruta{docs/arquitectura/workspace.dsl} escrito en Structurizr DSL. Los tres
-PNG del mismo directorio son artefactos derivados: se regeneran con
+\ruta{docs/arquitectura/workspace.dsl} escrito en Structurizr DSL. Los PNG
+del mismo directorio son artefactos derivados: se regeneran con
 \texttt{make diagrams}, que exporta el DSL a PlantUML y lo renderiza, ambos
-pasos en contenedores. Esto cierra un problema real de esta entrega: antes
+pasos en contenedores. El nivel 3 completo (\ruta{L3-componentes.png}, los
+veinte componentes de los tres dominios en un solo lienzo) se conserva como
+referencia, pero a partir de esta revisión el cuerpo del informe usa la
+versión dividida por dominio (\ruta{L3-seguridad.png},
+\ruta{L3-academico.png}, \ruta{L3-deportivo.png}) — el docente pidió
+explícitamente que los diagramas grandes se dividan por módulo para que se
+puedan leer impresos; el lienzo completo, con los veinte componentes a la
+vez, quedaba con letra de 2--3\,pt y era ilegible en papel (evaluación
+integral del examen suspenso, 17-sep-2026). Esto cierra un problema real de
+esta entrega: antes
 coexistían dos modelos C4 —el DSL y unos \texttt{.puml} sueltos en
 \ruta{docs/diagramas/}— y los \texttt{.puml} habían quedado congelados en
 la arquitectura anterior a la reestructuración de paquetes. Se eliminaron
@@ -1422,12 +1431,31 @@ verificable en el diagrama, no solo declarada en el texto.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{../arquitectura/L3-componentes.png}
-\caption{C4 nivel 3 — componentes del contenedor API Spring Boot, generado desde \ruta{docs/arquitectura/workspace.dsl}.}
-\label{fig:c4-l3}
+\includegraphics[width=\textwidth]{../arquitectura/L3-seguridad.png}
+\caption{C4 nivel 3 — componentes del dominio \texttt{seguridad}, generado desde \ruta{docs/arquitectura/workspace.dsl}.}
+\label{fig:c4-l3-seguridad}
 \end{figure}
 
-Dos detalles del diagrama de la Figura~\ref{fig:c4-l3} merecen lectura
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../arquitectura/L3-academico.png}
+\caption{C4 nivel 3 — componentes del dominio \texttt{academico}, generado desde \ruta{docs/arquitectura/workspace.dsl}.}
+\label{fig:c4-l3-academico}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{../arquitectura/L3-deportivo.png}
+\caption{C4 nivel 3 — componentes del dominio \texttt{deportivo}, generado desde \ruta{docs/arquitectura/workspace.dsl}.}
+\label{fig:c4-l3-deportivo}
+\end{figure}
+
+Las tres figuras juntas (\ref{fig:c4-l3-seguridad}--\ref{fig:c4-l3-deportivo})
+son la misma vista de componentes que antes se imprimía como un solo
+lienzo con los veinte componentes a la vez (\ruta{L3-componentes.png},
+que se conserva en el repositorio como referencia, sin imprimirse aquí),
+dividida por dominio para que el texto de cada componente sea legible
+impreso. Dos detalles merecen lectura
 explícita. Primero,
 \texttt{StudentRepository} es el único repositorio que invoca
 procedimientos almacenados (sección~\ref{sec:acceso-datos}): el resto usa
