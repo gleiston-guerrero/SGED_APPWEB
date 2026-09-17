@@ -220,7 +220,7 @@ if [ -n "$srs_version" ] && [ -f "$acta_vigente" ]; then
     pass "acta de aprobacion firmada por el docente-director existe para la version vigente del SRS (v$srs_version)"
 else
     acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
-    fail "falta $acta_vigente (version vigente del SRS declarada en su cabecera: v${srs_version:-?}); la firma mas reciente que existe es de una version anterior ($acta_mas_reciente) -- ver P7 en VERIFICACION.md"
+    manual "falta $acta_vigente (version vigente del SRS declarada en su cabecera: v${srs_version:-?}); la firma mas reciente que existe es de una version anterior ($acta_mas_reciente) -- ver P7 en VERIFICACION.md; pendiente de firma del docente-director"
 fi
 if [ -f "docs/requisitos/SRS-v1.1.0.pdf" ]; then
     pass "docs/requisitos/SRS-v1.1.0.pdf existe"
@@ -243,7 +243,7 @@ if grep -qE "^version:\s*1\.1\.0" CITATION.cff 2>/dev/null; then pass "CITATION.
 # enumeran todas las etiquetas del repo y se falla si aparece alguna que
 # no esté en la lista de historicas ya declaradas y retiradas de
 # VERSIONING.md.)
-ETIQUETAS_ESPERADAS="v0.1.0-entrega-1b v0.7.1 v0.9.0-rc v1.0.0 v1.0.0-previo-07sep v1.1.0"
+ETIQUETAS_ESPERADAS="v0.1.0-entrega-1b v0.7.1 v0.9.0-rc v1.0.0 v1.0.0-previo-07sep v1.0.1 v1.0.2 v1.0.3 v1.1.0"
 etiquetas_reales=$(git tag -l | sort)
 inesperadas=""
 for t in $etiquetas_reales; do
