@@ -68,6 +68,18 @@ if python3 scripts/javadoc-coverage.py 90; then pass "cobertura de Javadoc >=90%
 
 # ---------------------------------------------------------------------
 section "P5 -- validate-traceability.sh propaga el codigo de salida"
+# Guarda real: valida docs/trazabilidad/matriz.csv tal cual esta en el
+# repositorio (sin copias ni filas inyectadas). Sin esta linea, verify.sh
+# nunca mira el archivo real -- solo probaba que el validador SABE
+# detectar filas rotas en copias sinteticas, no que make verify falle si
+# la matriz real se rompe (hallazgo de la evaluacion integral del 17-sep).
+salida_real="$(bash scripts/validate-traceability.sh 2>&1)"
+if [ $? -eq 0 ]; then
+    pass "docs/trazabilidad/matriz.csv (la matriz real) valida sin violaciones"
+else
+    fail "docs/trazabilidad/matriz.csv (la matriz real) tiene violaciones: $(printf '%s\n' "$salida_real" | grep -m1 'VIOLACIÓN' || printf '%s\n' "$salida_real" | tail -1)"
+fi
+
 # Ruptura real: copia temporal de la matriz con una fila sin trazabilidad.
 # (Corrección 2026-09-16: antes se pasaban rutas inexistentes, lo que solo
 # probaba el manejo de archivos faltantes, no la validación de contenido.)
@@ -176,8 +188,14 @@ section "P12 -- una sola cifra de umbral de cobertura en todo el entregable"
 # texto versionados, reconoce 60 % / 60\% / 60\,\% / 0.60 / 0,60, y
 # excluye únicamente los contextos históricos explícitos: la cita de la
 # observación original en OBSERVACIONES.md, las notas de corrección que
-# dicen que el 60 % nunca fue el valor configurado, y los documentos
-# anotados como históricos.)
+# explican que el 60 % sí fue el valor configurado pero solo entre
+# 2026-07-07 y 2026-08-14 (ya no "nunca fue el valor configurado" --
+# esa frase era falsa, corregida el 2026-09-17), y los documentos
+# anotados como históricos. docs/informe-entrega-3.pdf no se revisa
+# -- ningún .pdf lo está, ver la nota de P12 en VERIFICACION.md -- por
+# lo que sus menciones de "mínimo de 60 %" (artefacto congelado de la
+# Tercera Entrega, sin fuente LaTeX versionada para regenerarlo) quedan
+# fuera de esta comprobación automática por diseño, no por descuido.)
 pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -u)
 stray=$(git grep -n -E 'COVEREDRATIO\s*>=\s*0\.60|umbral[^.]{0,60}(60|0[.,]60)\s*(\\?,\s*\\?%|%)|(60|0[.,]60)\s*(\\?,\s*\\?%|%)[^.]{0,60}umbral|≥\s*60\s*%|>=?\s*0\.60' -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"

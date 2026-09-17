@@ -281,11 +281,50 @@ exit=0
 una orden con rutas inexistentes y la salida recortada con `[...]`;
 arriba está la ruptura real de una fila y la salida íntegra.)
 
-**Respalda:** [`scripts/validate-traceability.sh`](scripts/validate-traceability.sh) (usa `exec`, por lo que ya propaga el código de salida de `validate-traceability.py`)
+**El criterio literal de la guía — "romper una fila real de la matriz
+hace fallar `make verify`" — con una fila real, no sintética:**
+
+```bash
+bash scripts/test-verify-fails-on-real-row.sh
+```
+
+```
+== docs/trazabilidad/matriz.csv real, con RF-01 corrompida in situ ==
+== corriendo 'bash scripts/verify.sh' completo (make verify) ==
+
+OK: romper la fila real RF-01 (prueba_automatizada -> metodo inexistente)
+    hace fallar 'bash scripts/verify.sh' con codigo de salida 1.
+
+-- fragmento relevante de la salida de verify.sh --
+== P5 -- validate-traceability.sh propaga el codigo de salida ==
+  FALLA: docs/trazabilidad/matriz.csv (la matriz real) tiene violaciones: VIOLACIÓN: la matriz cita ClaseQueNoExisteTest.metodoFantasma pero no existe la clase de prueba ClaseQueNoExisteTest.
+  PASA: el validador imprime la VIOLACIÓN y sale con codigo 1 ante fila rota real
+  FALLA: scripts/test-validate-traceability.sh falla
+```
+
+El script corrompe la columna `prueba_automatizada` de `RF-01` (fila
+real del proyecto, no inventada), corre `bash scripts/verify.sh`
+completo contra ese archivo, confirma el fallo, y restaura el original
+—`docs/trazabilidad/matriz.csv` queda intacto al terminar—.
+
+(Nota 2026-09-17: la evaluación integral señaló que la prueba anterior
+solo agregaba una fila sintética a una *copia*, y nunca mostraba
+`make verify` fallando sobre el archivo real. Dos correcciones: (a)
+`scripts/verify.sh` ahora valida también `docs/trazabilidad/matriz.csv`
+tal cual está en el repositorio, sin copias — antes nunca miraba el
+archivo real, solo probaba que el validador *sabe* detectar filas
+rotas en copias; (b) se agregó `scripts/test-verify-fails-on-real-row.sh`,
+que corrompe una fila real y lo demuestra end-to-end. No se integró
+dentro de `scripts/verify.sh` porque este ya invoca a
+`scripts/test-validate-traceability.sh`, y ese script a su vez invoca a
+`verify.sh` completo — crearía recursión infinita.)
+
+**Respalda:** [`scripts/validate-traceability.sh`](scripts/validate-traceability.sh) (usa `exec`, por lo que ya propaga el código de salida de `validate-traceability.py`), [`scripts/test-verify-fails-on-real-row.sh`](scripts/test-verify-fails-on-real-row.sh)
 
 **Estado:** hecho. El script sí falla con código distinto de cero; el
-defecto real era que nada lo invocaba automáticamente — `make verify`
-(este mismo expediente) ya lo hace en cada corrida.
+defecto real era que nada lo invocaba automáticamente sobre el archivo
+real — `make verify` ahora lo hace en cada corrida, y el script de
+arriba demuestra el caso extremo (fila real rota) end-to-end.
 
 ---
 
@@ -545,12 +584,26 @@ de texto versionados (`git grep`, reconoce `60 %` / `60\%` /
 `60\,\%` / `0.60` / `0,60`) y solo excluye contextos históricos
 explícitos: la cita de la observación original en
 `docs/observaciones/OBSERVACIONES.md`, las notas de corrección que
-dicen que el 60 % nunca fue el valor configurado (`main.tex:2583`,
-`SRS.md:1657-1658`), y los documentos anotados como históricos
-(`VERSIONING.md`, spec del 2026-08-12). Además se corrigió la única
-afirmación viva falsa (el quality gate de
-`docs/iso25010-atributos-calidad.md:20` declaraba un umbral menor que
-el configurado → ahora `0.70`, igual que `pom.xml`).)
+explican que el 60 % sí fue el valor configurado, pero solo entre
+2026-07-07 y 2026-08-14 (`main.tex:2582-2583`, `SRS.md:1656-1658` —
+corregidas el 2026-09-17: antes decían, de forma falsa, que el 60 %
+"nunca fue el valor configurado"; ver más abajo y Piso 3), y los
+documentos anotados como históricos (`VERSIONING.md`, spec del
+2026-08-12). Además se corrigió la única afirmación viva falsa (el
+quality gate de `docs/iso25010-atributos-calidad.md:20` declaraba un
+umbral menor que el configurado → ahora `0.70`, igual que `pom.xml`).)
+
+**Sobre `docs/informe-entrega-3.pdf`** (evaluación integral, 17-sep):
+ese PDF (artefacto de la Tercera Entrega, una milestone anterior a la
+Entrega Final) todavía dice "mínimo de 60 %" en varias páginas. No lo
+detecta ninguna comprobación automática porque `scripts/verify.sh` no
+revisa contenido de PDF en general (ni este ni ningún otro), y no tiene
+una fuente LaTeX versionada en este repositorio desde la cual
+regenerarlo — es un artefacto congelado de un hito ya cerrado y
+calificado. Se declara aquí como fuera de alcance de este punto (el
+umbral vigente y único de *este* entregable, el examen suspenso, es
+70 %); no se retira ni se edita el PDF porque alteraría un entregable
+ya evaluado en su momento.
 
 **Respalda:** [`backend/pom.xml`](backend/pom.xml), [`scripts/verify.sh`](scripts/verify.sh) (sección P12)
 
@@ -680,11 +733,12 @@ cierran los pendientes.
 | P13 | Hecho — 15 constancias reales verificadas y marcadas `OBTENIDO` (2026-09-15) |
 | P14 | Hecho |
 
-`bash scripts/verify.sh` / `make verify`: **25 comprobaciones pasan, 0
+`bash scripts/verify.sh` / `make verify`: **26 comprobaciones pasan, 0
 fallan, 2 quedan marcadas por el script como "revisión manual" (P6, P9)
 porque el propio script no puede automatizarlas** (grep no lee imágenes
 rasterizadas ni sustituye un vistazo humano a una lista) — corrida el
-2026-09-15 sobre el commit vigente, después de cerrar P13 y P4. La
+2026-09-17, tras agregar la comprobación de P5 sobre la matriz real
+(antes eran 25; ver esa sección). La
 revisión manual de P6 y P9 ya se hizo y está documentada en sus
 secciones. Código de salida: 0.
 
