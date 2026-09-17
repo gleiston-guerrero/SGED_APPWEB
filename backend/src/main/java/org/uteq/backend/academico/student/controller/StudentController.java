@@ -38,7 +38,7 @@ public class StudentController {
      * @param page número de página (desde 0)
      * @param size tamaño de página
      * @param sort par {@code campo[,asc|desc]}; por defecto
-     *             {@code idEstudiante,asc}
+     *             {@code id,asc}
      * @param auth sesión autenticada; determina si el peso y la altura se
      *             incluyen en la response (RF-11b: {@code RECEPCIONISTA} no los ve)
      * @return {@code 200 OK} con la página solicitada
@@ -48,7 +48,7 @@ public class StudentController {
     public ResponseEntity<StudentPageResponse<StudentResponse>> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "idEstudiante,asc") String[] sort,
+            @RequestParam(defaultValue = "id,asc") String[] sort,
             Authentication auth) {
         String campo = sort[0];
         Sort.Direction dir = sort.length > 1 && "desc".equalsIgnoreCase(sort[1])
