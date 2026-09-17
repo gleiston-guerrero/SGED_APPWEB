@@ -10,7 +10,7 @@ y ruta del archivo que la respalda.
 desde un clon limpio y su código de salida es 0 solo si todo pasa.
 
 Commit sobre el que se corrió esta versión del expediente:
-`7f6f4241e2081e182f4ac25ad2d2bca3f56311ed` (cierre de P13).
+`0ecf27a3deb81fe4b831de3e0b9df49ad70ae48b` (cierre de P13).
 
 > **Nota de método.** Varios de los 14 pendientes que describe la guía ya
 > tenían trabajo sustantivo hecho en el repositorio al momento de escribir
@@ -385,9 +385,11 @@ PASA: sin coincidencias del diccionario de terminos en español dentro de mermai
 
 **Estado:** hecho. Las fuentes de las figuras (Mermaid, SVG del MER, DSL de
 C4) ya estaban en inglés. Revisión manual completada el 2026-09-15: se
-abrieron a simple vista los 4 PNG rasterizados que el grep no puede cubrir
+abrieron a simple vista los 10 PNG rasterizados que el grep no puede cubrir
 (`docs/arquitectura/L1-contexto.png`, `L2-contenedores.png`,
-`L3-componentes.png`, `docs/diagramas/mer-profutbol.png`) — los cuatro
+`L3-academico.png`, `L3-deportivo.png`, `L3-seguridad.png`, `L3-componentes.png`,
+`docs/diagramas/mer-academico.png`, `mer-deportivo.png`, `mer-inventario.png`,
+`mer-seguridad.png`, `mer-profutbol.png`) — los diez
 están 100% en inglés (títulos, entidades, atributos y notas), sin ningún
 término en español.
 
@@ -521,9 +523,9 @@ grep -E "^version:\s*1\.1\.0" CITATION.cff
 **Salida:**
 ```
 $ git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
-aaffcc2914a6af15f20a454be8c3abaf3b5c5f9a
-aaffcc2 fix(estudiantes): corrige el sort por defecto, rompia 500 en 6 paginas del frontend
-aaffcc2 fix(estudiantes): corrige el sort por defecto, rompia 500 en 6 paginas del frontend
+0ecf27a3deb81fe4b831de3e0b9df49ad70ae48b
+0ecf27a3 fix(examen-suspenso): P2 r2rs, P6/P8 expediente, PDF regenerado, CITATION
+0ecf27a3 fix(examen-suspenso): P2 r2rs, P6/P8 expediente, PDF regenerado, CITATION
 version: 1.1.0
 ```
 

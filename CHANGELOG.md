@@ -273,8 +273,7 @@ docente (M1–M3).
   `structurizr/structurizr` y `plantuml/plantuml` en contenedores. Se
   documenta que la imagen `structurizr/cli` quedó deprecada y su entrypoint
   ya no exporta nada.
-- Retirado `docs/informe-entrega-3.pdf` (sin fuente `.tex`/`.docx`
-  versionada); `docs/informe/main.tex` queda como único informe oficial.
+- Mantenido `docs/informe-entrega-3.pdf` como evidencia histórica de la Entrega 3 (sin fuente `.tex`/.docx` versionada); `docs/informe/main.tex` queda como único informe oficial.
 - Colisión de numeración `ADR-003` resuelta (el propio pasa a `ADR-007`).
 
 ### Seguridad
