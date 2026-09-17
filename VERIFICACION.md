@@ -650,9 +650,23 @@ diseño de `plantilla.md`: quedan fuera del control de versiones en
 equipo). Solo el número de participante anónimo y la ruta externa quedan
 en `registro.md`.
 
-Esto también desbloquea a **P1**: con el consentimiento cerrado, la
-medición SUS (15 respuestas, Brooke, IC con t de Student) ya es válida
-para citarse en el informe.
+**Hallazgo repetido por las dos evaluaciones (examen suspenso y
+evaluación integral, 16/17-sep): esto no es verificable por nadie fuera
+del equipo.** No hay forma de corregir eso por completo desde el
+repositorio — el consentimiento sigue siendo retroactivo (firmado el
+14-sep para sesiones de julio/agosto, declarado como tal arriba, no
+disfrazado) y los originales, por diseño, no pueden subirse. Lo único
+que se agregó (2026-09-17): el hash SHA-256 de cada uno de los 15
+`.docx` reales, en la sección "Verificación de integridad (SHA-256)" de
+[`registro.md`](docs/etica/consentimiento/registro.md#verificación-de-integridad-sha-256).
+Eso prueba que los 15 archivos existen y no cambiaron desde esa fecha,
+sin exponer nombres ni firmas — pero **no** reemplaza mostrar los
+originales en la defensa, que sigue siendo la única forma de que este
+punto pase de "no verificable" a "verificado".
+
+Esto también desbloquea a **P1**: con el consentimiento cerrado (con la
+misma reserva de arriba), la medición SUS (15 respuestas, Brooke, IC con
+t de Student) ya es válida para citarse en el informe.
 
 ---
 
