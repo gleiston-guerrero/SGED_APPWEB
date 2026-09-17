@@ -19,6 +19,47 @@ Commit sobre el que se corrió esta versión del expediente:
 > asumir que hay que rehacerlo. Lo que de verdad falta queda marcado como
 > **FALTA** con la orden que lo va a comprobar una vez cerrado.
 
+## EV-2 — Endurecimiento contra mutaciones (2026-09-17)
+
+La evaluación integral del examen suspenso corrió 13 mutaciones
+deliberadas contra `scripts/verify.sh` (romper una fila real de la
+matriz, agregar filas basura al CSV del SUS, apuntar Lighthouse a
+`localhost`, quitar el MoSCoW de un requisito, borrar `@param`/`@return`,
+agregar clases en español, crear una segunda etiqueta, frases de "60%"
+con otra redacción, alterar p-valores en el REPORT): 11 de 13 pasaron
+cuando deberían haber fallado. El defecto de fondo, repetido en varios
+puntos: los chequeos confirmaban que *algo con la forma correcta existe*
+(un archivo, una cuenta ≥ N, una palabra clave), no que el *contenido*
+fuera el correcto.
+
+Endurecido en esta ronda (verificado reproduciendo cada mutación exacta
+y confirmando que ahora `bash scripts/verify.sh` falla, luego
+restaurando el archivo):
+
+| Punto | Mutación que antes pasaba | Chequeo nuevo |
+|---|---|---|
+| P1 | Agregar filas basura al CSV (el conteo ">=15" no distingue basura de datos reales) | Valida forma de cada fila: 21 columnas, `participante` con forma `ENC-NN`, `p1`..`p10` enteros 1-5 |
+| P2 | Cambiar el `requestedUrl` de una corrida de Lighthouse a `localhost` (con 9+9 corridas archivadas, sobran para seguir pasando el umbral de "≥3 válidas") | Exige que **todas** las corridas encontradas sean válidas, no solo ≥3 |
+| P7 | Quitar el MoSCoW de un requisito puntual (79 de 80 sigue siendo ">0") | Verifica requisito por requisito que cada uno (salvo los 2 contenedores declarados, RF-19/RNF-23) tenga su propia línea `MoSCoW:` |
+| P8 | Crear una segunda etiqueta cualquiera (el chequeo solo confirmaba que `v1.1.0` existe, nunca que fuera la única activa) | Enumera todas las etiquetas del repo y falla si aparece alguna fuera de la lista histórica declarada en `VERSIONING.md` |
+| P10 | La tabla resumen de roles puede desincronizarse de la tabla de conteo real sin que nada lo note (así estaba: a Arcalle le faltaba `Writing – review & editing` con el conteo más alto de los tres) | Cruza programáticamente ambas tablas de `CONTRIBUTORS.md`; falla si a alguien le falta en su lista un rol con conteo > 0 |
+| P14 | Editar a mano un p-valor en `REPORT.md` (los chequeos solo confirmaban que la tabla existe) | Regenera `REPORT.md` desde los `*.samples.json` reales y lo compara contra el versionado, ignorando las 3 líneas de metadato que cambian por diseño (Fecha, Commit, Herramienta) |
+
+**No endurecido, declarado como límite conocido (no oculto):**
+- **P4** (borrar todos los `@param`/`@return`): requeriría parsear la firma de cada método para saber cuántos `@param` esperar — no se hizo por el riesgo de un parser frágil bajo el plazo del examen suspenso. Ya está declarado en la sección P4 de este documento que el `pom.xml` usa `doclint all,-missing`, que desactiva justo esa detección.
+- **P9** (agregar clases en español fuera del diccionario heurístico): el chequeo es, por diseño, un diccionario fijo de palabras — no puede enumerar todo el español. Por eso P9 ya queda marcada `PENDIENTE (revisión manual)` en `scripts/verify.sh`, no solo automática.
+- **P3, P6, P12**: ya se habían endurecido en la ronda anterior (16/17-sep); no se repitieron aquí porque las mutaciones de la evaluación integral sobre estos puntos (DOI, figuras, umbral) no encontraron nada nuevo que la ronda anterior no cubriera.
+
+Después de este endurecimiento, `bash scripts/verify.sh` tiene 5
+aserciones nuevas (P1, P7, P8, P10, P14; P2 se hizo más estricta sin
+agregar una aserción nueva) y pasa de **26/0/2** a **29/1/2**
+(pasan/fallan/manual). El único fallo nuevo es real y esperado: el
+chequeo endurecido de P7 (más abajo) ahora exige que el acta firmada
+cubra la versión vigente del SRS, y hoy no la cubre — antes pasaba en
+falso. **`make verify` ya no sale en verde hasta que el docente firme
+la v1.11**, lo cual es correcto: ese fallo describe el estado real, no
+un defecto del script.
+
 ---
 
 ## P1 — Respuestas del SUS (peso 1,3)
@@ -387,27 +428,41 @@ regeneró para reflejar las 35 tablas reales; no es un cambio pedido por
 la guía del examen suspenso (el MER no aparece en los 14 puntos) pero sí
 corrige un dato desactualizado que convenía no dejar pasar.
 
+**Defecto real señalado por la evaluación integral (17-sep) y corregido:**
+los 8 PNG divididos por dominio/módulo se generaron el 16-sep, pero
+`docs/informe/main.tex` seguía imprimiendo el lienzo único
+`L3-componentes.png` (letra de 2–3\,pt, ilegible) — la división existía
+como archivo, pero nunca se conectó al informe. Corregido: la
+sección~3.4 del informe ("Vista de componentes (C4 nivel 3)") ahora
+imprime las tres figuras por dominio (`L3-seguridad.png`,
+`L3-academico.png`, `L3-deportivo.png`), cada una a ancho de página
+completo; `L3-componentes.png` se conserva en el repositorio como
+referencia, mencionada en el texto pero sin imprimirse. PDF regenerado
+(74 páginas, 0 errores, 0 referencias sin resolver).
+
 ---
 
 ## P7 — SRS firmado, con MoSCoW (peso 0,8)
 
 **Orden:**
 ```bash
-grep -c "MoSCoW:" docs/requisitos/SRS.md
-ls docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf
-ls docs/requisitos/SRS-v1.1.0.pdf
+bash scripts/verify.sh 2>&1 | grep -A3 'P7 --'
 ```
 
 **Salida:**
 ```
-80
-docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf
-docs/requisitos/SRS-v1.1.0.pdf
+== P7 -- SRS firmado, versionado y con MoSCoW ==
+  80 requisitos evaluables (excluye 2 contenedores); faltan MoSCoW: []
+  PASA: cada requisito individual del SRS trae su propio MoSCoW explicito
+  FALLA: falta docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf (version vigente del SRS declarada en su cabecera: v1.11); la firma mas reciente que existe es de una version anterior (docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf) -- ver P7 en VERIFICACION.md
+  PASA: docs/requisitos/SRS-v1.1.0.pdf existe
 ```
 
 **Respalda:** [`docs/requisitos/SRS.md`](docs/requisitos/SRS.md), [`docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf`](docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf)
 
-**Estado:** hecho. `docs/requisitos/SRS-v1.1.0.pdf` existe (64 páginas),
+**Estado:** parcial. MoSCoW y el PDF versionado están hechos; la firma
+del docente-director sigue sin cubrir la versión vigente (ver más
+abajo). `docs/requisitos/SRS-v1.1.0.pdf` existe (64 páginas),
 generado con un pipeline nuevo y reproducible:
 [`scripts/build-srs-pdf.sh`](scripts/build-srs-pdf.sh) / `make srs` —
 Markdown → HTML autocontenido (`pandoc --embed-resources`, incrusta las
@@ -432,6 +487,26 @@ adelante. `docs/requisitos/SRS.pdf` (la copia "viva", sin versión en el
 nombre) también se regeneró con el mismo comando, porque estaba
 desactualizada desde el 2026-09-12 (le faltaban los cambios de URL del
 repositorio y de etiqueta de los commits de esta sesión).
+
+**Pendiente real, sin solución posible desde el repositorio: la firma
+cubre la v1.8, no la v1.11 vigente.** Tanto la guía original como la
+evaluación integral señalan esto — el acta firmada por el
+docente-director (`ACTA-APROBACION-SRS-v1.8.pdf`) aprueba explícitamente
+la v1.8, y el propio acta exige volver a someter el documento si cambia.
+`scripts/verify.sh` antes solo comprobaba que existiera *algún* acta
+firmada, pasando aunque fuera de una versión vieja. **Corregido
+(2026-09-17):** el chequeo ahora lee la versión vigente del SRS
+directamente de su cabecera (`docs/requisitos/SRS.md:4`, "Versión del
+documento") y exige un acta con ese número exacto en el nombre —
+`ACTA-APROBACION-SRS-v1.11.pdf` mientras la cabecera diga 1.11. Hoy
+correctamente **FALLA** (es la verdad: no existe firma para v1.11).
+**Preparado para cuando el docente firme:** cuando llegue esa firma,
+subir el PDF con el nombre exacto `docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf`
+(o el número de versión que tenga el SRS en ese momento) hace que este
+chequeo pase a `PASA` automáticamente, sin volver a tocar
+`scripts/verify.sh`. Probado en esta sesión copiando el acta de v1.8 con
+el nombre de v1.11 (cambia el resultado a `PASA`) y restaurado sin dejar
+el archivo de prueba.
 
 ---
 
@@ -539,6 +614,20 @@ editable en el script. Cuatro roles (Investigation, Methodology, Project
 administration, Supervision) incluyen trabajo real que no deja huella en
 archivos (reuniones con la escuela, coordinación) — se declaran así en
 vez de inventarles un número.
+
+**Defecto real señalado por la evaluación integral (17-sep) y corregido:**
+la tabla resumen "Integrante | Roles (CRediT)" de `CONTRIBUTORS.md`
+estaba desincronizada de esta misma tabla de conteo, y no solo en
+`Resources` (que fue lo único que señaló la evaluación) — a Arcalle
+Grefa le faltaban además `Methodology`, `Visualization`, `Writing –
+original draft` y `Writing – review & editing`, este último con el
+conteo más alto de los tres (87–102, según metodología). A Vélez López
+le faltaban `Data curation`, `Formal analysis`, `Visualization` y
+`Writing – original draft`. Se regeneró la lista de cada integrante
+directamente desde los roles con conteo distinto de cero de esta tabla.
+`scripts/verify.sh` ahora cruza ambas tablas programáticamente (sección
+EV-2 más arriba) para que esta desincronización no pueda volver a pasar
+inadvertida.
 
 ---
 
@@ -738,7 +827,7 @@ cierran los pendientes.
 | P4 | Hecho — 100% real (503/503), tras corregir un defecto del script de conteo que contaba `record` y `@interface` como métodos (antes daba 612/612) |
 | P5 | Hecho |
 | P6 | Hecho — revisión visual de los 4 PNG completada (2026-09-15) |
-| P7 | Hecho |
+| P7 | Parcial — MoSCoW y PDF versionado hechos; falta firma del docente-director para la v1.11 vigente (solo cubre v1.8) |
 | P8 | Hecho — etiqueta `v1.1.0` sobre `HEAD` (`aaffcc2`), commit final defendido |
 | P9 | Hecho — revisión manual de los 277 tipos completada (2026-09-15) |
 | P10 | Hecho |
@@ -747,12 +836,17 @@ cierran los pendientes.
 | P13 | Hecho — 15 constancias reales verificadas y marcadas `OBTENIDO` (2026-09-15) |
 | P14 | Hecho |
 
-`bash scripts/verify.sh` / `make verify`: **26 comprobaciones pasan, 0
-fallan, 2 quedan marcadas por el script como "revisión manual" (P6, P9)
+`bash scripts/verify.sh` / `make verify`: **29 comprobaciones pasan, 1
+falla, 2 quedan marcadas por el script como "revisión manual" (P6, P9)
 porque el propio script no puede automatizarlas** (grep no lee imágenes
 rasterizadas ni sustituye un vistazo humano a una lista) — corrida el
-2026-09-17, tras agregar la comprobación de P5 sobre la matriz real
-(antes eran 25; ver esa sección). La
+2026-09-17, tras el endurecimiento contra las 13 mutaciones de la
+evaluación integral (sección "EV-2 — Endurecimiento contra mutaciones"
+al inicio de este documento; antes eran 26/0/2). **El único fallo es
+real, no un defecto del script:** el chequeo de P7 ahora exige que el
+acta firmada cubra la versión vigente del SRS (v1.11), y solo existe
+firma para la v1.8 — ver esa sección. Queda a propósito así, en vez de
+maquillarlo, hasta que el docente firme. La
 revisión manual de P6 y P9 ya se hizo y está documentada en sus
 secciones. Código de salida: 0.
 

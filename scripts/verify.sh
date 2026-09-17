@@ -24,6 +24,42 @@ section() { echo; echo "== $1 =="; }
 section "P1 -- SUS: respuestas reales, Brooke, IC con t de Student"
 n_resp=$(($(wc -l < docs/mediciones/sus/respuestas.csv) - 1))
 if [ "$n_resp" -ge 15 ]; then pass "respuestas.csv tiene $n_resp participantes (>=15)"; else fail "respuestas.csv tiene $n_resp participantes (<15)"; fi
+# (Corrección 2026-09-17, evaluación integral: contar lineas no distingue
+# 15 respuestas reales de 15 filas basura -- ">=15" pasa igual con
+# cualquier contenido. Valida forma: 21 columnas, participante ENC-NN,
+# p1..p10 enteros 1-5.)
+csv_errores=$(python3 - docs/mediciones/sus/respuestas.csv <<'PYEOF'
+import csv, re, sys
+ruta = sys.argv[1]
+with open(ruta, newline='', encoding='utf-8') as f:
+    filas = list(csv.reader(f))
+cabecera = filas[0]
+esperado = 21
+errores = []
+for fila in filas[1:]:
+    if len(fila) != esperado:
+        errores.append(f"{fila[0] if fila else '?'}: {len(fila)} columnas, se esperaban {esperado}")
+        continue
+    d = dict(zip(cabecera, fila))
+    problemas = []
+    if not re.fullmatch(r'ENC-\d+', d.get('participante', '')):
+        problemas.append('id no tiene forma ENC-NN')
+    for p in [f'p{i}' for i in range(1, 11)]:
+        v = d.get(p, '')
+        if not (v.isdigit() and 1 <= int(v) <= 5):
+            problemas.append(f"{p} fuera de rango 1-5")
+            break
+    if problemas:
+        errores.append(f"{d.get('participante', '?')}: {', '.join(problemas)}")
+print(f"{len(errores)} fila(s): " + '; '.join(errores[:5]) + (' ...' if len(errores) > 5 else '') if errores else '')
+sys.exit(1 if errores else 0)
+PYEOF
+)
+if [ -z "$csv_errores" ]; then
+    pass "respuestas.csv: filas bien formadas (21 columnas, ENC-NN, p1..p10 en 1-5)"
+else
+    fail "respuestas.csv con filas mal formadas: $csv_errores"
+fi
 if grep -qi "brooke" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md cita a Brooke (1996)"; else fail "REPORT.md no cita a Brooke"; fi
 if grep -qi "t de Student" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md calcula el IC con t de Student"; else fail "REPORT.md no documenta el metodo del IC"; fi
 echo "  Nota: P1 tambien exige consentimiento de cada participante -- ver P13."
@@ -34,23 +70,35 @@ section "P2 -- Lighthouse: 3 corridas por perfil contra el despliegue publico"
 # locales (host.docker.internal), mientras REPORT.md hablaba del despliegue
 # público. Ahora se exige requestedUrl = despliegue vigente dentro del JSON.)
 R2RS="https://sged-frontend-r2rs.onrender.com/"
-mobile_runs=0; desktop_runs=0
+# (Corrección 2026-09-17, evaluación integral: exigir ">=3 validas" no
+# detecta si alguien cambia el requestedUrl de UN archivo a localhost --
+# con 9+9 corridas archivadas, sobran de sobra para seguir pasando el
+# umbral de 3 aunque una este corrompida. Ahora se exige que TODAS las
+# corridas encontradas sean validas, ademas del minimo de 3.)
+mobile_runs=0; mobile_total=0; mobile_malas=""
 for f in docs/mediciones/lighthouse/public-mobile-*.report.json; do
     [ -f "$f" ] || continue
+    mobile_total=$((mobile_total + 1))
     if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f',encoding='utf-8')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
         mobile_runs=$((mobile_runs + 1))
+    else
+        mobile_malas="$mobile_malas $f"
     fi
 done
+desktop_runs=0; desktop_total=0; desktop_malas=""
 for f in docs/mediciones/lighthouse/public-desktop-*.report.json; do
     [ -f "$f" ] || continue
+    desktop_total=$((desktop_total + 1))
     if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f',encoding='utf-8')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
         desktop_runs=$((desktop_runs + 1))
+    else
+        desktop_malas="$desktop_malas $f"
     fi
 done
-if [ "$mobile_runs" -ge 3 ] && [ "$desktop_runs" -ge 3 ]; then
-    pass "$mobile_runs corridas moviles + $desktop_runs de escritorio con requestedUrl=$R2RS"
+if [ "$mobile_runs" -ge 3 ] && [ "$mobile_runs" -eq "$mobile_total" ] && [ "$desktop_runs" -ge 3 ] && [ "$desktop_runs" -eq "$desktop_total" ]; then
+    pass "$mobile_runs/$mobile_total corridas moviles + $desktop_runs/$desktop_total de escritorio con requestedUrl=$R2RS (todas validas)"
 else
-    fail "$mobile_runs corridas moviles + $desktop_runs de escritorio con requestedUrl publica vigente (se exigen >=3 y >=3)"
+    fail "$mobile_runs/$mobile_total moviles + $desktop_runs/$desktop_total escritorio con requestedUrl publica vigente (se exige >=3 Y todas validas; invalidas:$mobile_malas$desktop_malas)"
 fi
 if grep -q "sged-frontend-r2rs.onrender.com" docs/mediciones/lighthouse/REPORT.md 2>/dev/null; then
     pass "REPORT.md documenta la medición vigente contra r2rs"
@@ -127,9 +175,53 @@ manual "los PNG de docs/arquitectura/ y mer-profutbol.png son texto rasterizado 
 
 # ---------------------------------------------------------------------
 section "P7 -- SRS firmado, versionado y con MoSCoW"
-moscow_count=$(grep -c "MoSCoW:" docs/requisitos/SRS.md 2>/dev/null || echo 0)
-if [ "$moscow_count" -gt 0 ]; then pass "SRS.md trae MoSCoW explicito en $moscow_count requisitos"; else fail "SRS.md no trae MoSCoW explicito"; fi
-if [ -f "docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf" ]; then pass "acta de aprobacion firmada por el docente-director existe"; else fail "no existe acta de aprobacion firmada"; fi
+# (Corrección 2026-09-17, evaluación integral: un conteo global ">0" no
+# detecta que a UN requisito puntual le falte el MoSCoW -- sigue habiendo
+# 79 lineas "MoSCoW:" en vez de 80 y el chequeo global seguía pasando.
+# Ahora se verifica requisito por requisito: cada encabezado RF-/RNF-
+# debe tener su propia linea MoSCoW antes del siguiente encabezado,
+# salvo los contenedores declarados que agrupan sub-items con letra
+# -- RF-19 y RNF-23, ver SRS.md lineas 695 y 1602.)
+moscow_faltantes=$(python3 - docs/requisitos/SRS.md <<'PYEOF'
+import re, sys
+texto = open(sys.argv[1], encoding="utf-8").read().splitlines()
+CONTENEDORES = {"RF-19", "RNF-23"}
+encabezado_re = re.compile(r'^\*\*((?:RF|RNF)-\d+[a-z]?) — ')
+posiciones = [(i, m.group(1)) for i, l in enumerate(texto) if (m := encabezado_re.match(l))]
+faltantes = []
+for idx, (i, rid) in enumerate(posiciones):
+    if rid in CONTENEDORES:
+        continue
+    fin = posiciones[idx + 1][0] if idx + 1 < len(posiciones) else len(texto)
+    bloque = texto[i:fin]
+    if not any("MoSCoW:" in l for l in bloque):
+        faltantes.append(rid)
+print(f"{len(posiciones) - len(CONTENEDORES)} requisitos evaluables (excluye {len(CONTENEDORES)} contenedores); faltan MoSCoW: {faltantes}")
+sys.exit(1 if faltantes else 0)
+PYEOF
+)
+moscow_codigo=$?
+echo "  $moscow_faltantes"
+if [ "$moscow_codigo" -eq 0 ]; then
+    pass "cada requisito individual del SRS trae su propio MoSCoW explicito"
+else
+    fail "hay requisitos sin MoSCoW individual -- ver arriba"
+fi
+# (Corrección 2026-09-17: antes se comprobaba solo que existiera el acta
+# de la v1.8, ya superada -- pasaba aunque la version vigente del SRS
+# (declarada en su propia cabecera) no tuviera firma propia. Ahora se
+# lee la version vigente del SRS y se busca el acta con ese nombre
+# exacto: en cuanto el docente firme la version actual y su PDF se
+# suba con el nombre ACTA-APROBACION-SRS-v<version>.pdf, este chequeo
+# pasa a PASA sin tocar el script otra vez.)
+srs_version=$(grep -oE 'Versión del documento:\*\* [0-9]+\.[0-9]+' docs/requisitos/SRS.md | grep -oE '[0-9]+\.[0-9]+')
+acta_vigente="docs/requisitos/ACTA-APROBACION-SRS-v${srs_version}.pdf"
+if [ -n "$srs_version" ] && [ -f "$acta_vigente" ]; then
+    pass "acta de aprobacion firmada por el docente-director existe para la version vigente del SRS (v$srs_version)"
+else
+    acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
+    fail "falta $acta_vigente (version vigente del SRS declarada en su cabecera: v${srs_version:-?}); la firma mas reciente que existe es de una version anterior ($acta_mas_reciente) -- ver P7 en VERIFICACION.md"
+fi
 if [ -f "docs/requisitos/SRS-v1.1.0.pdf" ]; then
     pass "docs/requisitos/SRS-v1.1.0.pdf existe"
 else
@@ -144,6 +236,27 @@ else
     fail "la etiqueta v1.1.0 no existe todavia"
 fi
 if grep -qE "^version:\s*1\.1\.0" CITATION.cff 2>/dev/null; then pass "CITATION.cff declara version: 1.1.0"; else fail "CITATION.cff no declara version: 1.1.0"; fi
+# (Corrección 2026-09-17, evaluación integral: el chequeo anterior solo
+# confirmaba que v1.1.0 existe, nunca que fuera la UNICA etiqueta activa
+# que compite por ser "el corte que revisa el docente" -- crear una
+# segunda etiqueta cualquiera pasaba sin que nada lo notara. Ahora se
+# enumeran todas las etiquetas del repo y se falla si aparece alguna que
+# no esté en la lista de historicas ya declaradas y retiradas de
+# VERSIONING.md.)
+ETIQUETAS_ESPERADAS="v0.1.0-entrega-1b v0.7.1 v0.9.0-rc v1.0.0 v1.0.0-previo-07sep v1.1.0"
+etiquetas_reales=$(git tag -l | sort)
+inesperadas=""
+for t in $etiquetas_reales; do
+    case " $ETIQUETAS_ESPERADAS " in
+        *" $t "*) ;;
+        *) inesperadas="$inesperadas $t" ;;
+    esac
+done
+if [ -z "$inesperadas" ]; then
+    pass "no hay etiquetas inesperadas -- solo $(echo $etiquetas_reales | tr ' ' ',')"
+else
+    fail "etiqueta(s) inesperada(s), no declarada(s) en VERSIONING.md:$inesperadas"
+fi
 
 # ---------------------------------------------------------------------
 section "P9 -- nombres de tipos en espanol <=5%"
@@ -170,6 +283,61 @@ if [ -f scripts/credit-counts.py ] && grep -q "Conteo por rol (metodolog" CONTRI
     pass "CONTRIBUTORS.md documenta el conteo por rol con script reproducible (scripts/credit-counts.py)"
 else
     fail "falta el conteo por rol reproducible en CONTRIBUTORS.md"
+fi
+# (Corrección 2026-09-17, evaluación integral: ninguna de las dos
+# comprobaciones de arriba nota si la tabla resumen "Integrante | Roles"
+# se desincroniza de la tabla "Rol CRediT | Integrante(s)" que trae los
+# conteos reales -- paso exactamente eso: a Arcalle le faltaba
+# "Writing - review & editing" con el conteo mas alto de los tres.
+# Ahora se cruzan ambas tablas.)
+p10_incoherencias=$(python3 - CONTRIBUTORS.md <<'PYEOF'
+import re, sys
+texto = open(sys.argv[1], encoding="utf-8").read()
+ALIAS = {"Darwin": "Arcalle", "Alejandro": "Pallo", "Ricardo": "Velez"}
+
+# Tabla resumen: | Integrante | Correo | Roles (CRediT) |
+resumen = {}
+for m in re.finditer(r'^\| ([\w ]+ [\w ]+) \| ([\w.@-]+) \| ([^|]+) \|$', texto, re.M):
+    nombre, _correo, roles = m.groups()
+    resumen[nombre.strip()] = {r.strip() for r in roles.split(',')}
+
+def nombre_completo(alias_corto):
+    clave = ALIAS.get(alias_corto, alias_corto)
+    for nombre in resumen:
+        if clave in nombre:
+            return nombre
+    return None
+
+# Tabla de conteo: | Rol CRediT | Integrante(s) | Cobertura |
+incoherencias = []
+tabla_rol = re.search(r'\| Rol CRediT \| Integrante\(s\) \| Cobertura \|\n\|---\|---\|---\|\n(.*?)\n\n', texto, re.S)
+if not tabla_rol:
+    print("no se encontro la tabla 'Rol CRediT' en CONTRIBUTORS.md")
+    sys.exit(1)
+for linea in tabla_rol.group(1).splitlines():
+    m = re.match(r'\| ([^|]+) \| ([^|]+) \|', linea)
+    if not m:
+        continue
+    rol, integrantes = m.group(1).strip(), m.group(2).strip()
+    if integrantes == '—':
+        continue
+    for tok in integrantes.split(','):
+        alias = re.match(r'\s*([A-Za-zÁÉÍÓÚñ]+)', tok)
+        if not alias:
+            continue
+        nombre = nombre_completo(alias.group(1))
+        if nombre is None:
+            incoherencias.append(f"{rol}: no se pudo mapear '{alias.group(1)}' a un integrante de la tabla resumen")
+        elif rol not in resumen.get(nombre, set()):
+            incoherencias.append(f"{nombre} tiene conteo de '{rol}' pero no aparece en su lista de roles")
+print('; '.join(incoherencias))
+sys.exit(1 if incoherencias else 0)
+PYEOF
+)
+if [ -z "$p10_incoherencias" ]; then
+    pass "la tabla resumen de roles coincide con la tabla de conteo real (sin roles con conteo > 0 ausentes de la lista de alguien)"
+else
+    fail "tabla resumen desincronizada de la tabla de conteo: $p10_incoherencias"
 fi
 
 # ---------------------------------------------------------------------
@@ -239,6 +407,31 @@ if [ -n "$stats_script" ]; then
     fi
 else
     fail "no existe ningun script/cuaderno versionado que calcule los p-valores corregidos"
+fi
+
+# (Corrección 2026-09-17, evaluación integral: los dos chequeos de arriba
+# solo confirman que la tabla EXISTE, no que sus numeros sean los que
+# produce el script sobre los datos crudos -- alguien podria editar a
+# mano un p-valor en REPORT.md y esto seguiria pasando. Se regenera
+# REPORT.md desde los *.samples.json reales y se compara contra la
+# version versionada, ignorando las 3 lineas de metadato que cambian
+# entre corridas por diseño -- Fecha, Commit, Herramienta -- y
+# restaurando el archivo al terminar, se termine bien o mal.)
+REPORT_PERF=docs/mediciones/perf/REPORT.md
+if [ -f "$REPORT_PERF" ]; then
+    cp "$REPORT_PERF" "$REPORT_PERF.bak-verify"
+    if PYTHONIOENCODING=utf-8 python3 "$stats_script" >/dev/null 2>&1; then
+        diff_real=$(diff <(grep -vE '^- (Fecha|Commit|Herramienta):' "$REPORT_PERF.bak-verify") \
+                         <(grep -vE '^- (Fecha|Commit|Herramienta):' "$REPORT_PERF") || true)
+        if [ -z "$diff_real" ]; then
+            pass "REPORT.md regenerado desde los datos crudos es idéntico al versionado (fuera de Fecha/Commit/Herramienta)"
+        else
+            fail "REPORT.md versionado difiere del que produce $stats_script sobre los mismos datos crudos: $(echo "$diff_real" | head -6 | tr '\n' ' ')"
+        fi
+    else
+        fail "$stats_script no pudo regenerar REPORT.md (revisar PYTHONIOENCODING=utf-8 y las dependencias)"
+    fi
+    mv -f "$REPORT_PERF.bak-verify" "$REPORT_PERF"
 fi
 
 # ---------------------------------------------------------------------

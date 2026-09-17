@@ -6,9 +6,9 @@ del historial de `git log` (no auto-declarados).
 
 | Integrante | Correo institucional | Roles (CRediT) |
 |---|---|---|
-| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Conceptualization, Software, Formal analysis, Investigation, Methodology, Validation, Data curation, Writing – original draft, Writing – review & editing, Visualization |
-| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Conceptualization, Software, Validation, Methodology, Resources, Writing – review & editing |
-| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Conceptualization, Software, Investigation, Validation, Data curation, Project administration, Supervision |
+| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Resources, Software, Validation, Visualization, Writing – original draft, Writing – review & editing |
+| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Conceptualization, Data curation, Formal analysis, Methodology, Resources, Software, Validation, Visualization, Writing – original draft, Writing – review & editing |
+| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Conceptualization, Data curation, Formal analysis, Investigation, Methodology, Project administration, Resources, Software, Supervision, Validation, Visualization, Writing – original draft, Writing – review & editing |
 
 La taxonomía CRediT completa define catorce roles; en este proyecto todos
 quedan cubiertos por el equipo de la siguiente manera. **El conteo junto a
@@ -20,6 +20,20 @@ las rutas declaradas para ese rol — ver metodología y tabla completa en
 intelectual, no una partición exclusiva de archivos, así que un mismo
 commit puede sostener varios roles a la vez (una prueba de carga es a la
 vez `Software` y `Validation`).
+
+**Corrección 2026-09-17 (evaluación integral del examen suspenso):** la
+tabla de arriba estaba desincronizada con la tabla "Rol CRediT" de abajo
+— la fuente real de conteos — en varios roles para los tres integrantes,
+no solo en `Resources` (que fue lo que señaló la evaluación). Ejemplos
+del defecto real: a Arcalle Grefa le faltaba `Writing – review & editing`
+pese a tener el conteo más alto de los tres en ese rol (87–102); a Vélez
+López le faltaban `Data curation`, `Formal analysis`, `Visualization` y
+`Writing – original draft`. Se regeneró la lista de cada integrante
+tomando directamente los roles con conteo distinto de cero en la tabla
+"Rol CRediT" de abajo (más los cuatro roles cualitativos ya declarados:
+`Funding acquisition` no aplica a nadie, `Project administration` y
+`Supervision` son solo de Arcalle Grefa por criterio cualitativo, ver
+nota ¹).
 
 | Rol CRediT | Integrante(s) | Cobertura |
 |---|---|---|
