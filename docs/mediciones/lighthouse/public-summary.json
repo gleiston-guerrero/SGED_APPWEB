@@ -1,6 +1,6 @@
 {
-  "baseUrl": "https://sged-frontend-jofa.onrender.com",
-  "fecha": "2026-09-08T04:31:49.041Z",
+  "baseUrl": "https://sged-frontend-r2rs.onrender.com",
+  "fecha": "2026-09-17T00:24:05.162Z",
   "rutas": [
     "/dashboard",
     "/inventario"
@@ -11,56 +11,56 @@
       "/dashboard": {
         "corridas": [
           {
-            "performance": 98,
+            "performance": 84,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 100,
+            "performance": 87,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 100,
+            "performance": 87,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 99.33333333333333,
+          "performance": 86,
           "accessibility": 91,
-          "best-practices": 100,
+          "best-practices": 96,
           "seo": 63
         }
       },
       "/inventario": {
         "corridas": [
           {
-            "performance": 99,
+            "performance": 100,
             "accessibility": 100,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
             "performance": 100,
             "accessibility": 100,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
             "performance": 100,
             "accessibility": 100,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 99.66666666666667,
+          "performance": 100,
           "accessibility": 100,
-          "best-practices": 100,
+          "best-practices": 96,
           "seo": 63
         }
       }
@@ -69,56 +69,56 @@
       "/dashboard": {
         "corridas": [
           {
-            "performance": 80,
+            "performance": 77,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 80,
+            "performance": 84,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 80,
+            "performance": 77,
             "accessibility": 91,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 80,
+          "performance": 79.33333333333333,
           "accessibility": 91,
-          "best-practices": 100,
+          "best-practices": 96,
           "seo": 63
         }
       },
       "/inventario": {
         "corridas": [
           {
-            "performance": 99,
+            "performance": 100,
             "accessibility": 95,
-            "best-practices": 100,
-            "seo": 63
-          },
-          {
-            "performance": 99,
-            "accessibility": 95,
-            "best-practices": 100,
+            "best-practices": 96,
             "seo": 63
           },
           {
             "performance": 100,
             "accessibility": 95,
-            "best-practices": 100,
+            "best-practices": 96,
+            "seo": 63
+          },
+          {
+            "performance": 100,
+            "accessibility": 95,
+            "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 99.33333333333333,
+          "performance": 100,
           "accessibility": 95,
-          "best-practices": 100,
+          "best-practices": 96,
           "seo": 63
         }
       }

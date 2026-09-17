@@ -57,7 +57,7 @@ bash scripts/verify.sh 2>&1 | grep -A3 'P2 --'
 **Salida:**
 ```
 == P2 -- Lighthouse: 3 corridas por perfil contra el despliegue publico ==
-  PASA: 3 corridas moviles + 3 de escritorio con requestedUrl=https://sged-frontend-r2rs.onrender.com/
+  PASA: 9 corridas moviles + 9 de escritorio con requestedUrl=https://sged-frontend-r2rs.onrender.com/
   PASA: REPORT.md documenta la medición vigente contra r2rs
 ```
 
@@ -65,37 +65,94 @@ bash scripts/verify.sh 2>&1 | grep -A3 'P2 --'
 `mobile-run*`/`desktop-run*` — que son locales
 (`host.docker.internal:8443`) — mientras afirmaba despliegue público.
 Las corridas `public-*-2026-09-08` apuntan a `sged-frontend-jofa`,
-sufijo anterior; se conservan como bitácora fechada. La medición
-vigente es del 2026-09-16, 3 por perfil contra
-`https://sged-frontend-r2rs.onrender.com/` (despliegue declarado en el
-README), ruta raíz pública `/`: `public-{mobile,desktop}-r2rs-home-run{1,2,3}.report.json`,
-con `requestedUrl` verificable dentro de cada JSON.)
+sufijo anterior; se conservan como bitácora fechada.)
 
-**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (6 LHR r2rs + bitácoras locales y jofa fechadas)
+**Corrección 2026-09-16 (más tarde el mismo día):** se agregaron las 12
+corridas autenticadas contra `/dashboard` e `/inventario` en `r2rs`
+(`public-{mobile,desktop}-{dashboard,inventario}-run{1,2,3}.report.json`),
+con `LH_USER`/`LH_PASS` reales y `scripts/lighthouse-ci.mjs` sin
+modificar. Estas — no la medición de la portada del mismo día — son la
+evidencia vigente, porque miden las pantallas reales de la aplicación:
 
-**Estado:** hecho. 3 corridas por perfil contra el despliegue público vigente, JSON versionados.
+| Perfil | Ruta | Rendimiento (3 corridas) | Media | Estado |
+|---|---|---|---|---|
+| Móvil | `/dashboard` | 84 / 87 / 87 | 86,0 | ✅ ≥ 80 |
+| Móvil | `/inventario` | 100 / 100 / 100 | 100,0 | ✅ ≥ 80 |
+| Escritorio | `/dashboard` | 77 / 84 / 77 | **79,3** | ⚠️ < 80 |
+| Escritorio | `/inventario` | 100 / 100 / 100 | 100,0 | ✅ ≥ 80 |
+
+**Escritorio/`/dashboard` (79,3) queda por debajo del umbral de 80.**
+No es un empate en el umbral ni un artefacto del entorno de medición
+(a diferencia de la corrida de la portada, esta no usó renderizado por
+software): es un resultado real y reproducible. Se declara como
+hallazgo abierto, sin optimizar el panel para maquillarlo. Ver
+`docs/mediciones/lighthouse/REPORT.md` para el detalle completo
+(accesibilidad, buenas prácticas y SEO de las cuatro combinaciones).
+
+**Corrección 2026-09-16 (script):** `scripts/verify.sh` contaba "3
+corridas móviles + 3 de escritorio" en vez de las 9 de cada una
+(portada + dashboard + inventario) porque en Windows `python3` abría
+los JSON con la codificación por defecto del sistema (`cp1252`) en vez
+de UTF-8; los reportes de `/dashboard`/`/inventario` (que sí incluyen
+texto no-ASCII de la interfaz) fallaban a decodificar y se contaban
+como "no coincide", silenciado por el `2>/dev/null` del script. El
+resultado (`PASA`, ≥3 de cada uno) no cambiaba porque igual sobraban
+corridas válidas, pero era un defecto de portabilidad del script en
+Windows. Corregido en el mismo commit: ambos `open()` de
+`scripts/verify.sh` ahora pasan `encoding='utf-8'` explícito.
+
+**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (18 LHR contra r2rs: portada + dashboard + inventario, más bitácoras locales y jofa fechadas)
+
+**Estado:** hecho, con un hallazgo abierto declarado (escritorio/`/dashboard` bajo el umbral).
 
 ---
 
 ## P3 — DOI retirado (peso 0,5)
 
+**Corrección 2026-09-16:** `scripts/check-doi.sh` solo revisaba
+README.md/CITATION.cff (2 archivos) y no tocaba la bibliografía —
+exactamente el hueco que señalaba la revisión, porque `main.tex` cita
+tanto el DOI retirado como `zenodo.21713240` y ninguno de los dos
+pasaba por el script. Reescrito para que:
+1. busque DOI de Zenodo en **todo el repositorio versionado**
+   (`git grep` sobre `*.md`/`*.tex`/`*.cff`), no solo en 2 archivos;
+2. para el DOI retirado, exija 410 **y** que todos los archivos que lo
+   citan digan explícitamente que está retirado (no solo README.md);
+3. revise también los 27 DOI de [`docs/informe/referencias.bib`](docs/informe/referencias.bib),
+   aceptando 200, 403 (bloqueo de editorial a clientes automatizados) o
+   202 (mismo bloqueo, pero así responde IEEE Xplore — verificado que
+   el redirect llega a un documento real).
+
 **Orden:** `bash scripts/check-doi.sh`
 
-**Salida:**
+**Salida (resumen; ver `scripts/check-doi.sh` para la lista completa):**
 ```
+== DOI de Zenodo citados en el repositorio ==
 OK   10.5281/zenodo.21713239 -> 200
+OK   10.5281/zenodo.21713240 -> 200
 OK   10.5281/zenodo.22422305 -> 200
-OK   10.5281/zenodo.22635766 -> 410 (retirado, documentado como tal; no se cita como vigente)
+OK   10.5281/zenodo.22635766 -> 410 (retirado, documentado como tal en todas sus citas)
 OK   10.5281/zenodo.22714477 -> 200
 OK   10.5281/zenodo.22730565 -> 200
 OK   10.5281/zenodo.22739944 -> 200
+
+== DOI de la bibliografia (docs/informe/referencias.bib) ==
+(27/27 OK: 19 resuelven 200, 7 bloquean con 403 a clientes
+automatizados -- editoriales conocidas -- y 1 con 202 de IEEE Xplore,
+redirect verificado a un documento real: 10.1109/msr66628.2025.00020)
 ```
 
-**Respalda:** [`scripts/check-doi.sh`](scripts/check-doi.sh), [`README.md`](README.md), [`CITATION.cff`](CITATION.cff)
+**Nota sobre disponibilidad:** al intentar esta verificación más
+temprano el mismo día, Zenodo devolvía 504 (Gateway Timeout) de forma
+consistente -- una caída real de su servidor, confirmada por dos vías
+de red distintas, no un DOI roto. Se reintentó más tarde con éxito.
 
-**Estado:** hecho. Todos los DOI vigentes resuelven a 200. El DOI retirado
-(`zenodo.22635766`) resuelve a 410 y el README ya explica que quedó
-tombstone y que no debe citarse.
+**Respalda:** [`scripts/check-doi.sh`](scripts/check-doi.sh), [`README.md`](README.md), [`CITATION.cff`](CITATION.cff), [`docs/informe/main.tex`](docs/informe/main.tex), [`docs/informe/referencias.bib`](docs/informe/referencias.bib)
+
+**Estado:** hecho. Los 7 DOI de Zenodo citados en el repositorio y los
+27 de la bibliografía resuelven según lo esperado; el DOI retirado
+(`zenodo.22635766`) resuelve a 410 y toda cita suya en el repositorio
+ya explica que quedó tombstone y no debe citarse.
 
 ---
 

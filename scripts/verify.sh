@@ -37,13 +37,13 @@ R2RS="https://sged-frontend-r2rs.onrender.com/"
 mobile_runs=0; desktop_runs=0
 for f in docs/mediciones/lighthouse/public-mobile-*.report.json; do
     [ -f "$f" ] || continue
-    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
+    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f',encoding='utf-8')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
         mobile_runs=$((mobile_runs + 1))
     fi
 done
 for f in docs/mediciones/lighthouse/public-desktop-*.report.json; do
     [ -f "$f" ] || continue
-    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
+    if python3 -c "import json,sys;sys.exit(0 if json.load(open('$f',encoding='utf-8')).get('requestedUrl','').startswith('$R2RS') else 1)" 2>/dev/null; then
         desktop_runs=$((desktop_runs + 1))
     fi
 done

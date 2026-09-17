@@ -127,9 +127,76 @@ despliegue (la misma ruta en móvil da 74–98 y en la medición CI del
 2026-09-08 las rutas autenticadas daban 80–100). SEO 63 en ambas, igual
 que en todas las mediciones (ver nota `is-crawlable` más arriba).
 
+**Actualización 2026-09-16 (más tarde el mismo día) — se agregaron las
+12 corridas autenticadas contra `/dashboard` e `/inventario` en este
+mismo despliegue (`r2rs`); ver la sección siguiente. Esa suite, no esta
+medición de la portada, es la evidencia vigente del Bloque C.5/A.1: mide
+las pantallas reales de la aplicación en vez de la pantalla de login.**
+
+---
+
+# Medición pública autenticada contra r2rs — 2026-09-16 (`/dashboard`, `/inventario`)
+
+- **Fecha:** 2026-09-16
+- **Herramienta:** Lighthouse v13.4.1 (API de Node, `scripts/lighthouse-ci.mjs`),
+  Microsoft Edge (Chromium) *headless* vía `chrome-launcher` +
+  `puppeteer-core` (`LH_CHROME_PATH` apuntando al Edge local; no había
+  Chrome instalado en este entorno)
+- **URL medida:** `https://sged-frontend-r2rs.onrender.com` (despliegue
+  público vigente declarado en el README) — las doce evidencias tienen
+  `requestedUrl` y `finalUrl` en esa URL pública, verificado
+  individualmente en cada JSON
+- **Sesión:** autenticación real — `POST /api/auth/login` contra el
+  proxy del propio frontend con el mismo mecanismo de cookies por CDP
+  que la medición de 2026-09-08
+- **Corridas:** 2 perfiles (móvil 412×823 DPR 1.75 y escritorio
+  1350×940, ambos `throttlingMethod: simulate`) × 2 rutas autenticadas
+  (`/dashboard`, `/inventario`) × 3 = **12 LHR completos**
+  (`public-{mobile,desktop}-{dashboard,inventario}-run{1,2,3}.report.json`,
+  reemplazan a los del 2026-09-08 que apuntaban a `jofa`)
+
+## Resultados por perfil y ruta (medias de 3 corridas)
+
+### Perfil móvil
+
+| Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO | Estado |
+|---|---|---|---|---|---|
+| `/dashboard` | **86,0** (84/87/87) | 91,0 | 96 | 63 | ✅ cumple |
+| `/inventario` | **100,0** (100/100/100) | 100 | 96 | 63 | ✅ cumple |
+
+### Perfil escritorio
+
+| Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO | Estado |
+|---|---|---|---|---|---|
+| `/dashboard` | **79,3** (77/84/77) | 91,0 | 96 | 63 | ⚠️ por debajo del umbral (< 80) |
+| `/inventario` | **100,0** (100/100/100) | 95,0 | 96 | 63 | ✅ cumple |
+
+Umbrales del Bloque A.1: rendimiento ≥ 80, accesibilidad ≥ 90, buenas
+prácticas ≥ 90. SEO relajado a *warn* (63) por `is-crawlable`, igual
+que en el resto de las mediciones — ver la nota correspondiente más
+arriba.
+
+**Nota sobre escritorio/`/dashboard` (79,3, por debajo de 80):** a
+diferencia de la medición del 2026-09-08 (que dio 80,0 justo en el
+umbral contra la URL vieja), esta corrida contra `r2rs` promedia 79,3
+con variación real entre corridas (77/84/77) — no es un empate exacto
+en el umbral ni un artefacto de entorno como el de la medición de la
+portada más arriba (esa sí usaba renderizado por software sin GPU; esta
+corrida no). Es un resultado real, medible y reproducible: el panel de
+`/dashboard` en escritorio contra el despliegue actual de Render queda
+por debajo del umbral exigido. No se ha optimizado el panel para
+corregirlo; queda declarado como hallazgo abierto en vez de
+suavizado u omitido.
+
 ---
 
 # Medición pública en despliegue real — 2026-09-08 (opción A, CI)
+
+**Histórica — superada por la sección anterior.** Esta suite mide
+`sged-frontend-jofa.onrender.com`, un sufijo de Render anterior al
+despliegue vigente (`sged-frontend-r2rs.onrender.com`, declarado en el
+README). Se conserva como bitácora fechada; la evidencia vigente contra
+`/dashboard` e `/inventario` es la medición del 2026-09-16 de arriba.
 
 - **Fecha:** 2026-09-08
 - **Herramienta:** Lighthouse v13.4.1 (API de Node), Chrome *headless*
