@@ -157,36 +157,60 @@ las pantallas reales de la aplicación en vez de la pantalla de login.**
 
 ## Resultados por perfil y ruta (medias de 3 corridas)
 
+**Primera corrida (2026-09-16, antes de corregir el panel):**
+
+| Perfil | Ruta | Rendimiento | Estado |
+|---|---|---|---|
+| Móvil | `/dashboard` | 86,0 (84/87/87) | ✅ cumple |
+| Escritorio | `/dashboard` | **79,3** (77/84/77) | ⚠️ por debajo del umbral (< 80) |
+
+Escritorio/`/dashboard` quedó por debajo de 80 de forma real y
+reproducible (no un empate en el umbral ni un artefacto de entorno: la
+corrida no usaba renderizado por software, a diferencia de la medición
+de la portada más arriba). Investigado con `cls-culprits-insight` del
+propio LHR: **CLS = 0,689**, con el 88% del puntaje atribuido a
+`app-mapa-asistencia` desplazándose ~208px hacia abajo. La causa raíz
+real, confirmada midiendo con el navegador contra la app en vivo, era
+`app-graficos-ingresos` (405px) apareciendo **sin espacio reservado**
+justo arriba de él cuando `/api/pagos/ingresos-historico` y
+`/api/alertas` resolvían — el elemento que Lighthouse reportaba como
+"desplazado" no era la causa, era la víctima. Corregido en
+[`dashboard.component.ts`](../../../frontend/src/app/features/dashboard/dashboard.component.ts):
+ambos bloques (`app-graficos-ingresos` y `app-mapa-asistencia`) ahora
+reservan su alto real con un marcador de carga mientras el dato no
+llega, en vez de aparecer de la nada.
+
+**Segunda corrida (2026-09-17, después del fix, desplegado en `r2rs`):**
+
 ### Perfil móvil
 
 | Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO | Estado |
 |---|---|---|---|---|---|
-| `/dashboard` | **86,0** (84/87/87) | 91,0 | 96 | 63 | ✅ cumple |
-| `/inventario` | **100,0** (100/100/100) | 100 | 96 | 63 | ✅ cumple |
+| `/dashboard` | **99,3** (98/100/100) | 91,0 | 96 | 63 | ✅ cumple |
+| `/inventario` | **99,7** (99/100/100) | 100 | 96 | 63 | ✅ cumple |
 
 ### Perfil escritorio
 
 | Ruta | Rendimiento | Accesibilidad | Buenas prácticas | SEO | Estado |
 |---|---|---|---|---|---|
-| `/dashboard` | **79,3** (77/84/77) | 91,0 | 96 | 63 | ⚠️ por debajo del umbral (< 80) |
+| `/dashboard` | **100,0** (100/100/100) | 91,0 | 96 | 63 | ✅ cumple |
 | `/inventario` | **100,0** (100/100/100) | 95,0 | 96 | 63 | ✅ cumple |
 
 Umbrales del Bloque A.1: rendimiento ≥ 80, accesibilidad ≥ 90, buenas
 prácticas ≥ 90. SEO relajado a *warn* (63) por `is-crawlable`, igual
 que en el resto de las mediciones — ver la nota correspondiente más
-arriba.
+arriba. CLS de escritorio/`/dashboard` pasó de 0,689 a **0** (score 1)
+tras el fix.
 
-**Nota sobre escritorio/`/dashboard` (79,3, por debajo de 80):** a
-diferencia de la medición del 2026-09-08 (que dio 80,0 justo en el
-umbral contra la URL vieja), esta corrida contra `r2rs` promedia 79,3
-con variación real entre corridas (77/84/77) — no es un empate exacto
-en el umbral ni un artefacto de entorno como el de la medición de la
-portada más arriba (esa sí usaba renderizado por software sin GPU; esta
-corrida no). Es un resultado real, medible y reproducible: el panel de
-`/dashboard` en escritorio contra el despliegue actual de Render queda
-por debajo del umbral exigido. No se ha optimizado el panel para
-corregirlo; queda declarado como hallazgo abierto en vez de
-suavizado u omitido.
+**Pendiente, fuera de este fix:** `.panel-alertas` (debajo del mapa en
+el DOM, hasta 1059px en esta cuenta de prueba) también aparece sin
+espacio reservado cuando `/api/alertas` resuelve, empujando la sección
+"Sesiones de hoy" hacia abajo. No se le puso una reserva de altura fija
+porque su alto depende del número de estudiantes en riesgo (variable
+por cuenta y por fecha) y una cifra fija adivinada podría quedar mal
+para la mayoría de los casos reales. No afectó el resultado medido de
+esta corrida (CLS ya en 0), pero es un contribuyente potencial de CLS
+en cuentas con muchas alertas.
 
 ---
 

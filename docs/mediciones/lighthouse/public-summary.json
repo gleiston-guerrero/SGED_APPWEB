@@ -1,6 +1,6 @@
 {
   "baseUrl": "https://sged-frontend-r2rs.onrender.com",
-  "fecha": "2026-09-17T00:24:05.162Z",
+  "fecha": "2026-09-17T06:55:20.709Z",
   "rutas": [
     "/dashboard",
     "/inventario"
@@ -11,26 +11,26 @@
       "/dashboard": {
         "corridas": [
           {
-            "performance": 84,
+            "performance": 98,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 87,
+            "performance": 100,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 87,
+            "performance": 100,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 86,
+          "performance": 99.33333333333333,
           "accessibility": 91,
           "best-practices": 96,
           "seo": 63
@@ -39,7 +39,7 @@
       "/inventario": {
         "corridas": [
           {
-            "performance": 100,
+            "performance": 99,
             "accessibility": 100,
             "best-practices": 96,
             "seo": 63
@@ -58,7 +58,7 @@
           }
         ],
         "media": {
-          "performance": 100,
+          "performance": 99.66666666666667,
           "accessibility": 100,
           "best-practices": 96,
           "seo": 63
@@ -69,26 +69,26 @@
       "/dashboard": {
         "corridas": [
           {
-            "performance": 77,
+            "performance": 100,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 84,
+            "performance": 100,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           },
           {
-            "performance": 77,
+            "performance": 100,
             "accessibility": 91,
             "best-practices": 96,
             "seo": 63
           }
         ],
         "media": {
-          "performance": 79.33333333333333,
+          "performance": 100,
           "accessibility": 91,
           "best-practices": 96,
           "seo": 63

@@ -81,13 +81,40 @@ evidencia vigente, porque miden las pantallas reales de la aplicación:
 | Escritorio | `/dashboard` | 77 / 84 / 77 | **79,3** | ⚠️ < 80 |
 | Escritorio | `/inventario` | 100 / 100 / 100 | 100,0 | ✅ ≥ 80 |
 
-**Escritorio/`/dashboard` (79,3) queda por debajo del umbral de 80.**
-No es un empate en el umbral ni un artefacto del entorno de medición
-(a diferencia de la corrida de la portada, esta no usó renderizado por
-software): es un resultado real y reproducible. Se declara como
-hallazgo abierto, sin optimizar el panel para maquillarlo. Ver
+**Escritorio/`/dashboard` (79,3) quedó por debajo del umbral de 80.**
+No era un empate en el umbral ni un artefacto del entorno de medición
+(a diferencia de la corrida de la portada, esa no usó renderizado por
+software): era un resultado real y reproducible. Diagnosticado con
+`cls-culprits-insight` del LHR: CLS = 0,689, atribuido en un 88% a
+`app-mapa-asistencia` desplazándose ~208px. Medido con el navegador
+contra la app en vivo, la causa real era `app-graficos-ingresos`
+(405px) apareciendo sin espacio reservado justo arriba, al resolver
+`/api/pagos/ingresos-historico` y `/api/alertas` — empujaba el mapa
+hacia abajo, y Lighthouse atribuía el desplazamiento al elemento
+empujado, no al que empujaba.
+
+**Corrección 2026-09-17 (código):** en
+[`dashboard.component.ts`](frontend/src/app/features/dashboard/dashboard.component.ts),
+tanto `app-graficos-ingresos` como `app-mapa-asistencia` ahora reservan
+su alto real (405px y 208px) con un marcador de carga mientras el dato
+no llega, en vez de aparecer de la nada. Desplegado en `r2rs` y
+re-medido (12 corridas nuevas):
+
+| Perfil | Ruta | Rendimiento (3 corridas) | Media | Estado |
+|---|---|---|---|---|
+| Móvil | `/dashboard` | 98 / 100 / 100 | 99,3 | ✅ ≥ 80 |
+| Móvil | `/inventario` | 99 / 100 / 100 | 99,7 | ✅ ≥ 80 |
+| Escritorio | `/dashboard` | 100 / 100 / 100 | **100,0** | ✅ ≥ 80 |
+| Escritorio | `/inventario` | 100 / 100 / 100 | 100,0 | ✅ ≥ 80 |
+
+CLS de escritorio/`/dashboard` pasó de 0,689 a 0 (score 1). Ya no hay
+ningún hallazgo abierto en P2. Pendiente, fuera de este fix:
+`.panel-alertas` (debajo del mapa, hasta 1059px con muchos estudiantes
+en riesgo) también aparece sin reserva, pero su alto es inherentemente
+variable — no se le puso una cifra fija adivinada. Ver
 `docs/mediciones/lighthouse/REPORT.md` para el detalle completo
-(accesibilidad, buenas prácticas y SEO de las cuatro combinaciones).
+(accesibilidad, buenas prácticas y SEO de las cuatro combinaciones, en
+ambas corridas).
 
 **Corrección 2026-09-16 (script):** `scripts/verify.sh` contaba "3
 corridas móviles + 3 de escritorio" en vez de las 9 de cada una
@@ -101,9 +128,9 @@ corridas válidas, pero era un defecto de portabilidad del script en
 Windows. Corregido en el mismo commit: ambos `open()` de
 `scripts/verify.sh` ahora pasan `encoding='utf-8'` explícito.
 
-**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (18 LHR contra r2rs: portada + dashboard + inventario, más bitácoras locales y jofa fechadas)
+**Respalda:** [`docs/mediciones/lighthouse/`](docs/mediciones/lighthouse/) (18 LHR contra r2rs: portada + dashboard + inventario, más bitácoras locales y jofa fechadas), [`dashboard.component.ts`](frontend/src/app/features/dashboard/dashboard.component.ts)
 
-**Estado:** hecho, con un hallazgo abierto declarado (escritorio/`/dashboard` bajo el umbral).
+**Estado:** hecho. Las cuatro combinaciones perfil×ruta cumplen los tres umbrales del Bloque A.1.
 
 ---
 
