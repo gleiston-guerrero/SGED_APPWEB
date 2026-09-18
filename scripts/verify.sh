@@ -385,9 +385,21 @@ pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -
 # (Corrección 2026-09-17, evaluación v2: el ancla "umbral" no cubre
 # "minimo de 60%" ni ">= 60%" en forma entera -- probaron 4 redacciones,
 # 3 sobrevivieron. Ancla ampliada a minimo/minima/cobertura/coverage/
-# threshold ademas de umbral, y agregado el patron entero ">=60%".)
+# threshold ademas de umbral, y agregado el patron entero ">=60%".
+#
+# Corrección 2026-09-18: sobrevivian ademas "60 por ciento" (sin
+# simbolo %), "0,6" (un solo decimal, sin el cero final de "0,60") y
+# "60~\%" (tilde de LaTeX antes del %, no es un espacio para \s).
+# NUM60 cubre 60 / 0.60 / 0,60 / 0.6 / 0,6; PORCENTAJE cubre
+# %/\%/\,\%/~\% y la palabra "por ciento".)
+NUM60='(60|0[.,]6(0)?)'
+PORCENTAJE='(~?\\?,?\s*\\?%|por\s+ciento)'
 ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
-stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)|(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)[^.]{0,60}(${ANCLA})|≥\s*60\s*%|>=?\s*0\.60|>=\s*60\s*%" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
+# (Nota: las formas decimales sueltas -- "0,6"/"0.6" sin "umbral" ni
+# "cobertura" cerca -- deliberadamente NO se buscan sin ancla: colisionan
+# con strings ajenos como ">= 0.6" de ingenieria de paquetes npm en
+# frontend/package-lock.json. Siempre requieren un ancla al lado.)
+stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}${NUM60}(\s*${PORCENTAJE})?|${NUM60}(\s*${PORCENTAJE})?[^.]{0,60}(${ANCLA})|≥\s*${NUM60}\s*${PORCENTAJE}?|>=?\s*0\.60|>=\s*${NUM60}\s*${PORCENTAJE}" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!frontend/package-lock.json' ':!*.lock' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
     pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"

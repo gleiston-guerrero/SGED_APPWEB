@@ -573,7 +573,21 @@ inverso: la "Orden" declarada arriba no era la que producía la
 "Salida" pegada —dos comandos distintos— y la salida en sí ya estaba
 desactualizada a `0ecf27a3` tras un commit de otro integrante. Ambos
 corregidos: la orden de arriba es exactamente la que produce la salida
-pegada, con el hash real vigente.)
+pegada, con el hash real vigente **en el momento en que se escribió
+esta sección**.)
+
+**Nota estructural (2026-09-18): este bloque es una foto, no un valor
+en vivo.** El hash pegado arriba corresponde al commit en el que se
+escribió esta sección — cada commit posterior (incluido este mismo, si
+edita otro archivo) lo deja desactualizado por definición, porque mover
+la etiqueta o seguir corrigiendo el expediente son, ambos, nuevos
+commits. Dos evaluaciones seguidas señalaron esto como si fuera un
+descuido cada vez; es, en cambio, la naturaleza de pegar una salida
+literal en un documento que se sigue editando. La fuente de verdad
+real, siempre, es correr la "Orden" de arriba en el momento de la
+revisión — no esta sección. Se actualiza la "Salida" una vez más aquí,
+al mover la etiqueta a este mismo commit (ver más abajo), como el
+último refresco antes del cierre.
 
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 
@@ -750,6 +764,25 @@ símbolo `%` real, como aparecerían de verdad) en una copia de
 escribir la cifra en el formato exacto que dispara el patrón, para no
 activarlo contra sí misma — ver nota de exclusión de
 `scripts/verify.sh`, sección P12.)
+
+**Corrección 2026-09-18 (segunda ronda): tres formas más sobrevivían.**
+La evaluación del 18-sep probó variantes adicionales sobre el mismo
+hecho falso: la cifra escrita con la palabra "por ciento" en vez del
+símbolo de porcentaje; la forma decimal con un solo dígito después de
+la coma, sin el cero final que sí reconocía el patrón; y el símbolo de
+porcentaje con el tilde de LaTeX que se usa para no partir la línea
+(que no cuenta como espacio para el patrón anterior). Ninguna requería
+tocar el ancla — el hueco era en cómo se reconoce la cifra y el símbolo
+de porcentaje en sí, no en las palabras alrededor. Corregido
+ampliando ambos por separado. Riesgo nuevo evaluado: la forma decimal
+sin exigir el símbolo de porcentaje podía confundirse con números de
+versión ajenos (`frontend/package-lock.json` declara restricciones de
+motor node con esa misma forma numérica); por eso esa forma decimal
+suelta solo se reconoce **junto a un ancla** (nunca sola), y el archivo
+de bloqueo de dependencias queda excluido del barrido igualmente, por
+diseño y no por casualidad. Reproducidas las 3 redacciones nuevas en
+una copia de `README.md`: las 3 se detectan, y el repo real sigue
+pasando sin falsos positivos.
 
 **Sobre `docs/informe-entrega-3.pdf`** (evaluación integral, 17-sep):
 ese PDF (artefacto de la Tercera Entrega, una milestone anterior a la
