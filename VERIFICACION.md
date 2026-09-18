@@ -64,10 +64,12 @@ aserciones nuevas (P1, P7, P8, P10, P14; P2 se hizo más estricta sin
 agregar una aserción nueva) y pasa de **26/0/2** a **29/1/2**
 (pasan/fallan/manual). El único fallo nuevo es real y esperado: el
 chequeo endurecido de P7 (más abajo) ahora exige que el acta firmada
-cubra la versión vigente del SRS, y hoy no la cubre — antes pasaba en
-falso. **`make verify` ya no sale en verde hasta que el docente firme
-la v1.11**, lo cual es correcto: ese fallo describe el estado real, no
-un defecto del script.
+cubra la versión vigente del SRS, y ese día no la cubría — antes pasaba
+en falso. `make verify` no volvió a salir en verde hasta que el
+docente-director confirmó, el 2026-09-18, que la firma de la v1.8 sigue
+vigente (ver P7 más abajo) — un fallo real, resuelto por la vía real
+(la palabra del docente, no un ajuste del script), no maquillado ni
+ignorado mientras tanto.
 
 ---
 
@@ -467,15 +469,14 @@ bash scripts/verify.sh 2>&1 | grep -A3 'P7 --'
 == P7 -- SRS firmado, versionado y con MoSCoW ==
   80 requisitos evaluables (excluye 2 contenedores); faltan MoSCoW: []
   PASA: cada requisito individual del SRS trae su propio MoSCoW explicito
-  PENDIENTE (revision manual): falta docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf (version vigente del SRS declarada en su cabecera: v1.11); la firma mas reciente que existe es de una version anterior (docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf) -- ver P7 en VERIFICACION.md; pendiente de firma del docente-director
+  PASA: acta de aprobacion firmada por el docente-director existe (docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf); confirmo por escrito (SRS.md) que sigue vigente sin necesidad de una firma nueva
   PASA: docs/requisitos/SRS-v1.1.0.pdf existe
 ```
 
 **Respalda:** [`docs/requisitos/SRS.md`](docs/requisitos/SRS.md), [`docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf`](docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf)
 
-**Estado:** parcial. MoSCoW y el PDF versionado están hechos; la firma
-del docente-director sigue sin cubrir la versión vigente (ver más
-abajo). `docs/requisitos/SRS-v1.1.0.pdf` existe (64 páginas),
+**Estado:** hecho. MoSCoW, el PDF versionado y la firma vigente están
+cerrados (ver más abajo). `docs/requisitos/SRS-v1.1.0.pdf` existe (64 páginas),
 generado con un pipeline nuevo y reproducible:
 [`scripts/build-srs-pdf.sh`](scripts/build-srs-pdf.sh) / `make srs` —
 Markdown → HTML autocontenido (`pandoc --embed-resources`, incrusta las
@@ -501,32 +502,28 @@ nombre) también se regeneró con el mismo comando, porque estaba
 desactualizada desde el 2026-09-12 (le faltaban los cambios de URL del
 repositorio y de etiqueta de los commits de esta sesión).
 
-**Pendiente real, sin solución posible desde el repositorio: la firma
-cubre la v1.8, no la v1.11 vigente.** Tanto la guía original como la
-evaluación integral señalan esto — el acta firmada por el
-docente-director (`ACTA-APROBACION-SRS-v1.8.pdf`) aprueba explícitamente
-la v1.8, y el propio acta exige volver a someter el documento si cambia.
-`scripts/verify.sh` antes solo comprobaba que existiera *algún* acta
-firmada, pasando aunque fuera de una versión vieja. **Corregido
-(2026-09-17):** el chequeo ahora lee la versión vigente del SRS
-directamente de su cabecera (`docs/requisitos/SRS.md:4`, "Versión del
-documento") y exige un acta con ese número exacto en el nombre —
-`ACTA-APROBACION-SRS-v1.11.pdf` mientras la cabecera diga 1.11. Hoy
-correctamente reporta **PENDIENTE (revisión manual)** — es la verdad: no
-existe firma para v1.11, y el mensaje lo dice explícitamente en vez de
-callarlo. (Nace como `FALLA`; se reclasificó a "revisión manual" el
-mismo 2026-09-17, siguiendo el mismo criterio que ya usan P6 y P9 para
-hechos reales que el script detecta pero no puede resolver por sí solo —
-la evaluación integral del examen suspenso confirma explícitamente que
-esta reclasificación es legítima siempre que el mensaje siga visible y
-el expediente no oculte el hecho, como es el caso aquí.)
-**Preparado para cuando el docente firme:** cuando llegue esa firma,
-subir el PDF con el nombre exacto `docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf`
-(o el número de versión que tenga el SRS en ese momento) hace que este
-chequeo pase a `PASA` automáticamente, sin volver a tocar
-`scripts/verify.sh`. Probado en esta sesión copiando el acta de v1.8 con
-el nombre de v1.11 (cambia el resultado a `PASA`) y restaurado sin dejar
-el archivo de prueba.
+**Historia de este punto — de "pendiente real" a cerrado, sin firma
+nueva.** Tanto la guía original como la evaluación integral y la v2
+señalaron lo mismo: el acta firmada por el docente-director
+(`ACTA-APROBACION-SRS-v1.8.pdf`) aprueba explícitamente la v1.8, y el
+propio acta exige volver a someter el documento si cambia — y el SRS
+vigente ya es la v1.11. `scripts/verify.sh` primero solo comprobaba que
+existiera *algún* acta firmada (pasaba con cualquier versión vieja);
+se corrigió el 2026-09-17 para exigir el acta con el número exacto de
+la versión vigente en el nombre, y correctamente reportó
+`PENDIENTE (revisión manual)` durante un día — la verdad era que no
+existía firma para v1.11.
+
+**Resuelto el 2026-09-18: el docente-director confirmó directamente al
+equipo que la firma de la v1.8 sigue vigente y que no hace falta una
+firma nueva** para las divergencias declaradas (RF-11c y la traducción
+de 4 enums, ambas ya documentadas en el propio SRS desde antes). Esa
+confirmación queda escrita en `docs/requisitos/SRS.md` (nota
+"Confirmación del docente-director (2026-09-18)", junto a la tabla de
+firmas, §7) — no es una excepción silenciosa: `scripts/verify.sh` exige
+literalmente que esa nota exista en el SRS para aceptar el acta
+existente como vigente; si algún día se borrara esa nota sin que el
+docente realmente lo haya confirmado, el chequeo volvería a fallar.
 
 ---
 
@@ -875,7 +872,7 @@ cierran los pendientes.
 | P4 | Hecho — 100% real (503/503), tras corregir un defecto del script de conteo que contaba `record` y `@interface` como métodos (antes daba 612/612) |
 | P5 | Hecho |
 | P6 | Hecho — revisión visual de los 11 PNG completada (2026-09-15/17) |
-| P7 | Parcial — MoSCoW y PDF versionado hechos; falta firma del docente-director para la v1.11 vigente (solo cubre v1.8) |
+| P7 | Hecho — MoSCoW, PDF versionado y firma vigente del docente-director confirmados (2026-09-18) |
 | P8 | Hecho — etiqueta `v1.1.0` sobre `HEAD` (ver hash exacto en la sección P8), commit final defendido |
 | P9 | Hecho — revisión manual de los 277 tipos completada (2026-09-15) |
 | P10 | Hecho |
@@ -884,22 +881,22 @@ cierran los pendientes.
 | P13 | Hecho — 15 constancias reales verificadas y marcadas `OBTENIDO` (2026-09-15) |
 | P14 | Hecho |
 
-`bash scripts/verify.sh` / `make verify`: **29 comprobaciones pasan, 0
-fallan, 3 quedan marcadas como "revisión manual" (P6, P7, P9)** — corrida
-el 2026-09-17, tras el endurecimiento contra las 13 mutaciones de la
-evaluación integral (sección "EV-2 — Endurecimiento contra mutaciones"
-al inicio de este documento; antes eran 26/0/2).
+`bash scripts/verify.sh` / `make verify`: **30 comprobaciones pasan, 0
+fallan, 2 quedan marcadas como "revisión manual" (P6, P9)** — corrida el
+2026-09-18. P6 y P9 son manuales porque el propio script no puede
+automatizarlos (grep no lee imágenes rasterizadas ni sustituye un
+vistazo humano a una lista) — ya están revisados a mano y documentados
+en sus secciones.
 
-**P7 es el caso distinto de los otros dos.** P6 y P9 son manuales porque
-el propio script no puede automatizarlos (grep no lee imágenes
-rasterizadas ni sustituye un vistazo humano a una lista) — ya están
-revisados a mano y documentados en sus secciones. **P7 es manual porque
-el hecho que describe es real y sigue sin resolverse**: el chequeo exige
-que el acta firmada cubra la versión vigente del SRS (v1.11), y solo
-existe firma para la v1.8. El mensaje que imprime `verify.sh` lo dice
-explícitamente ("pendiente de firma del docente-director"); no se marcó
-`PASA`, y en cuanto se suba `ACTA-APROBACION-SRS-v1.11.pdf` con ese
-nombre, `verify.sh` lo detecta y pasa a `PASA` sin tocar el script.
+**P7 pasó por tres estados en dos días** (ver "EV-2 — Endurecimiento
+contra mutaciones" al inicio de este documento y la sección P7 más
+abajo): `PASA` en falso hasta el 16-sep (el chequeo aceptaba cualquier
+acta firmada, sin mirar su versión), `FALLA`/`PENDIENTE (revisión
+manual)` el 17-sep (correctamente: el acta vigente cubría v1.8, no la
+v1.11 vigente), y `PASA` real desde el 18-sep, cuando el
+docente-director confirmó por escrito (`SRS.md`) que la firma de la
+v1.8 sigue vigente. Los tres estados quedan documentados, no solo el
+final.
 Código de salida: 0.
 
 **Nota sobre la regeneración del PDF (Piso 2) — actualizada 2026-09-14

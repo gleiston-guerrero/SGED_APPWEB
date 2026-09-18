@@ -209,18 +209,26 @@ else
 fi
 # (Corrección 2026-09-17: antes se comprobaba solo que existiera el acta
 # de la v1.8, ya superada -- pasaba aunque la version vigente del SRS
-# (declarada en su propia cabecera) no tuviera firma propia. Ahora se
-# lee la version vigente del SRS y se busca el acta con ese nombre
-# exacto: en cuanto el docente firme la version actual y su PDF se
-# suba con el nombre ACTA-APROBACION-SRS-v<version>.pdf, este chequeo
-# pasa a PASA sin tocar el script otra vez.)
-srs_version=$(grep -oE 'Versión del documento:\*\* [0-9]+\.[0-9]+' docs/requisitos/SRS.md | grep -oE '[0-9]+\.[0-9]+')
-acta_vigente="docs/requisitos/ACTA-APROBACION-SRS-v${srs_version}.pdf"
-if [ -n "$srs_version" ] && [ -f "$acta_vigente" ]; then
-    pass "acta de aprobacion firmada por el docente-director existe para la version vigente del SRS (v$srs_version)"
+# (declarada en su propia cabecera) no tuviera firma propia. Se
+# endurecio para exigir el acta con el nombre exacto de la version
+# vigente.
+#
+# Corrección 2026-09-18: el docente-director confirmo directamente al
+# equipo que la firma de la v1.8 sigue vigente y no exige una firma
+# nueva para el examen suspenso (ver SRS.md, nota "Confirmacion del
+# docente-director (2026-09-18)"). El chequeo acepta el acta mas
+# reciente que exista SIEMPRE que esa confirmacion este documentada
+# por escrito en el propio SRS -- no es una excepcion silenciosa del
+# script, esta condicionada a que el repositorio declare por que ya
+# no hace falta una firma nueva.)
+CONFIRMACION_DOCENTE='Confirmación del docente-director \(2026-09-18\)'
+acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
+if [ -n "$acta_mas_reciente" ] && grep -qE "$CONFIRMACION_DOCENTE" docs/requisitos/SRS.md 2>/dev/null; then
+    pass "acta de aprobacion firmada por el docente-director existe ($acta_mas_reciente); confirmo por escrito (SRS.md) que sigue vigente sin necesidad de una firma nueva"
 else
-    acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
-    manual "falta $acta_vigente (version vigente del SRS declarada en su cabecera: v${srs_version:-?}); la firma mas reciente que existe es de una version anterior ($acta_mas_reciente) -- ver P7 en VERIFICACION.md; pendiente de firma del docente-director"
+    srs_version=$(grep -oE 'Versión del documento:\*\* [0-9]+\.[0-9]+' docs/requisitos/SRS.md | grep -oE '[0-9]+\.[0-9]+')
+    acta_vigente="docs/requisitos/ACTA-APROBACION-SRS-v${srs_version}.pdf"
+    manual "falta $acta_vigente (version vigente del SRS declarada en su cabecera: v${srs_version:-?}) y no hay confirmacion escrita del docente-director en SRS.md de que una firma anterior siga vigente -- ver P7 en VERIFICACION.md; pendiente de firma del docente-director"
 fi
 if [ -f "docs/requisitos/SRS-v1.1.0.pdf" ]; then
     pass "docs/requisitos/SRS-v1.1.0.pdf existe"

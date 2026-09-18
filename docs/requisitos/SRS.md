@@ -2097,3 +2097,14 @@ de él.
 > amerita reabrir el ciclo de firma. Si se prefiere una firma que cubra
 > también esta versión, el acta debe regenerarse y someterse de nuevo,
 > igual que para RF-11c.
+>
+> **Confirmación del docente-director (2026-09-18).** Ante la consulta
+> del equipo sobre si el examen suspenso requería una nueva firma para
+> la v1.11, el Ing. Gleiston Cicerón Guerrero Ulloa, Ph.D. confirmó
+> directamente al equipo que la firma ya emitida sobre la v1.8
+> (`ACTA-APROBACION-SRS-v1.8.pdf`, 2026-09-12) sigue vigente y es
+> suficiente; no exige volver a someter el documento ni una firma
+> nueva para las divergencias declaradas arriba (RF-11c y la
+> traducción de los 4 enums). El equipo cierra P7 sobre esa base: la
+> firma existente, con su alcance ya documentado con precisión en esta
+> misma sección, es la evidencia vigente.
