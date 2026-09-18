@@ -10,10 +10,34 @@
 # editorial a clientes automatizados) o 202 (IEEE Xplore responde asi a
 # clientes automatizados en vez de 403, verificado -- el redirect final
 # sí resuelve a un documento real); cualquier otro codigo falla.
-set -euo pipefail
+set -uo pipefail
 
 RETIRED_DOI="10.5281/zenodo.22635766"
 fail=0
+
+# (Corrección 2026-09-18, evaluación del 18-sep: `curl -w "%{http_code}"
+# ... || echo "000"` podia dejar escrito el codigo de un salto de la
+# redireccion (ej. "302") antes de agotar el tiempo, y el `|| echo "000"`
+# lo CONCATENABA en vez de reemplazarlo -- "302000" no es "200" ni "410"
+# y el DOI se marcaba como fallo aunque resolviera. Eso hacia que
+# scripts/verify.sh (y por tanto make verify) terminara en 0 o en 1 segun
+# la suerte de la red, no segun el estado real de los DOI. Ahora se
+# descarta explicitamente cualquier salida parcial cuando curl termina
+# con un codigo de error distinto de cero (se reemplaza por "000", nunca
+# se concatena), se sube el limite a 30s y se agregan 2 reintentos con
+# 2s de espera para timeouts transitorios de Zenodo (medido: 4,3-15s en
+# corridas normales, muy cerca del limite anterior de 20s).
+resolver_doi() {
+    local doi="$1" salida codigo_curl code
+    salida="$(curl -sL -o /dev/null -w '%{http_code}' --max-time 30 --retry 2 --retry-delay 2 "https://doi.org/${doi}" 2>/dev/null)"
+    codigo_curl=$?
+    if [ "$codigo_curl" -ne 0 ]; then
+        code="000"
+    else
+        code="$salida"
+    fi
+    echo "$code"
+}
 
 echo "== DOI de Zenodo citados en el repositorio =="
 zenodo_dois=$(git grep -ohE '10\.5281/zenodo\.[0-9]+' -- '*.md' '*.tex' '*.cff' 2>/dev/null | sort -u)
@@ -24,7 +48,7 @@ if [ -z "$zenodo_dois" ]; then
 fi
 
 for doi in $zenodo_dois; do
-    code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 "https://doi.org/${doi}" || echo "000")
+    code=$(resolver_doi "$doi")
     if [ "$doi" = "$RETIRED_DOI" ]; then
         if [ "$code" = "410" ]; then
             sin_aviso=""
@@ -59,7 +83,7 @@ echo "== DOI de la bibliografia (docs/informe/referencias.bib) =="
 biblio_dois=$(grep -oE 'doi[[:space:]]*=[[:space:]]*\{[^}]+\}' docs/informe/referencias.bib 2>/dev/null | sed -E 's/doi[[:space:]]*=[[:space:]]*\{([^}]+)\}/\1/' | sort -u)
 
 for doi in $biblio_dois; do
-    code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 "https://doi.org/${doi}" || echo "000")
+    code=$(resolver_doi "$doi")
     case "$code" in
         200) echo "OK   $doi -> $code" ;;
         403) echo "OK   $doi -> $code (bloqueo de editorial a clientes automatizados, aceptado)" ;;

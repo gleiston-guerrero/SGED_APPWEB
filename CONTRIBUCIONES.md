@@ -97,9 +97,14 @@ que seguía abierto (nada lo llamaba automáticamente).
 **Titular:** Arcalle Grefa Darwin Orlando.
 
 Traducción de las fuentes (Mermaid, SVG, DSL de C4) en los commits
-`215a4ec` y `f8aeb48`. Revisión visual final de los 4 PNG rasterizados
-(no cubiertos por grep), confirmando que están 100% en inglés, en esta
-ronda — `VERIFICACION.md` (commit `7f6f424`).
+`215a4ec` y `f8aeb48`. Revisión visual final de los 11 PNG rasterizados
+(no cubiertos por grep) — 6 en `docs/arquitectura/` (incluidos los 3
+divididos por dominio del C4 nivel 3) y 5 en `docs/diagramas/`
+(incluidos los 4 del MER dividido por esquema) — confirmando que están
+100% en inglés. Cierre inicial en `VERIFICACION.md` (commit `7f6f424`);
+conteo corregido de 4 a 11 el 2026-09-17/18 (evaluaciones v2 y del
+18-sep), tras dividir el C4 nivel 3 (P6, commit `d5e8aa4`) y el MER
+(commit `51ba4dc`) por módulo.
 
 ## P7 — SRS firmado, con MoSCoW (peso 0,8)
 
@@ -193,6 +198,38 @@ trabajo de fondo de Pallo Pinto (commits `734a79f`, `7ce1474` y
 siguientes). El punto que señalaba la guía (encontrar esa trazabilidad
 sin depender de buscar por nombre de archivo) se cerró documentándolo
 explícitamente en `VERIFICACION.md`, commit `634537b`, de Arcalle Grefa.
+
+---
+
+## Trabajo adicional del 17/18-sep (posterior al primer cierre de este expediente)
+
+**Defecto señalado por la evaluación del 18-sep:** este expediente no se
+había tocado desde el 16-sep y no declaraba nada del trabajo real hecho
+después — en particular, perjudicaba la atribución de Vélez López,
+autor del commit que devolvió `make verify` a código 0 la noche del
+17-sep. Se corrige aquí con la lista completa de commits por persona,
+contrastada contra `git log 2c2c7cf..HEAD`.
+
+**Vélez López Ricardo Elías** (correo institucional en los 5 commits):
+
+| Commit | Qué hace |
+|---|---|
+| `5f99078` | Corrige el defecto real de conteo de Javadoc (P4), y ajusta P5, P10, P11, P12, P14 tras la revisión preliminar del 16-sep |
+| `a6ab791` | Quita un literal `0.60` de `VERIFICACION.md` que rompía el propio chequeo de P12 |
+| `0ecf27a` | P2 contra el despliegue real (`r2rs`), expediente de P6/P8, PDF regenerado, `CITATION.cff` |
+| `43c79cb` | Corrige `CHANGELOG.md` (retiro falso de `informe-entrega-3.pdf`), ajustes de `VERIFICACION.md`, elimina el `informe-final.pdf` duplicado huérfano de la raíz |
+| `e19929a` | **Mueve el chequeo del acta de P7 a "revisión manual"** — el cambio puntual que devolvió `bash scripts/verify.sh` a código de salida 0 la noche del 17-sep, sin el cual la nota quedaba topada en 40% |
+
+**Arcalle Grefa Darwin Orlando** (correo personal, declarado y justificado más abajo):
+autor del resto de los commits de este período — correcciones de P2
+(CLS real del dashboard), la falsa afirmación del 60% (Piso 3), P5
+(prueba sobre fila real de la matriz), P6 (C4 nivel 3 dividido por
+dominio), P7 (confirmación del docente-director sobre la firma de la
+v1.8), P8 (retiro de `v1.0.1`–`v1.0.3`), P10 (resincronización de las
+tablas de roles), P11 (`CONTRASENA_ADMIN` real), P12 (endurecimiento
+del patrón de detección) y P13 (hash SHA-256 de los 15 consentimientos)
+— y del endurecimiento general de `scripts/verify.sh` contra las
+mutaciones de las evaluaciones del 17 y 18-sep.
 
 ---
 

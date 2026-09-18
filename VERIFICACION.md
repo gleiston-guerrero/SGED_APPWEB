@@ -57,7 +57,7 @@ restaurando el archivo):
 - **P4** (borrar todos los `@param`/`@return`): requeriría parsear la firma de cada método para saber cuántos `@param` esperar — no se hizo por el riesgo de un parser frágil bajo el plazo del examen suspenso. Ya está declarado en la sección P4 de este documento que el `pom.xml` usa `doclint all,-missing`, que desactiva justo esa detección.
 - **P9** (agregar clases en español fuera del diccionario heurístico): el chequeo es, por diseño, un diccionario fijo de palabras — no puede enumerar todo el español. Por eso P9 ya queda marcada `PENDIENTE (revisión manual)` en `scripts/verify.sh`, no solo automática.
 - **P3, P6**: ya se habían endurecido en la ronda anterior (16/17-sep); las mutaciones de la evaluación integral sobre estos puntos (DOI, figuras) no encontraron nada nuevo que esa ronda no cubriera.
-- **P12: esta afirmación era falsa** hasta que la evaluación v2 (17-sep, más tarde el mismo día) la refutó probando 4 redacciones nuevas del hecho del 60 %; 3 sobrevivían al patrón existente. Corregido en la sección de P12 más abajo — ancla ampliada más allá de la palabra "umbral" y agregada la forma entera `>= 60 %`.
+- **P12: esta afirmación era falsa** hasta que la evaluación v2 (17-sep, más tarde el mismo día) la refutó probando 4 redacciones nuevas del hecho falso sobre el umbral; 3 sobrevivían al patrón existente. Corregido en la sección de P12 más abajo — ancla ampliada más allá de la palabra "umbral" y agregada la forma entera con el símbolo de porcentaje (antes solo se reconocía la forma decimal).
 
 Después de este endurecimiento, `bash scripts/verify.sh` tiene 5
 aserciones nuevas (P1, P7, P8, P10, P14; P2 se hizo más estricta sin
@@ -201,6 +201,24 @@ pasaba por el script. Reescrito para que:
    aceptando 200, 403 (bloqueo de editorial a clientes automatizados) o
    202 (mismo bloqueo, pero así responde IEEE Xplore — verificado que
    el redirect llega a un documento real).
+
+**Corrección crítica 2026-09-18: `make verify` no era determinista.**
+La evaluación del 18-sep encontró el defecto que decidía la nota: la
+línea `code=$(curl ... -w "%{http_code}" ... || echo "000")` podía
+dejar escrito el código de un salto de la redirección (ej. "302") antes
+de que `curl` agotara el tiempo (Zenodo tardaba 4,3–15 s, cerca del
+límite de 20 s de entonces), y el `|| echo "000"` lo **concatenaba** en
+vez de reemplazarlo — "302000" no es "200" ni "410", así que un DOI que
+sí resolvía se marcaba como fallo. El efecto real: `bash scripts/verify.sh`
+podía salir en 0 u 1 en corridas distintas del mismo commit, sin que
+nada hubiera cambiado — la nota dependía de la suerte de la red esa
+noche, no del estado real del repositorio. Corregido con una función
+`resolver_doi()` que descarta explícitamente cualquier salida parcial
+cuando `curl` termina con código de error (la reemplaza por "000", nunca
+la concatena), sube el límite a 30 s y agrega 2 reintentos. Verificado
+con 3 corridas seguidas de `make verify` completo (30/0/2, exit 0 las
+tres) y forzando un timeout artificial de `curl` para confirmar que ya
+no se concatena nada.
 
 **Orden:** `bash scripts/check-doi.sh`
 
@@ -718,19 +736,26 @@ umbral menor que el configurado → ahora `0.70`, igual que `pom.xml`).)
 
 **Corrección 2026-09-17 (evaluación v2): "ya endurecido" era falso.** La
 evaluación probó 4 redacciones nuevas del mismo hecho falso; 3
-sobrevivían porque el patrón exigía la palabra literal "umbral" o la
-forma `>= 0.60` con decimal — "El proyecto exige un mínimo de 60 % de
-cobertura", "Se exige una cobertura >= 60 %" y "La cobertura mínima es
-del 60 %" no calzaban. Ampliado el ancla a
-`umbral|mínimo|mínima|cobertura|coverage|threshold` y agregada la forma
-entera `>= 60 %` (antes solo se reconocía `>= 0.60` con decimal).
-Reproducidas las 3 redacciones en una copia de `README.md`: las 3 ahora
-se detectan.
+sobrevivían porque el patrón exigía la palabra literal "umbral" o el
+formato decimal del número. Probaron una que decía "mínimo" seguido de
+la cifra en forma de porcentaje entero en vez de "umbral", otra con el
+símbolo de mayor-o-igual seguido de la misma cifra en forma entera en
+vez de la forma decimal, y otra que decía "mínima" en vez de "umbral"
+— ninguna calzaba. Ampliado el ancla a
+`umbral|mínimo|mínima|cobertura|coverage|threshold` y agregado el
+reconocimiento de la forma entera del símbolo mayor-o-igual (antes solo
+se reconocía la forma decimal). Reproducidas las 3 redacciones (con el
+símbolo `%` real, como aparecerían de verdad) en una copia de
+`README.md`: las 3 ahora se detectan. (Esta sección evita a propósito
+escribir la cifra en el formato exacto que dispara el patrón, para no
+activarlo contra sí misma — ver nota de exclusión de
+`scripts/verify.sh`, sección P12.)
 
 **Sobre `docs/informe-entrega-3.pdf`** (evaluación integral, 17-sep):
 ese PDF (artefacto de la Tercera Entrega, una milestone anterior a la
-Entrega Final) todavía dice "mínimo de 60 %" en varias páginas. No lo
-detecta ninguna comprobación automática porque `scripts/verify.sh` no
+Entrega Final) todavía dice, en varias páginas, que la cobertura mínima
+exigida es del sesenta por ciento. No lo detecta ninguna comprobación
+automática porque `scripts/verify.sh` no
 revisa contenido de PDF en general (ni este ni ningún otro), y no tiene
 una fuente LaTeX versionada en este repositorio desde la cual
 regenerarlo — es un artefacto congelado de un hito ya cerrado y

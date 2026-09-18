@@ -251,7 +251,7 @@ if grep -qE "^version:\s*1\.1\.0" CITATION.cff 2>/dev/null; then pass "CITATION.
 # enumeran todas las etiquetas del repo y se falla si aparece alguna que
 # no esté en la lista de historicas ya declaradas y retiradas de
 # VERSIONING.md.)
-ETIQUETAS_ESPERADAS="v0.1.0-entrega-1b v0.7.1 v0.9.0-rc v1.0.0 v1.0.0-previo-07sep v1.0.1 v1.0.2 v1.0.3 v1.1.0"
+ETIQUETAS_ESPERADAS="v0.1.0-entrega-1b v0.7.1 v0.9.0-rc v1.0.0 v1.0.0-previo-07sep v1.1.0"
 etiquetas_reales=$(git tag -l | sort)
 inesperadas=""
 for t in $etiquetas_reales; do
@@ -372,18 +372,22 @@ section "P12 -- una sola cifra de umbral de cobertura en todo el entregable"
 # lo que sus menciones de "mínimo de 60 %" (artefacto congelado de la
 # Tercera Entrega, sin fuente LaTeX versionada para regenerarlo) quedan
 # fuera de esta comprobación automática por diseño, no por descuido.
-# scripts/verify.sh y VERIFICACION.md tambien se excluyen: son la
-# meta-documentacion de este mismo chequeo y citan a proposito las
-# redacciones evasivas de ejemplo -- excluirlas de la busqueda no abre
-# una via real para esconder una afirmacion viva, porque ninguna cifra
-# de umbral vigente del proyecto se declara en ninguno de los dos.)
+#
+# Corrección 2026-09-18 (evaluación del 18-sep): scripts/verify.sh se
+# excluye porque es la meta-documentacion de este mismo chequeo (cita
+# el patron en sus propios comentarios). VERIFICACION.md YA NO se
+# excluye -- estaba excluido hasta este commit, lo cual el barrido no
+# podia detectar si alguien escribia ahi una afirmacion viva falsa del
+# 60%. Sus ejemplos de redacciones evasivas se reescribieron sin el
+# simbolo "%" (con la palabra "por ciento") para no disparar su propio
+# patron -- ver VERIFICACION.md, seccion P12.)
 pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -u)
 # (Corrección 2026-09-17, evaluación v2: el ancla "umbral" no cubre
 # "minimo de 60%" ni ">= 60%" en forma entera -- probaron 4 redacciones,
 # 3 sobrevivieron. Ancla ampliada a minimo/minima/cobertura/coverage/
 # threshold ademas de umbral, y agregado el patron entero ">=60%".)
 ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
-stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)|(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)[^.]{0,60}(${ANCLA})|≥\s*60\s*%|>=?\s*0\.60|>=\s*60\s*%" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!VERIFICACION.md' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
+stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)|(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)[^.]{0,60}(${ANCLA})|≥\s*60\s*%|>=?\s*0\.60|>=\s*60\s*%" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
     pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"

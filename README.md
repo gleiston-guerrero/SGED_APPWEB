@@ -134,7 +134,7 @@ mediciones, trazabilidad, ética), `k6/`, `scripts/`, `.github/workflows/`.
 ## Evidencia y reproducibilidad
 
 * **Informe de la Entrega Final (PDF):**
-  [`docs/informe/main.pdf`](docs/informe/main.pdf) — 72 páginas,
+  [`docs/informe/main.pdf`](docs/informe/main.pdf) — 74 páginas,
   cerrado en la etiqueta `v1.1.0`.
 * Fuente del informe: [`docs/informe/main.tex`](docs/informe/main.tex),
   compilable con `pdflatex→bibtex→pdflatex→pdflatex→pdflatex` (`make docs`).
