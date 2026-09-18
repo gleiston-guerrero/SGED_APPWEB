@@ -26,7 +26,10 @@ Para el **examen suspenso** (Guía del examen suspenso, UTEQ, cierre
 `v1.1.0` ("Lo que no esté dentro de la etiqueta no existe. Muevan v1.1.0
 al último commit que quieren que revise"): es la que se movió, siguiendo
 el mismo criterio que `v1.0.0` tuvo antes, hasta quedar fija sobre el
-commit final defendido (`aaffcc2`, 2026-09-17). `v1.0.0` dejó de moverse
+commit final defendido — el hash exacto es el que resuelve
+`git rev-parse v1.1.0^{commit}` en cada momento, en vez de repetirlo
+aquí fijo (esta misma línea citaba `aaffcc2`, ya superado, señalado por
+la evaluación v2 del 17-sep). `v1.0.0` dejó de moverse
 desde que se creó `v1.1.0` y pasa a ser un punto de referencia histórico
 (el corte que se defendió en el examen final original, antes del
 suspenso).

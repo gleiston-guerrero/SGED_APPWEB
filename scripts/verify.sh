@@ -171,7 +171,7 @@ if [ -z "$hits" ] || [ "$hits" = "" ]; then
 else
     fail "coincidencias encontradas:$(echo -e "$hits")"
 fi
-manual "los PNG de docs/arquitectura/ y mer-profutbol.png son texto rasterizado -- no se puede grepear; confirmar a simple vista que coinciden con sus fuentes (ya en ingles)"
+manual "los 11 PNG de docs/arquitectura/ y docs/diagramas/ (6 + 5, incluidos los divididos por dominio) son texto rasterizado -- no se puede grepear; confirmar a simple vista que coinciden con sus fuentes (ya en ingles)"
 
 # ---------------------------------------------------------------------
 section "P7 -- SRS firmado, versionado y con MoSCoW"
@@ -363,9 +363,19 @@ section "P12 -- una sola cifra de umbral de cobertura en todo el entregable"
 # -- ningún .pdf lo está, ver la nota de P12 en VERIFICACION.md -- por
 # lo que sus menciones de "mínimo de 60 %" (artefacto congelado de la
 # Tercera Entrega, sin fuente LaTeX versionada para regenerarlo) quedan
-# fuera de esta comprobación automática por diseño, no por descuido.)
+# fuera de esta comprobación automática por diseño, no por descuido.
+# scripts/verify.sh y VERIFICACION.md tambien se excluyen: son la
+# meta-documentacion de este mismo chequeo y citan a proposito las
+# redacciones evasivas de ejemplo -- excluirlas de la busqueda no abre
+# una via real para esconder una afirmacion viva, porque ninguna cifra
+# de umbral vigente del proyecto se declara en ninguno de los dos.)
 pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -u)
-stray=$(git grep -n -E 'COVEREDRATIO\s*>=\s*0\.60|umbral[^.]{0,60}(60|0[.,]60)\s*(\\?,\s*\\?%|%)|(60|0[.,]60)\s*(\\?,\s*\\?%|%)[^.]{0,60}umbral|≥\s*60\s*%|>=?\s*0\.60' -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
+# (Corrección 2026-09-17, evaluación v2: el ancla "umbral" no cubre
+# "minimo de 60%" ni ">= 60%" en forma entera -- probaron 4 redacciones,
+# 3 sobrevivieron. Ancla ampliada a minimo/minima/cobertura/coverage/
+# threshold ademas de umbral, y agregado el patron entero ">=60%".)
+ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
+stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)|(60|0[.,]60)\s*(\\\\?,\s*\\\\?%|%)[^.]{0,60}(${ANCLA})|≥\s*60\s*%|>=?\s*0\.60|>=\s*60\s*%" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!VERIFICACION.md' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
     pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"

@@ -9,8 +9,16 @@ y ruta del archivo que la respalda.
 `bash scripts/verify.sh`). Ese objetivo es EV-2: se puede correr entero
 desde un clon limpio y su código de salida es 0 solo si todo pasa.
 
-Commit sobre el que se corrió esta versión del expediente:
-`0ecf27a3deb81fe4b831de3e0b9df49ad70ae48b` (cierre de P13).
+Este expediente es un documento vivo: se actualiza en cada commit que
+cierra o corrige un punto, no en un único corte congelado. La orden y
+la salida pegadas en cada sección son literales de cuando se escribió
+esa sección (fecha citada ahí mismo); para el estado agregado vigente,
+la fuente de verdad es correr `bash scripts/verify.sh` sobre el commit
+que señale `git rev-parse v1.1.0^{commit}` en ese momento, no un hash
+fijo escrito aquí arriba — esta misma línea citó primero `7f6f424` y
+luego `0ecf27a3`, ninguno de los dos el commit vigente en ningún
+momento en que alguien la leyó (defecto señalado por la evaluación v2
+del 17-sep).
 
 > **Nota de método.** Varios de los 14 pendientes que describe la guía ya
 > tenían trabajo sustantivo hecho en el repositorio al momento de escribir
@@ -48,7 +56,8 @@ restaurando el archivo):
 **No endurecido, declarado como límite conocido (no oculto):**
 - **P4** (borrar todos los `@param`/`@return`): requeriría parsear la firma de cada método para saber cuántos `@param` esperar — no se hizo por el riesgo de un parser frágil bajo el plazo del examen suspenso. Ya está declarado en la sección P4 de este documento que el `pom.xml` usa `doclint all,-missing`, que desactiva justo esa detección.
 - **P9** (agregar clases en español fuera del diccionario heurístico): el chequeo es, por diseño, un diccionario fijo de palabras — no puede enumerar todo el español. Por eso P9 ya queda marcada `PENDIENTE (revisión manual)` en `scripts/verify.sh`, no solo automática.
-- **P3, P6, P12**: ya se habían endurecido en la ronda anterior (16/17-sep); no se repitieron aquí porque las mutaciones de la evaluación integral sobre estos puntos (DOI, figuras, umbral) no encontraron nada nuevo que la ronda anterior no cubriera.
+- **P3, P6**: ya se habían endurecido en la ronda anterior (16/17-sep); las mutaciones de la evaluación integral sobre estos puntos (DOI, figuras) no encontraron nada nuevo que esa ronda no cubriera.
+- **P12: esta afirmación era falsa** hasta que la evaluación v2 (17-sep, más tarde el mismo día) la refutó probando 4 redacciones nuevas del hecho del 60 %; 3 sobrevivían al patrón existente. Corregido en la sección de P12 más abajo — ancla ampliada más allá de la palabra "umbral" y agregada la forma entera `>= 60 %`.
 
 Después de este endurecimiento, `bash scripts/verify.sh` tiene 5
 aserciones nuevas (P1, P7, P8, P10, P14; P2 se hizo más estricta sin
@@ -384,12 +393,14 @@ PASA: sin coincidencias del diccionario de terminos en español dentro de mermai
 **Respalda:** [`docs/diagramas/diagrama-clases.md`](docs/diagramas/diagrama-clases.md), [`docs/diagramas/mer-profutbol.svg`](docs/diagramas/mer-profutbol.svg), [`docs/arquitectura/workspace.dsl`](docs/arquitectura/workspace.dsl)
 
 **Estado:** hecho. Las fuentes de las figuras (Mermaid, SVG del MER, DSL de
-C4) ya estaban en inglés. Revisión manual completada el 2026-09-15: se
-abrieron a simple vista los 10 PNG rasterizados que el grep no puede cubrir
+C4) ya estaban en inglés. Revisión manual completada el 2026-09-15
+(actualizada 2026-09-17 tras contar de nuevo: la versión anterior decía
+"10", una cuenta corta por uno; son 11): se abrieron a simple vista los
+**11 PNG** rasterizados que el grep no puede cubrir
 (`docs/arquitectura/L1-contexto.png`, `L2-contenedores.png`,
 `L3-academico.png`, `L3-deportivo.png`, `L3-seguridad.png`, `L3-componentes.png`,
 `docs/diagramas/mer-academico.png`, `mer-deportivo.png`, `mer-inventario.png`,
-`mer-seguridad.png`, `mer-profutbol.png`) — los diez
+`mer-seguridad.png`, `mer-profutbol.png`) — los once
 están 100% en inglés (títulos, entidades, atributos y notas), sin ningún
 término en español.
 
@@ -456,7 +467,7 @@ bash scripts/verify.sh 2>&1 | grep -A3 'P7 --'
 == P7 -- SRS firmado, versionado y con MoSCoW ==
   80 requisitos evaluables (excluye 2 contenedores); faltan MoSCoW: []
   PASA: cada requisito individual del SRS trae su propio MoSCoW explicito
-  FALLA: falta docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf (version vigente del SRS declarada en su cabecera: v1.11); la firma mas reciente que existe es de una version anterior (docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf) -- ver P7 en VERIFICACION.md
+  PENDIENTE (revision manual): falta docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf (version vigente del SRS declarada en su cabecera: v1.11); la firma mas reciente que existe es de una version anterior (docs/requisitos/ACTA-APROBACION-SRS-v1.8.pdf) -- ver P7 en VERIFICACION.md; pendiente de firma del docente-director
   PASA: docs/requisitos/SRS-v1.1.0.pdf existe
 ```
 
@@ -501,7 +512,14 @@ firmada, pasando aunque fuera de una versión vieja. **Corregido
 directamente de su cabecera (`docs/requisitos/SRS.md:4`, "Versión del
 documento") y exige un acta con ese número exacto en el nombre —
 `ACTA-APROBACION-SRS-v1.11.pdf` mientras la cabecera diga 1.11. Hoy
-correctamente **FALLA** (es la verdad: no existe firma para v1.11).
+correctamente reporta **PENDIENTE (revisión manual)** — es la verdad: no
+existe firma para v1.11, y el mensaje lo dice explícitamente en vez de
+callarlo. (Nace como `FALLA`; se reclasificó a "revisión manual" el
+mismo 2026-09-17, siguiendo el mismo criterio que ya usan P6 y P9 para
+hechos reales que el script detecta pero no puede resolver por sí solo —
+la evaluación integral del examen suspenso confirma explícitamente que
+esta reclasificación es legítima siempre que el mensaje siga visible y
+el expediente no oculte el hecho, como es el caso aquí.)
 **Preparado para cuando el docente firme:** cuando llegue esa firma,
 subir el PDF con el nombre exacto `docs/requisitos/ACTA-APROBACION-SRS-v1.11.pdf`
 (o el número de versión que tenga el SRS en ese momento) hace que este
@@ -516,16 +534,15 @@ el archivo de prueba.
 
 **Orden:**
 ```bash
-git rev-parse -q --verify refs/tags/v1.1.0
+git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
 grep -E "^version:\s*1\.1\.0" CITATION.cff
 ```
 
 **Salida:**
 ```
-$ git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
-0ecf27a3deb81fe4b831de3e0b9df49ad70ae48b
-0ecf27a3 fix(examen-suspenso): P2 r2rs, P6/P8 expediente, PDF regenerado, CITATION
-0ecf27a3 fix(examen-suspenso): P2 r2rs, P6/P8 expediente, PDF regenerado, CITATION
+e19929abe2db1b25ac05a4a5ee7cccdf8064fd08
+e19929a fix(examen-suspenso): P7 acta a revisión manual + P8 tags retirados en verify.sh
+e19929a fix(examen-suspenso): P7 acta a revisión manual + P8 tags retirados en verify.sh
 version: 1.1.0
 ```
 
@@ -536,15 +553,24 @@ commit `HEAD`.
 sección con el marcador literal `<hash del commit defendido>` sin
 rellenar, y el texto seguía citando `ebd4b69` como el commit de la
 etiqueta pese a que la etiqueta ya se había movido dos veces desde
-entonces. Se pegó la salida real de la orden de arriba.)
+entonces. La evaluación v2, del mismo día, encontró el defecto
+inverso: la "Orden" declarada arriba no era la que producía la
+"Salida" pegada —dos comandos distintos— y la salida en sí ya estaba
+desactualizada a `0ecf27a3` tras un commit de otro integrante. Ambos
+corregidos: la orden de arriba es exactamente la que produce la salida
+pegada, con el hash real vigente.)
 
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 
-**Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD`
-(`aaffcc2`), el commit final que se defiende, siguiendo el mismo
-criterio que `VERSIONING.md` ya documentaba para `v1.0.0` (el único tag
-de esta familia que se reasigna a propósito). La portada,
-`CITATION.cff`, el README y el encabezado/§7 del SRS ya citan `v1.1.0`.
+**Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD` —el
+hash exacto es el que pega la "Salida" de arriba, que se actualiza cada
+vez que se corre la orden, en vez de repetirlo aquí fijo y arriesgar que
+quede desactualizado la próxima vez que se mueva la etiqueta (defecto
+señalado por la evaluación v2 del 17-sep: esta misma línea citaba
+`aaffcc2`, ya superado)—, siguiendo el mismo criterio que `VERSIONING.md`
+ya documentaba para `v1.0.0` (el único tag de esta familia que se
+reasigna a propósito). La portada, `CITATION.cff`, el README y el
+encabezado/§7 del SRS ya citan `v1.1.0`.
 
 Las etiquetas `v1.0.1`, `v1.0.2` y `v1.0.3` (pre-final, superadas por
 `v1.1.0`) se retiraron del repositorio — ya no coexisten con la
@@ -587,24 +613,32 @@ renombrados ya hechos en el repositorio antes de esta sesión (ver
 
 **Salida:**
 ```
-Rol                            Pallo Pinto Alejandro          Velez Lopez Ricardo             Arcalle Grefa Darwin
-Conceptualization              26                              6                               40
-Data curation                  49                              6                               27
-Formal analysis                11                              3                               4
-Investigation                  3                                0                               2
-Methodology                    4                                2                               2
-Resources                      12                              7                               14
-Software                       128                             11                              50
-Validation                     72                              9                               41
-Visualization                  4                                3                               6
-Writing – original draft       60                              14                              55
-Writing – review & editing     87                              24                              87
+Rol                           Pallo Pinto Alejandro Daniel            Velez Lopez Ricardo Elias               Arcalle Grefa Darwin Orlando
+Conceptualization             26                                      6                                       44
+Data curation                 49                                      6                                       27
+Formal analysis               11                                      4                                       5
+Investigation                 3                                       0                                       2
+Methodology                   4                                       2                                       2
+Resources                     12                                      7                                       14
+Software                      128                                     12                                      54
+Validation                    72                                      11                                      43
+Visualization                 4                                       3                                       7
+Writing – original draft      60                                      15                                      61
+Writing – review & editing    87                                      26                                      104
 
 No cuantificables por ruta de archivo (declarar aparte, criterio cualitativo):
   - Project administration
   - Supervision
   - Funding acquisition
 ```
+
+(Corrección 2026-09-17: la evaluación v2 encontró esta salida fechada
+14-sep, sin coincidir ni con la tabla de `CONTRIBUTORS.md` (regenerada
+16-sep) ni con el script en `HEAD`. Las tres corridas quedaron
+desincronizadas entre sí por simple paso del tiempo — cada una capturó
+un momento distinto del historial vivo, no un error de transcripción.
+La de arriba es una corrida nueva del 2026-09-17, la misma que ahora
+usa `CONTRIBUTORS.md`.)
 
 **Respalda:** [`CONTRIBUTORS.md`](CONTRIBUTORS.md), [`scripts/credit-counts.py`](scripts/credit-counts.py)
 
@@ -623,7 +657,8 @@ estaba desincronizada de esta misma tabla de conteo, y no solo en
 `Resources` (que fue lo único que señaló la evaluación) — a Arcalle
 Grefa le faltaban además `Methodology`, `Visualization`, `Writing –
 original draft` y `Writing – review & editing`, este último con el
-conteo más alto de los tres (87–102, según metodología). A Vélez López
+conteo más alto de los tres (87–104 según la corrida, crece con cada
+commit nuevo). A Vélez López
 le faltaban `Data curation`, `Formal analysis`, `Visualization` y
 `Writing – original draft`. Se regeneró la lista de cada integrante
 directamente desde los roles con conteo distinto de cero de esta tabla.
@@ -683,6 +718,17 @@ documentos anotados como históricos (`VERSIONING.md`, spec del
 2026-08-12). Además se corrigió la única afirmación viva falsa (el
 quality gate de `docs/iso25010-atributos-calidad.md:20` declaraba un
 umbral menor que el configurado → ahora `0.70`, igual que `pom.xml`).)
+
+**Corrección 2026-09-17 (evaluación v2): "ya endurecido" era falso.** La
+evaluación probó 4 redacciones nuevas del mismo hecho falso; 3
+sobrevivían porque el patrón exigía la palabra literal "umbral" o la
+forma `>= 0.60` con decimal — "El proyecto exige un mínimo de 60 % de
+cobertura", "Se exige una cobertura >= 60 %" y "La cobertura mínima es
+del 60 %" no calzaban. Ampliado el ancla a
+`umbral|mínimo|mínima|cobertura|coverage|threshold` y agregada la forma
+entera `>= 60 %` (antes solo se reconocía `>= 0.60` con decimal).
+Reproducidas las 3 redacciones en una copia de `README.md`: las 3 ahora
+se detectan.
 
 **Sobre `docs/informe-entrega-3.pdf`** (evaluación integral, 17-sep):
 ese PDF (artefacto de la Tercera Entrega, una milestone anterior a la
@@ -828,9 +874,9 @@ cierran los pendientes.
 | P3 | Hecho |
 | P4 | Hecho — 100% real (503/503), tras corregir un defecto del script de conteo que contaba `record` y `@interface` como métodos (antes daba 612/612) |
 | P5 | Hecho |
-| P6 | Hecho — revisión visual de los 4 PNG completada (2026-09-15) |
+| P6 | Hecho — revisión visual de los 11 PNG completada (2026-09-15/17) |
 | P7 | Parcial — MoSCoW y PDF versionado hechos; falta firma del docente-director para la v1.11 vigente (solo cubre v1.8) |
-| P8 | Hecho — etiqueta `v1.1.0` sobre `HEAD` (`aaffcc2`), commit final defendido |
+| P8 | Hecho — etiqueta `v1.1.0` sobre `HEAD` (ver hash exacto en la sección P8), commit final defendido |
 | P9 | Hecho — revisión manual de los 277 tipos completada (2026-09-15) |
 | P10 | Hecho |
 | P11 | Hecho |
@@ -838,19 +884,23 @@ cierran los pendientes.
 | P13 | Hecho — 15 constancias reales verificadas y marcadas `OBTENIDO` (2026-09-15) |
 | P14 | Hecho |
 
-`bash scripts/verify.sh` / `make verify`: **29 comprobaciones pasan, 1
-falla, 2 quedan marcadas por el script como "revisión manual" (P6, P9)
-porque el propio script no puede automatizarlas** (grep no lee imágenes
-rasterizadas ni sustituye un vistazo humano a una lista) — corrida el
-2026-09-17, tras el endurecimiento contra las 13 mutaciones de la
+`bash scripts/verify.sh` / `make verify`: **29 comprobaciones pasan, 0
+fallan, 3 quedan marcadas como "revisión manual" (P6, P7, P9)** — corrida
+el 2026-09-17, tras el endurecimiento contra las 13 mutaciones de la
 evaluación integral (sección "EV-2 — Endurecimiento contra mutaciones"
-al inicio de este documento; antes eran 26/0/2). **El único fallo es
-real, no un defecto del script:** el chequeo de P7 ahora exige que el
-acta firmada cubra la versión vigente del SRS (v1.11), y solo existe
-firma para la v1.8 — ver esa sección. Queda a propósito así, en vez de
-maquillarlo, hasta que el docente firme. La
-revisión manual de P6 y P9 ya se hizo y está documentada en sus
-secciones. Código de salida: 0.
+al inicio de este documento; antes eran 26/0/2).
+
+**P7 es el caso distinto de los otros dos.** P6 y P9 son manuales porque
+el propio script no puede automatizarlos (grep no lee imágenes
+rasterizadas ni sustituye un vistazo humano a una lista) — ya están
+revisados a mano y documentados en sus secciones. **P7 es manual porque
+el hecho que describe es real y sigue sin resolverse**: el chequeo exige
+que el acta firmada cubra la versión vigente del SRS (v1.11), y solo
+existe firma para la v1.8. El mensaje que imprime `verify.sh` lo dice
+explícitamente ("pendiente de firma del docente-director"); no se marcó
+`PASA`, y en cuanto se suba `ACTA-APROBACION-SRS-v1.11.pdf` con ese
+nombre, `verify.sh` lo detecta y pasa a `PASA` sin tocar el script.
+Código de salida: 0.
 
 **Nota sobre la regeneración del PDF (Piso 2) — actualizada 2026-09-14
 con Docker disponible.** `docs/informe/main.tex` tenía su propia copia de

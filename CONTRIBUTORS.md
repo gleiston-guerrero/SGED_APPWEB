@@ -37,22 +37,22 @@ nota ¹).
 
 | Rol CRediT | Integrante(s) | Cobertura |
 |---|---|---|
-| Conceptualization | Darwin (43), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
+| Conceptualization | Darwin (44), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
 | Data curation | Alejandro (49), Darwin (27), Ricardo (6) | Diseño del esquema, procedimientos almacenados y limpieza de los datos crudos de medición. |
-| Formal analysis | Alejandro (11), Darwin (5), Ricardo (3) | Análisis estadístico de los datos de rendimiento y usabilidad (intervalos, distribución t). |
+| Formal analysis | Alejandro (11), Darwin (5), Ricardo (4) | Análisis estadístico de los datos de rendimiento y usabilidad (intervalos, distribución t). |
 | Funding acquisition | — | No aplica (proyecto académico sin financiación externa). |
 | Investigation | Alejandro (3), Darwin (2)¹ | Relevamiento de requisitos con la escuela ProFútbol y recolección de evidencia empírica — trabajo de campo, no solo edición de archivos; ver nota ¹. |
 | Methodology | Alejandro (4), Ricardo (2), Darwin (2)¹ | Proceso de investigación (DSR) y protocolo de medición; ver nota ¹. |
 | Project administration | Darwin¹ | Administración del proyecto, calendario y gestión de entregas: gestión de las etiquetas de release (`v1.0.1`/`v1.0.2`/`v1.0.3`/`v1.1.0` movidas por Darwin), coordinación del expediente de verificación EV-1/EV-2/EV-3 y del acta de aprobación — no se refleja en rutas de archivo; ver nota ¹. |
 | Resources | Alejandro (12), Darwin (14), Ricardo (7) | Configuración del entorno de despliegue (Render), contenedores Docker y base de datos. |
-| Software | Alejandro (128), Darwin (51), Ricardo (11) | Implementación de backend (Spring Boot), frontend (Angular) y procedimientos almacenados. |
+| Software | Alejandro (128), Darwin (54), Ricardo (12) | Implementación de backend (Spring Boot), frontend (Angular) y procedimientos almacenados. |
 | Supervision | Darwin¹ | Coordinación del equipo y seguimiento del repositorio (revisión e integración del trabajo de los tres integrantes en `main`, expediente `CONTRIBUCIONES.md`) — no se refleja en rutas de archivo; ver nota ¹. |
-| Validation | Alejandro (72), Darwin (41), Ricardo (9) | Pruebas de cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. |
+| Validation | Alejandro (72), Darwin (43), Ricardo (11) | Pruebas de cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. |
 | Visualization | Darwin (7), Alejandro (4), Ricardo (3) | Diagramas C4 y de arquitectura del sistema. |
-| Writing – original draft | Alejandro (60), Darwin (59), Ricardo (14) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
-| Writing – review & editing | Darwin (97), Alejandro (87), Ricardo (24) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
+| Writing – original draft | Darwin (61), Alejandro (60), Ricardo (15) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
+| Writing – review & editing | Darwin (104), Alejandro (87), Ricardo (26) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
 
-*(Conteos regenerados el 2026-09-16 con `scripts/credit-counts.py` sobre
+*(Conteos regenerados el 2026-09-17 con `scripts/credit-counts.py` sobre
 `main` actual; cambian ligeramente con cada commit porque corren sobre
 el historial vivo — ver nota metodológica en "Conteo por rol".)*
 
@@ -77,20 +77,24 @@ declarado y coherente con los archivos que cada uno escribió").
 
 | Rol | Pallo Pinto Alejandro | Vélez López Ricardo | Arcalle Grefa Darwin |
 |---|---:|---:|---:|
-| Conceptualization | 26 | 6 | 40 |
+| Conceptualization | 26 | 6 | 44 |
 | Data curation | 49 | 6 | 27 |
-| Formal analysis | 11 | 3 | 4 |
+| Formal analysis | 11 | 4 | 5 |
 | Investigation | 3 | 0 | 2 |
 | Methodology | 4 | 2 | 2 |
 | Resources | 12 | 7 | 14 |
-| Software | 128 | 11 | 50 |
-| Validation | 72 | 9 | 41 |
-| Visualization | 4 | 3 | 6 |
-| Writing – original draft | 60 | 14 | 55 |
-| Writing – review & editing | 87 | 24 | 87 |
+| Software | 128 | 12 | 54 |
+| Validation | 72 | 11 | 43 |
+| Visualization | 4 | 3 | 7 |
+| Writing – original draft | 60 | 15 | 61 |
+| Writing – review & editing | 87 | 26 | 104 |
 
-_Medido 2026-09-14 sobre `main`. Reproducible con
-`python3 scripts/credit-counts.py`._
+_Medido 2026-09-17 sobre `main`. Reproducible con
+`python3 scripts/credit-counts.py`. (Corrección 2026-09-17: hasta
+entonces convivían dos corridas congeladas de fechas distintas —
+14-sep en esta tabla, 16-sep en la de arriba— que ya no coincidían
+entre sí ni con el script en HEAD; ambas se regeneraron juntas, en la
+misma corrida, señalado por la evaluación v2 del 17-sep.)_
 
 ## Evidencia cuantitativa (derivada de `git log`, no autodeclarada)
 
