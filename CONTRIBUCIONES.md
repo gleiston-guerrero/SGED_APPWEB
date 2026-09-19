@@ -38,12 +38,21 @@ específica de Velez Lopez Ricardo Elias descrita abajo.
 
 ## P2 — Lighthouse (peso 0,9)
 
-**Titular:** Pallo Pinto Alejandro Daniel.
+**Titular del cierre:** Velez Lopez Ricardo Elias y Arcalle Grefa Darwin
+Orlando.
 
-Las 3 corridas por perfil (móvil/escritorio) contra el despliegue público
-y su versionado en `docs/mediciones/lighthouse/` son trabajo de fondo de
-Pallo Pinto (commit `9f75e71` y siguientes). No requirió cierre adicional
-en esta ronda: `VERIFICACION.md` documenta la orden que lo comprueba.
+Las 3 corridas por perfil (móvil/escritorio) versionadas en
+`docs/mediciones/lighthouse/` son trabajo de fondo de **Pallo Pinto
+Alejandro Daniel**, previo a la guía (commit `9f75e71`, 28-jul). La guía
+encontró que no había informe de Lighthouse contra el despliegue público,
+y ese es el cierre que corrigió: **Velez Lopez Ricardo Elias**, las seis
+corridas contra el despliegue público real `r2rs` y la exigencia de URL
+pública en el verificador (commit `0ecf27a`); **Arcalle Grefa Darwin
+Orlando**, las corridas de panel e inventario y la corrección de dos
+causas reales de CLS que las corridas exponían (commit `efa0ca0`).
+(Corrección 2026-09-18: la versión anterior de este expediente declaraba
+"no requirió cierre adicional en esta ronda", lo que contradecía el
+hallazgo de la guía y el trabajo real posterior.)
 
 ## P3 — DOI retirado (peso 0,5)
 
@@ -158,13 +167,22 @@ Arcalle Grefa, commit `634537b`.
 
 ## P12 — Umbral de cobertura unificado (peso 0,5)
 
-**Titular:** Pallo Pinto Alejandro Daniel, con verificación de Arcalle
-Grefa Darwin Orlando.
+**Titular del cierre:** Arcalle Grefa Darwin Orlando y Velez Lopez Ricardo
+Elias.
 
 La corrección original de esta misma inconsistencia (RNF-09 citaba el
-umbral equivocado) es de Pallo Pinto, commit `76e4e48`. La verificación
-de que todo el entregable sigue citando 70% de forma consistente es de
-Arcalle Grefa, commit `e70f02a`.
+umbral equivocado) es de **Pallo Pinto Alejandro Daniel**, commit
+`76e4e48` (2-sep), trabajo de fondo previo a la guía. El cierre posterior
+a la guía, con el barrido y la detección por mutación que exige el
+criterio, es de: **Arcalle Grefa Darwin Orlando**, corrección de la
+afirmación falsa sobre el 60% en `main.tex`/`SRS.md` (commit `04cf112`) y
+ampliación del patrón de detección a redacciones evasivas — "60 por
+ciento", "0,6", "60~\%" (commit `af23fb9`); **Velez Lopez Ricardo Elias**,
+extensión del barrido a todo el repositorio y al formato LaTeX, con
+corrección de la cita `0.60` en `iso25010` (commit `5f99078`).
+(Corrección 2026-09-18: la versión anterior de este expediente atribuía
+el cierre entero a Pallo Pinto por el commit de 2-sep, ignorando el
+trabajo posterior a la guía.)
 
 ## P13 — Consentimientos informados del SUS (peso 0,5)
 
