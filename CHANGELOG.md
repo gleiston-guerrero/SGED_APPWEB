@@ -46,8 +46,8 @@ la excepción declarada en [VERSIONING.md](VERSIONING.md)).
 - 14 archivos de test que habían quedado sin compilar por una mezcla
   incorrecta de campos en inglés (mis entidades) y en español (paquete
   `deportivo`, DTOs) tras un *rename* automático.
-- **DOI de Zenodo del software** (Punto 9 de la rúbrica): el DOI anterior
-  (`10.5281/zenodo.22635766`) había quedado retirado/*tombstone* en
+- **DOI de Zenodo del software** (Punto 9 de la rúbrica): el depósito
+  anterior había quedado retirado/*tombstone* (HTTP 410) en
   Zenodo por publicarse como depósito independiente en vez de nueva
   versión de la serie del concept DOI `10.5281/zenodo.21713239`. Nueva
   versión publicada el 2026-09-11 vía integración GitHub→Zenodo sobre el

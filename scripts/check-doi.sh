@@ -1,19 +1,24 @@
 #!/usr/bin/env bash
 # Resuelve cada DOI de Zenodo citado en cualquier archivo versionado
-# (.md/.tex/.cff), no solo en README.md/CITATION.cff. El DOI marcado
-# como retirado (10.5281/zenodo.22635766, tombstone en Zenodo) se
-# comprueba aparte: se exige que devuelva 410 (confirma que sigue
-# retirado) y que TODAS las citas -- en cualquier archivo -- digan
-# explicitamente que no debe citarse. El resto de DOI de Zenodo deben
-# resolver a 200. Ademas revisa los DOI de la bibliografia
-# (docs/informe/referencias.bib): aceptan 200, 403 (bloqueo de
-# editorial a clientes automatizados) o 202 (IEEE Xplore responde asi a
-# clientes automatizados en vez de 403, verificado -- el redirect final
-# sí resuelve a un documento real); cualquier otro codigo falla.
+# (.md/.tex/.cff), no solo en README.md/CITATION.cff. TODOS deben
+# resolver a 200. El deposito retirado (tombstone en Zenodo, 410) ya no
+# se cita en ningun documento; este script falla si vuelve a aparecer
+# en una cita, para que no regrese sin que nadie lo note. Ademas revisa
+# los DOI de la bibliografia (docs/informe/referencias.bib): aceptan
+# 200, 403 (bloqueo de editorial a clientes automatizados) o 202 (IEEE
+# Xplore responde asi a clientes automatizados en vez de 403,
+# verificado -- el redirect final si resuelve a un documento real);
+# cualquier otro codigo falla.
 set -uo pipefail
 
 RETIRED_DOI="10.5281/zenodo.22635766"
 fail=0
+
+if git grep -q "$RETIRED_DOI" -- '*.md' '*.tex' '*.cff' '*.bib' 2>/dev/null; then
+    echo "FAIL el DOI retirado ($RETIRED_DOI, 410) vuelve a estar citado:"
+    git grep -n "$RETIRED_DOI" -- '*.md' '*.tex' '*.cff' '*.bib'
+    fail=1
+fi
 
 # (Corrección 2026-09-18, evaluación del 18-sep: `curl -w "%{http_code}"
 # ... || echo "000"` podia dejar escrito el codigo de un salto de la
@@ -49,27 +54,6 @@ fi
 
 for doi in $zenodo_dois; do
     code=$(resolver_doi "$doi")
-    if [ "$doi" = "$RETIRED_DOI" ]; then
-        if [ "$code" = "410" ]; then
-            sin_aviso=""
-            for f in $(git grep -l "$RETIRED_DOI" -- '*.md' '*.tex' '*.cff' 2>/dev/null); do
-                if ! grep -B1 -A2 "$RETIRED_DOI" "$f" | grep -qi "no debe citarse\|retirado\|tombstone"; then
-                    sin_aviso="$sin_aviso $f"
-                fi
-            done
-            if [ -z "$sin_aviso" ]; then
-                echo "OK   $doi -> $code (retirado, documentado como tal en todas sus citas)"
-            else
-                echo "FAIL $doi -> $code, pero estos archivos no explican que esta retirado:$sin_aviso"
-                fail=1
-            fi
-        else
-            echo "FAIL $doi -> $code (se esperaba 410: si volvio a estar disponible, hay que decidir si se cita)"
-            fail=1
-        fi
-        continue
-    fi
-
     if [ "$code" = "200" ]; then
         echo "OK   $doi -> $code"
     else

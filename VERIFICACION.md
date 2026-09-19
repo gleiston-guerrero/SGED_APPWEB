@@ -188,6 +188,23 @@ Windows. Corregido en el mismo commit: ambos `open()` de
 
 ## P3 — DOI retirado (peso 0,5)
 
+**Corrección 2026-09-19: el DOI retirado ya no se declara.** El criterio
+de la guía es "todos los DOI declarados resolviendo a 200". Citar el
+depósito retirado, aunque fuera advirtiendo que estaba retirado, seguía
+siendo declararlo, y no puede resolver a 200: Zenodo lo dio de baja
+(*tombstone*, HTTP 410) porque se había publicado como registro
+independiente y no como nueva versión de la serie del concept DOI
+`10.5281/zenodo.21713239`, error que se corrigió publicando la serie
+vigente (`22714477`, `22730565` y `22739944`). Se retiró de `README.md`,
+`CITATION.cff`, `docs/informe/main.tex` (y su PDF), `docs/checklists/fair.md`
+y `docs/observaciones/OBSERVACIONES.md`; el motivo queda explicado, sin
+el identificador, en `CHANGELOG.md`, `README.md` y `main.tex`. El
+historial de git conserva el DOI y su corte (`v1.0.1`). `scripts/check-doi.sh`
+ya no tiene un caso especial: exige 200 en todos los DOI de Zenodo
+citados, y **falla** si el DOI retirado vuelve a aparecer en alguna cita
+(comprobado por mutación: añadir la cita a `CHANGELOG.md` → `FAIL`,
+código 1).
+
 **Corrección 2026-09-16:** `scripts/check-doi.sh` solo revisaba
 README.md/CITATION.cff (2 archivos) y no tocaba la bibliografía —
 exactamente el hueco que señalaba la revisión, porque `main.tex` cita
@@ -228,7 +245,6 @@ no se concatena nada.
 OK   10.5281/zenodo.21713239 -> 200
 OK   10.5281/zenodo.21713240 -> 200
 OK   10.5281/zenodo.22422305 -> 200
-OK   10.5281/zenodo.22635766 -> 410 (retirado, documentado como tal en todas sus citas)
 OK   10.5281/zenodo.22714477 -> 200
 OK   10.5281/zenodo.22730565 -> 200
 OK   10.5281/zenodo.22739944 -> 200
@@ -246,10 +262,10 @@ de red distintas, no un DOI roto. Se reintentó más tarde con éxito.
 
 **Respalda:** [`scripts/check-doi.sh`](scripts/check-doi.sh), [`README.md`](README.md), [`CITATION.cff`](CITATION.cff), [`docs/informe/main.tex`](docs/informe/main.tex), [`docs/informe/referencias.bib`](docs/informe/referencias.bib)
 
-**Estado:** hecho. Los 7 DOI de Zenodo citados en el repositorio y los
-27 de la bibliografía resuelven según lo esperado; el DOI retirado
-(`zenodo.22635766`) resuelve a 410 y toda cita suya en el repositorio
-ya explica que quedó tombstone y no debe citarse.
+**Estado:** hecho. Los 6 DOI de Zenodo citados en el repositorio
+resuelven a 200 y los 27 de la bibliografía resuelven según lo
+esperado; el DOI retirado ya no se cita en ningún documento y el
+verificador lo vigila.
 
 ---
 
@@ -855,6 +871,15 @@ Eso prueba que los 15 archivos existen y no cambiaron desde esa fecha,
 sin exponer nombres ni firmas — pero **no** reemplaza mostrar los
 originales en la defensa, que sigue siendo la única forma de que este
 punto pase de "no verificable" a "verificado".
+
+**Actualización 2026-09-19:** los 15 originales se subieron a una carpeta
+de Google Drive de acceso restringido (solo el docente evaluador y Darwin
+Arcalle), enlazada en
+[`registro.md`](docs/etica/consentimiento/registro.md#acceso-del-docente-a-los-originales-2026-09-19).
+Así el docente puede ver cada constancia y compararla con su hash sin que
+nombres ni firmas queden en el repositorio público. Que sean auténticas lo
+sigue juzgando el docente; el consentimiento continúa siendo retroactivo,
+tal como se declara arriba.
 
 Esto también desbloquea a **P1**: con el consentimiento cerrado (con la
 misma reserva de arriba), la medición SUS (15 respuestas, Brooke, IC con

@@ -107,7 +107,7 @@ else
 fi
 
 # ---------------------------------------------------------------------
-section "P3 -- DOI declarados resuelven (excepto el retirado, documentado)"
+section "P3 -- todos los DOI declarados resuelven a 200 (y el retirado no se cita)"
 if bash scripts/check-doi.sh; then pass "todos los DOI resuelven segun lo esperado"; else fail "algun DOI no resuelve como se espera"; fi
 
 # ---------------------------------------------------------------------

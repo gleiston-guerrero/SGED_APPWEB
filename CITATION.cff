@@ -7,8 +7,8 @@ date-released: 2026-09-16
 repository-code: "https://github.com/gleiston-guerrero/SGED_APPWEB"
 license: MIT
 # DOI del software (Zenodo, corte v1.0.0 vigente; nueva version sobre el
-# concept DOI 10.5281/zenodo.21713239 -- el deposito anterior (22635766)
-# quedo retirado/tombstone y no debe volver a citarse). Versiones
+# concept DOI 10.5281/zenodo.21713239; un deposito anterior, publicado por
+# error como registro independiente, quedo retirado y ya no se cita). Versiones
 # anteriores de esta misma serie, vigentes pero superadas por esta:
 # 10.5281/zenodo.22714477 (commit 455927c) y 10.5281/zenodo.22730565
 # (commit cead25d, corte del 2026-09-12 con la firma del docente-director).

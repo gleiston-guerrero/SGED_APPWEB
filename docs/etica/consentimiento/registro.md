@@ -85,6 +85,22 @@ con nombre y firma reales) se archivaron fuera de este repositorio en
 fuera del control de versiones), tal como exige la nota de cierre de
 `plantilla.md`.
 
+## Acceso del docente a los originales (2026-09-19)
+
+Para que el docente evaluador pueda ver las constancias sin publicarlas,
+los 15 originales firmados se subieron a una carpeta de Google Drive de
+**acceso restringido**: solo pueden abrirla el docente y Darwin Arcalle
+(por invitación individual), no cualquiera con el enlace. El consentimiento firmado lo
+permite: `plantilla.md` (§4) prevé compartir los datos con "el docente
+evaluador del PFC" y archivarlos en un lugar de acceso restringido.
+
+Carpeta: <https://drive.google.com/drive/folders/1Qotl9UsnFcW9FjJqQTclWIV-CHINiS_f?usp=sharing>
+
+Los archivos de la carpeta son los mismos `.docx` sin modificar cuya
+huella SHA-256 figura abajo; se pueden comparar con `sha256sum` o
+`Get-FileHash` tras descargarlos. Quien no tenga permiso verá una
+solicitud de acceso, no los datos personales.
+
 ## Verificación de integridad (SHA-256)
 
 Ni la evaluación del examen suspenso ni la integral pudieron comprobar

@@ -20,9 +20,9 @@ intención, solo por evidencia — mismo criterio que ya aplica
       serie). Supera a las versiones anteriores de la misma serie
       (`10.5281/zenodo.22730565`, corte 2026-09-12 con la firma del
       docente-director; y `10.5281/zenodo.22714477`, corte 2026-09-11).
-      Un intento anterior de publicar quedó como depósito independiente
-      (`10.5281/zenodo.22635766`, corte `v1.0.1`) y terminó
-      retirado/tombstone en Zenodo — no citar ese DOI.
+      Un intento anterior de publicar (corte `v1.0.1`) quedó como depósito
+      independiente y terminó retirado/tombstone en Zenodo (HTTP 410);
+      por eso ya no se cita.
 - [x] Metadatos ricos y buscables: `CITATION.cff` con título, autores,
       afiliación, licencia, palabras clave (`spring-boot`, `angular`,
       `postgresql`, `jwt`, `owasp`, `proyecto-fin-de-curso`).
