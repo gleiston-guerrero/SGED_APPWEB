@@ -257,7 +257,8 @@ mutaciones de las evaluaciones del 17 y 18-sep.
 | Commit | Qué hace |
 |---|---|
 | `f2c0f11` | P3: retira de las citas el DOI de Zenodo retirado (410) y reescribe `scripts/check-doi.sh` para exigir 200 y vigilar que no vuelva; P13: enlaza en `registro.md` la carpeta de Drive de acceso restringido con las 15 constancias |
-| el commit posterior a `f2c0f11` | Corrige la frase caducada de P11 (`.env.example` sí contenía el literal antiguo), los bloques P2/P8/P10 desactualizados de `VERIFICACION.md`, `scripts/credit-counts.py` con revisión fija, `scripts/javadoc-coverage.py` que ahora exige texto y `@param`/`@return`, y este expediente |
+| el commit posterior a `f2c0f11` | Corrige la frase caducada de P11 (`.env.example` sí contenía el literal antiguo), los bloques P2/P8/P10 desactualizados de `VERIFICACION.md`, `scripts/credit-counts.py` con revisión fija, `scripts/javadoc-coverage.py` que ahora exige texto y `@param`/`@return`, y este expediente |
+| 20-sep, `verify.sh` y `javadoc-coverage.py` | Cinco hallazgos de la evaluación del 19-sep: P8 exige que la etiqueta apunte a `HEAD`; un `{@inheritDoc}` solo ya no cuenta como Javadoc; el barrido de P12 reconoce la cifra escrita en letras; se corrige la tabla de EV-2 (P4 ya está endurecido); la salida de P1 se pega completa. Commit hecho con el correo institucional de Arcalle Grefa (`darcalleg@uteq.edu.ec`) |
 
 ---
 

@@ -239,7 +239,18 @@ fi
 # ---------------------------------------------------------------------
 section "P8 -- una sola etiqueta v1.1.0 sobre el commit a defender"
 if git rev-parse -q --verify "refs/tags/v1.1.0" >/dev/null; then
-    pass "la etiqueta v1.1.0 existe, apunta al commit $(git rev-parse --short 'v1.1.0^{commit}')"
+    # (Corrección 2026-09-20, evaluación del 19-sep: la comprobación se
+    # titula "sobre el commit a defender" pero solo miraba que la etiqueta
+    # existiera; moverla dos commits atrás pasaba sin aviso. Ahora exige
+    # que apunte a HEAD, que es lo que hace que el docente evalúe el
+    # último commit.)
+    tag_commit=$(git rev-parse 'v1.1.0^{commit}')
+    head_commit=$(git rev-parse HEAD)
+    if [ "$tag_commit" = "$head_commit" ]; then
+        pass "la etiqueta v1.1.0 existe y apunta a HEAD ($(git rev-parse --short HEAD))"
+    else
+        fail "la etiqueta v1.1.0 apunta a $(git rev-parse --short "$tag_commit") pero HEAD es $(git rev-parse --short "$head_commit"): hay que mover la etiqueta al último commit"
+    fi
 else
     fail "la etiqueta v1.1.0 no existe todavia"
 fi
@@ -392,7 +403,7 @@ pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -
 # "60~\%" (tilde de LaTeX antes del %, no es un espacio para \s).
 # NUM60 cubre 60 / 0.60 / 0,60 / 0.6 / 0,6; PORCENTAJE cubre
 # %/\%/\,\%/~\% y la palabra "por ciento".)
-NUM60='(60|0[.,]6(0)?)'
+NUM60='(60|0[.,]6(0)?|[Ss]esenta)'
 PORCENTAJE='(~?\\?,?\s*\\?%|por\s+ciento)'
 ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
 # (Nota: las formas decimales sueltas -- "0,6"/"0.6" sin "umbral" ni

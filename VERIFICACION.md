@@ -54,7 +54,7 @@ restaurando el archivo):
 | P14 | Editar a mano un p-valor en `REPORT.md` (los chequeos solo confirmaban que la tabla existe) | Regenera `REPORT.md` desde los `*.samples.json` reales y lo compara contra el versionado, ignorando las 3 líneas de metadato que cambian por diseño (Fecha, Commit, Herramienta) |
 
 **No endurecido, declarado como límite conocido (no oculto):**
-- **P4** (borrar todos los `@param`/`@return`): requeriría parsear la firma de cada método para saber cuántos `@param` esperar — no se hizo por el riesgo de un parser frágil bajo el plazo del examen suspenso. Ya está declarado en la sección P4 de este documento que el `pom.xml` usa `doclint all,-missing`, que desactiva justo esa detección.
+- **P4**: dejó de estar aquí el 2026-09-19. `scripts/javadoc-coverage.py` ya exige texto real y un `@param` por parámetro y `@return` si devuelve algo; borrar todos los `@param`/`@return` o vaciar el Javadoc (a `/** . */` o a un `{@inheritDoc}` solo) hace fallar `verify.sh`, comprobado por mutación (ver sección P4).
 - **P9** (agregar clases en español fuera del diccionario heurístico): el chequeo es, por diseño, un diccionario fijo de palabras — no puede enumerar todo el español. Por eso P9 ya queda marcada `PENDIENTE (revisión manual)` en `scripts/verify.sh`, no solo automática.
 - **P3, P6**: ya se habían endurecido en la ronda anterior (16/17-sep); las mutaciones de la evaluación integral sobre estos puntos (DOI, figuras) no encontraron nada nuevo que esa ronda no cubriera.
 - **P12: esta afirmación era falsa** hasta que la evaluación v2 (17-sep, más tarde el mismo día) la refutó probando 4 redacciones nuevas del hecho falso sobre el umbral; 3 sobrevivían al patrón existente. Corregido en la sección de P12 más abajo — ancla ampliada más allá de la palabra "umbral" y agregada la forma entera con el símbolo de porcentaje (antes solo se reconocía la forma decimal).
@@ -87,8 +87,13 @@ grep -i "t de Student" docs/mediciones/sus/REPORT.md
 participantes: 15
 - Instrumento: System Usability Scale (Brooke, 1996), 10 items, escala 1-5
 - Brooke, J. (1996). *SUS: A quick and dirty usability scale.*
-- Metodo del IC | t de Student, gl=14, t=2.145
+| Metodo del IC | t de Student, gl=14, t=2.145 |
+Con 15 participantes externos, el sistema obtiene una media SUS de 69.33 (IC 95 % 58.87–79.79, calculado con t de Student, gl=14, t=2.145), lo que corresponde al grado **C (Aceptable)** en la escala adjetival de Bangor, Kortum y Miller (2009).
 ```
+
+(Corrección 2026-09-20: la salida anterior omitía una fila y mostraba la
+línea del método del IC con otro formato; la de arriba es la salida
+literal de la orden, que da dos líneas para `t de Student`, no una.)
 
 **Respalda:** [`docs/mediciones/sus/respuestas.csv`](docs/mediciones/sus/respuestas.csv), [`docs/mediciones/sus/REPORT.md`](docs/mediciones/sus/REPORT.md), [`docs/mediciones/sus/INTERPRETACION.md`](docs/mediciones/sus/INTERPRETACION.md)
 
@@ -304,12 +309,15 @@ la evaluación final mostró dos mutaciones que seguían dando "503/503,
 100 %": borrar todos los `@param`/`@return` del backend y vaciar todo el
 Javadoc a `/** . */`. El criterio de la guía es Javadoc completo y el
 script solo comprobaba que existiera un bloque. Ahora exige (a) texto
-real dentro del bloque y (b) un `@param` por parámetro y un `@return` si
+real dentro del bloque (un `{@inheritDoc}` solo tampoco cuenta) y (b) un `@param` por parámetro y un `@return` si
 el método devuelve algo, cada uno con el mismo umbral. Repetidas ambas
 mutaciones sobre una copia: la primera da Cobertura 73,2 % y
 Completitud 0,2 % → `FALLA`, código 1; la segunda da 0,4 % → `FALLA`,
 código 1. Sobre el código real: 503/503 con texto y 502/503 completos
-(99,8 %).
+(99,8 %). (2026-09-20: la evaluación del 19-sep encontró que vaciar todo
+a `/** {@inheritDoc} */` seguía dando 100 %; ahora un `{@inheritDoc}`
+sin texto propio no cuenta como documentado y esa mutación da 0,4 % →
+`FALLA`, código 1.)
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
@@ -600,6 +608,14 @@ caduca mientras la etiqueta se mueva al último commit, que es lo que
 pide la guía. Si la etiqueta se queda atrás, la orden no imprime el
 `OK` y se ve al instante.)
 
+**Corrección 2026-09-20:** la evaluación del 19-sep mostró que la
+sección P8 de `scripts/verify.sh`, titulada "sobre el commit a
+defender", solo comprobaba que la etiqueta existiera: moverla dos
+commits atrás daba `PASA`. Ahora exige que apunte a `HEAD` y falla con
+el hash de ambos si no coincide (probado moviendo la etiqueta un commit
+atrás → `FALLA`, código 1). Consecuencia práctica: tras cada commit hay
+que mover la etiqueta antes de correr `verify.sh`.
+
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 
 **Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD`
@@ -768,6 +784,12 @@ bash scripts/verify.sh 2>&1 | grep -A2 'P12 --'
   umbral en pom.xml: <minimum>0.70</minimum>
   PASA: ninguna afirmación viva de umbral distinto de 70% en el repo versionado
 ```
+
+**Corrección 2026-09-20:** la evaluación del 19-sep encontró una quinta redacción evasiva: el número
+escrito en letras. El barrido solo reconocía dígitos, así que una frase con la cifra en palabras y
+seguida de "por ciento" pasaba. Se añadió la forma en letras al patrón de la cifra. Comprobado
+por mutación (añadir a este documento una frase que exige la cifra falsa en letras) → `FALLA`,
+código 1; retirada la frase, vuelve a pasar.
 
 (Corrección 2026-09-16: la versión anterior mostraba una orden que solo
 revisaba `main.tex` y el `README`, no reconocía el formato LaTeX

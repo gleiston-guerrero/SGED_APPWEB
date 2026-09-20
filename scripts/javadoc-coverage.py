@@ -275,7 +275,8 @@ def main():
             total += 1
             end = is_documented(lines, idx)
             text = javadoc_text(lines, end) if end is not None else ""
-            if end is not None and re.search(r"[A-Za-z]{3,}", text):
+            # "{@inheritDoc}" solo no cuenta: es un bloque sin texto propio.
+            if end is not None and re.search(r"[A-Za-z]{3,}", text.replace("{@inheritDoc}", "")):
                 documented += 1
                 names, returns = signature_parts(lines, idx)
                 if is_complete(text, names, returns):
