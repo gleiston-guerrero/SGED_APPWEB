@@ -58,9 +58,12 @@ hallazgo de la guía y el trabajo real posterior.)
 
 **Titular del cierre:** Arcalle Grefa Darwin Orlando.
 
-`scripts/check-doi.sh` (comprueba que los DOI vigentes resuelvan a 200 y
-que el retirado resuelva a 410, documentado como tal) se agregó en el
-commit `c2c36fa`. La gestión previa de los DOI de Zenodo across releases
+`scripts/check-doi.sh` (comprueba que todos los DOI de Zenodo citados y
+los de la bibliografía resuelvan como se espera) se agregó en el commit
+`c2c36fa`. Desde el 19-sep (`f2c0f11`) exige 200 en todos los DOI de
+Zenodo citados y falla si vuelve a citarse el depósito retirado (410),
+que se quitó de las citas: la guía pide "todos los DOI declarados
+resolviendo a 200". La gestión previa de los DOI de Zenodo across releases
 es compartida entre los tres integrantes a lo largo del proyecto (ver
 `CITATION.cff` y su historial); el cierre específico de este punto —la
 verificación reproducible— es de Arcalle Grefa.
@@ -248,6 +251,13 @@ tablas de roles), P11 (`CONTRASENA_ADMIN` real), P12 (endurecimiento
 del patrón de detección) y P13 (hash SHA-256 de los 15 consentimientos)
 — y del endurecimiento general de `scripts/verify.sh` contra las
 mutaciones de las evaluaciones del 17 y 18-sep.
+
+**19-sep (Arcalle Grefa Darwin Orlando, correo personal):**
+
+| Commit | Qué hace |
+|---|---|
+| `f2c0f11` | P3: retira de las citas el DOI de Zenodo retirado (410) y reescribe `scripts/check-doi.sh` para exigir 200 y vigilar que no vuelva; P13: enlaza en `registro.md` la carpeta de Drive de acceso restringido con las 15 constancias |
+| el commit posterior a `f2c0f11` | Corrige la frase caducada de P11 (`.env.example` sí contenía el literal antiguo), los bloques P2/P8/P10 desactualizados de `VERIFICACION.md`, `scripts/credit-counts.py` con revisión fija, `scripts/javadoc-coverage.py` que ahora exige texto y `@param`/`@return`, y este expediente |
 
 ---
 

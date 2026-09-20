@@ -15,13 +15,20 @@ declara explicitamente que no son cuantificables asi, en vez de inventar
 un numero.
 
 Uso:
-    python3 scripts/credit-counts.py
+    python3 scripts/credit-counts.py [revision]
+Sin argumento cuenta hasta `main` (la cifra crece con cada commit nuevo).
+Con una revision (ej. f2c0f11) cuenta solo hasta ese commit: es lo que
+permite pegar una tabla en el expediente y que siga siendo reproducible
+sin quedarse desactualizada por commits posteriores.
 Imprime la tabla; no escribe nada solo (revisen y peguen a mano en
 CONTRIBUTORS.md, o extiendan el script para que lo haga si prefieren
 automatizarlo del todo).
 """
 import subprocess
+import sys
 from collections import defaultdict
+
+REV = sys.argv[1] if len(sys.argv) > 1 else "main"
 
 AUTORES = {
     "dpallop@uteq.edu.ec": "Pallo Pinto Alejandro Daniel",
@@ -61,7 +68,7 @@ DOC_PATHS_PREFIX = ("docs/", "README.md", "CITATION.cff", "CONTRIBUTORS.md")
 
 def commits_autor():
     out = subprocess.check_output(
-        ["git", "log", "--pretty=%H\t%ae", "main"], text=True)
+        ["git", "log", "--pretty=%H\t%ae", REV], text=True)
     por_autor = defaultdict(list)
     for line in out.strip().splitlines():
         h, ae = line.split("\t")
@@ -82,7 +89,7 @@ def toca_alguna(archivos, prefijos):
 def es_primera_vez(commit_hash, archivo, cache_primeros):
     if archivo not in cache_primeros:
         out = subprocess.check_output(
-            ["git", "log", "--follow", "--diff-filter=A", "--pretty=%H", "--", archivo],
+            ["git", "log", "--follow", "--diff-filter=A", "--pretty=%H", REV, "--", archivo],
             text=True).strip().splitlines()
         cache_primeros[archivo] = set(out)
     return commit_hash in cache_primeros[archivo]

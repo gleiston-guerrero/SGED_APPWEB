@@ -109,7 +109,7 @@ bash scripts/verify.sh 2>&1 | grep -A3 'P2 --'
 **Salida:**
 ```
 == P2 -- Lighthouse: 3 corridas por perfil contra el despliegue publico ==
-  PASA: 9 corridas moviles + 9 de escritorio con requestedUrl=https://sged-frontend-r2rs.onrender.com/
+  PASA: 9/9 corridas moviles + 9/9 de escritorio con requestedUrl=https://sged-frontend-r2rs.onrender.com/ (todas validas)
   PASA: REPORT.md documenta la medición vigente contra r2rs
 ```
 
@@ -280,8 +280,9 @@ cd backend && ./mvnw -q javadoc:javadoc; echo "exit=$?"
 **Salida:**
 ```
 Metodos/constructores publicos encontrados: 503
-Con Javadoc inmediatamente encima: 503
-Cobertura: 100.0%  (umbral exigido: 90%)
+Con Javadoc con texto inmediatamente encima: 503
+Completos (@param por parametro y @return si devuelve): 502
+Cobertura: 100.0%  Completitud: 99.8%  (umbral exigido: 90%)
 RESULTADO: PASA
 
 exit=0
@@ -297,6 +298,18 @@ independiente de la revisión (506 métodos, 506 documentados, 499
 completos con `@param`/`@return` = 98,6 %) difiere en ±3 por criterio
 (constructor compacto sin paréntesis, casos límite de firma
 multipartida); con cualquier criterio la cobertura es 100 %.)
+
+**Corrección 2026-09-19 (el verificador no podía fallar por contenido):**
+la evaluación final mostró dos mutaciones que seguían dando "503/503,
+100 %": borrar todos los `@param`/`@return` del backend y vaciar todo el
+Javadoc a `/** . */`. El criterio de la guía es Javadoc completo y el
+script solo comprobaba que existiera un bloque. Ahora exige (a) texto
+real dentro del bloque y (b) un `@param` por parámetro y un `@return` si
+el método devuelve algo, cada uno con el mismo umbral. Repetidas ambas
+mutaciones sobre una copia: la primera da Cobertura 73,2 % y
+Completitud 0,2 % → `FALLA`, código 1; la segunda da 0,4 % → `FALLA`,
+código 1. Sobre el código real: 503/503 con texto y 502/503 completos
+(99,8 %).
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
@@ -565,54 +578,33 @@ docente realmente lo haya confirmado, el chequeo volvería a fallar.
 
 **Orden:**
 ```bash
-git rev-parse 'v1.1.0^{commit}' && git log --oneline -1 'v1.1.0^{commit}' && git log --oneline -1 HEAD
+test "$(git rev-parse 'v1.1.0^{commit}')" = "$(git rev-parse HEAD)" && echo "OK: v1.1.0 apunta a HEAD"
+git tag -l 'v1.*'
 grep -E "^version:\s*1\.1\.0" CITATION.cff
 ```
 
 **Salida:**
 ```
-e19929abe2db1b25ac05a4a5ee7cccdf8064fd08
-e19929a fix(examen-suspenso): P7 acta a revisión manual + P8 tags retirados en verify.sh
-e19929a fix(examen-suspenso): P7 acta a revisión manual + P8 tags retirados en verify.sh
+OK: v1.1.0 apunta a HEAD
+v1.0.0
+v1.0.0-previo-07sep
+v1.1.0
 version: 1.1.0
 ```
 
-Los tres hashes coinciden: la etiqueta `v1.1.0` apunta exactamente al
-commit `HEAD`.
-
-(Nota 2026-09-17: la evaluación integral del 17-sep encontró esta
-sección con el marcador literal `<hash del commit defendido>` sin
-rellenar, y el texto seguía citando `ebd4b69` como el commit de la
-etiqueta pese a que la etiqueta ya se había movido dos veces desde
-entonces. La evaluación v2, del mismo día, encontró el defecto
-inverso: la "Orden" declarada arriba no era la que producía la
-"Salida" pegada —dos comandos distintos— y la salida en sí ya estaba
-desactualizada a `0ecf27a3` tras un commit de otro integrante. Ambos
-corregidos: la orden de arriba es exactamente la que produce la salida
-pegada, con el hash real vigente **en el momento en que se escribió
-esta sección**.)
-
-**Nota estructural (2026-09-18): este bloque es una foto, no un valor
-en vivo.** El hash pegado arriba corresponde al commit en el que se
-escribió esta sección — cada commit posterior (incluido este mismo, si
-edita otro archivo) lo deja desactualizado por definición, porque mover
-la etiqueta o seguir corrigiendo el expediente son, ambos, nuevos
-commits. Dos evaluaciones seguidas señalaron esto como si fuera un
-descuido cada vez; es, en cambio, la naturaleza de pegar una salida
-literal en un documento que se sigue editando. La fuente de verdad
-real, siempre, es correr la "Orden" de arriba en el momento de la
-revisión — no esta sección. Se actualiza la "Salida" una vez más aquí,
-al mover la etiqueta a este mismo commit (ver más abajo), como el
-último refresco antes del cierre.
+(Corrección 2026-09-19: este bloque pegaba el hash del commit vigente al
+escribirlo, y cada commit posterior lo dejaba desactualizado —lo
+señalaron cuatro evaluaciones seguidas. Ahora la orden compara la
+etiqueta con `HEAD` y no imprime ningún hash, así que la salida no
+caduca mientras la etiqueta se mueva al último commit, que es lo que
+pide la guía. Si la etiqueta se queda atrás, la orden no imprime el
+`OK` y se ve al instante.)
 
 **Respalda:** [`VERSIONING.md`](VERSIONING.md), [`CITATION.cff`](CITATION.cff), portada de [`docs/informe/main.tex`](docs/informe/main.tex) y [`docs/informe/caratula-standalone.tex`](docs/informe/caratula-standalone.tex)
 
-**Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD` —el
-hash exacto es el que pega la "Salida" de arriba, que se actualiza cada
-vez que se corre la orden, en vez de repetirlo aquí fijo y arriesgar que
-quede desactualizado la próxima vez que se mueva la etiqueta (defecto
-señalado por la evaluación v2 del 17-sep: esta misma línea citaba
-`aaffcc2`, ya superado)—, siguiendo el mismo criterio que `VERSIONING.md`
+**Estado:** hecho. `v1.1.0` (etiqueta anotada) existe sobre `HEAD`
+—la orden de arriba lo comprueba sin depender de ningún hash pegado—,
+siguiendo el mismo criterio que `VERSIONING.md`
 ya documentaba para `v1.0.0` (el único tag de esta familia que se
 reasigna a propósito). La portada, `CITATION.cff`, el README y el
 encabezado/§7 del SRS ya citan `v1.1.0`.
@@ -654,12 +646,16 @@ renombrados ya hechos en el repositorio antes de esta sesión (ver
 
 ## P10 — Roles CRediT con conteo real (peso 0,5)
 
-**Orden:** `python3 scripts/credit-counts.py`
+**Orden:** `python3 scripts/credit-counts.py f2c0f11`
+
+(El argumento fija el commit hasta el que se cuenta. Sin él el script cuenta
+hasta `main`, y la cifra crece con cada commit nuevo: por eso la tabla
+pegada quedaba desactualizada cada vez que se editaba el repositorio.)
 
 **Salida:**
 ```
 Rol                           Pallo Pinto Alejandro Daniel            Velez Lopez Ricardo Elias               Arcalle Grefa Darwin Orlando
-Conceptualization             26                                      6                                       44
+Conceptualization             26                                      6                                       45
 Data curation                 49                                      6                                       27
 Formal analysis               11                                      4                                       5
 Investigation                 3                                       0                                       2
@@ -668,8 +664,8 @@ Resources                     12                                      7         
 Software                      128                                     12                                      54
 Validation                    72                                      11                                      43
 Visualization                 4                                       3                                       7
-Writing – original draft      60                                      15                                      61
-Writing – review & editing    87                                      26                                      104
+Writing – original draft      60                                      15                                      63
+Writing – review & editing    87                                      26                                      108
 
 No cuantificables por ruta de archivo (declarar aparte, criterio cualitativo):
   - Project administration
@@ -684,6 +680,14 @@ desincronizadas entre sí por simple paso del tiempo — cada una capturó
 un momento distinto del historial vivo, no un error de transcripción.
 La de arriba es una corrida nueva del 2026-09-17, la misma que ahora
 usa `CONTRIBUTORS.md`.)
+
+(Corrección 2026-09-19: la evaluación final volvió a encontrar tres
+celdas distintas de Arcalle Grefa (44/61/104 frente a 45/63/108), por la
+misma razón: el script contaba hasta `main` y cada commit nuevo cambia
+la cifra. Ahora `scripts/credit-counts.py` acepta una revisión, la tabla
+de arriba y las de `CONTRIBUTORS.md` se calcularon con `f2c0f11` y son
+reproducibles tal cual con esa orden, sin importar cuántos commits se
+añadan después.)
 
 **Respalda:** [`CONTRIBUTORS.md`](CONTRIBUTORS.md), [`scripts/credit-counts.py`](scripts/credit-counts.py)
 
@@ -725,9 +729,27 @@ JWT_SECRET=CAMBIAR_EN_PRODUCCION_min_32_caracteres_aleatorios
 **Respalda:** [`.env.example`](.env.example)
 
 **Estado:** hecho. Se reemplazó el valor con aspecto real por un
-marcador evidente (`CAMBIAR_EN_PRODUCCION_...`). No hay ninguna otra
-referencia al valor anterior en el repositorio (comprobado con
-`grep -rn "SGED_2026_SECRET_KEY_MUY_LARGA"`, sin resultados).
+marcador evidente (`CAMBIAR_EN_PRODUCCION_...`).
+
+**Corrección 2026-09-19:** la frase anterior de este expediente decía que
+la búsqueda del literal anterior de la clave no daba resultados, y no era
+cierto: el literal seguía dentro de la declaración histórica de
+`.env.example` (líneas 73 y 83, junto con el segundo literal antiguo).
+Era una afirmación caducada, no una salida fabricada: la declaración se
+añadió después de escribir esta frase y nadie volvió a ejecutar la orden.
+Se quitaron ambos literales del comentario (queda solo la descripción y
+el commit donde estuvieron) y esta vez se pegó la salida real:
+
+```bash
+git grep -n -E "SGED_(2026|SUPER)_SECRET_KEY"; echo "exit=$?"
+```
+```
+exit=1
+```
+
+(`git grep` mira solo los archivos versionados; `grep -rn` en un clon
+local también encontraría el `.env` propio de cada máquina, que está en
+`.gitignore` y no forma parte de la entrega.)
 
 ---
 

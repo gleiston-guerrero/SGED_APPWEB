@@ -9,6 +9,12 @@ Cubre dos casos:
      aunque no lleven la palabra "public", salvo que digan "private"
      explicitamente (metodos privados de interfaz, Java 9+).
 
+Un metodo cuenta como documentado si tiene un bloque Javadoc CON TEXTO
+(un "/** . */" vacio no cuenta) y, aparte, como completo si ademas trae un
+"@param" por cada parametro y un "@return" cuando devuelve algo. Ambos
+porcentajes deben alcanzar el umbral. (Antes solo se comprobaba que el
+bloque existiera: vaciar todo el Javadoc a "/** . */" seguia dando 100 %.)
+
 Un metodo cuenta como documentado si, subiendo desde su firma y saltando
 lineas en blanco, anotaciones (que pueden ocupar varias lineas, ej.
 @Audited con descriptionSpel partido) y comentarios de una sola linea
@@ -23,7 +29,7 @@ antes de fiarse del numero solo.
 Uso:
     python3 scripts/javadoc-coverage.py [umbral_porcentaje]
 
-Sale con 0 si el porcentaje >= umbral (default 90), 1 en caso contrario.
+Sale con 0 si ambos porcentajes >= umbral (default 90), 1 en caso contrario.
 """
 import re
 import sys
@@ -79,7 +85,70 @@ def is_documented(lines, idx, lookback=40):
         j -= 1
     if j < start:
         return False
-    return lines[j].strip().endswith("*/")
+    if not lines[j].strip().endswith("*/"):
+        return None
+    return j
+
+
+def javadoc_text(lines, end):
+    """Devuelve el texto del bloque Javadoc que termina en la linea `end`."""
+    k = end
+    while k >= 0 and "/**" not in lines[k]:
+        k -= 1
+    if k < 0:
+        return ""
+    block = " ".join(lines[k:end + 1])
+    block = block.replace("/**", " ").replace("*/", " ")
+    return re.sub(r"\s*\*\s+", " ", block).strip()
+
+
+MODIFIERS = {"public", "static", "final", "abstract", "default", "synchronized", "native"}
+
+
+def signature_parts(lines, idx):
+    """Devuelve (nombres_de_parametros, devuelve_algo) de la firma en idx."""
+    sig = lines[idx].strip()
+    j = idx
+    depth = sig.count("(") - sig.count(")")
+    while ("(" not in sig or depth > 0) and j + 1 < len(lines) and j - idx < 12:
+        j += 1
+        sig += " " + lines[j].strip()
+        depth = sig.count("(") - sig.count(")")
+    paren = sig.find("(")
+    head = re.sub(r"<[^()]*>", " ", sig[:paren])
+    head = re.sub(r"@\w+(\([^)]*\))?", " ", head)
+    tokens = [t for t in head.split() if t not in MODIFIERS]
+    returns = len(tokens) >= 2 and tokens[-2] != "void"
+    body = sig[paren + 1:]
+    level, cur, params = 0, "", []
+    for ch in body:
+        if ch in "(<":
+            level += 1
+        elif ch == ")" and level == 0:
+            break
+        elif ch in ")>":
+            level -= 1
+        if ch == "," and level == 0:
+            params.append(cur)
+            cur = ""
+        else:
+            cur += ch
+    if cur.strip():
+        params.append(cur)
+    names = []
+    for prm in params:
+        prm = re.sub(r"@\w+(\([^)]*\))?", " ", prm).replace("...", " ").strip()
+        if prm:
+            names.append(prm.split()[-1])
+    return names, returns
+
+
+def is_complete(text, names, returns):
+    if "{@inheritDoc}" in text:
+        return True
+    if any(not re.search(r"@param\s+" + re.escape(n) + r"\b", text) for n in names):
+        return False
+    return not returns or "@return" in text
 
 
 def join_signature(lines, idx, max_extra=4):
@@ -192,6 +261,7 @@ def main():
     threshold = float(sys.argv[1]) if len(sys.argv) > 1 else 90.0
     total = 0
     documented = 0
+    complete = 0
     undocumented_locations = []
 
     for java_file in sorted(SRC.rglob("*.java")):
@@ -203,15 +273,22 @@ def main():
 
         for idx in sorted(method_idxs):
             total += 1
-            if is_documented(lines, idx):
+            end = is_documented(lines, idx)
+            text = javadoc_text(lines, end) if end is not None else ""
+            if end is not None and re.search(r"[A-Za-z]{3,}", text):
                 documented += 1
+                names, returns = signature_parts(lines, idx)
+                if is_complete(text, names, returns):
+                    complete += 1
             else:
                 undocumented_locations.append(f"{rel}:{idx + 1}: {lines[idx].strip()[:100]}")
 
     pct = (documented / total * 100) if total else 0.0
+    pct_complete = (complete / total * 100) if total else 0.0
     print(f"Metodos/constructores publicos encontrados: {total}")
-    print(f"Con Javadoc inmediatamente encima: {documented}")
-    print(f"Cobertura: {pct:.1f}%  (umbral exigido: {threshold:.0f}%)")
+    print(f"Con Javadoc con texto inmediatamente encima: {documented}")
+    print(f"Completos (@param por parametro y @return si devuelve): {complete}")
+    print(f"Cobertura: {pct:.1f}%  Completitud: {pct_complete:.1f}%  (umbral exigido: {threshold:.0f}%)")
 
     if undocumented_locations:
         out_path = ROOT / "docs" / "mediciones" / "javadoc-sin-documentar.txt"
@@ -219,7 +296,7 @@ def main():
         out_path.write_text("\n".join(undocumented_locations) + "\n", encoding="utf-8")
         print(f"Lista de {len(undocumented_locations)} metodos sin Javadoc: {out_path.relative_to(ROOT)}")
 
-    if pct >= threshold:
+    if pct >= threshold and pct_complete >= threshold:
         print("RESULTADO: PASA")
         return 0
     print("RESULTADO: FALLA")

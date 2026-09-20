@@ -37,7 +37,7 @@ nota ¹).
 
 | Rol CRediT | Integrante(s) | Cobertura |
 |---|---|---|
-| Conceptualization | Darwin (44), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
+| Conceptualization | Darwin (45), Alejandro (26), Ricardo (6) | Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. |
 | Data curation | Alejandro (49), Darwin (27), Ricardo (6) | Diseño del esquema, procedimientos almacenados y limpieza de los datos crudos de medición. |
 | Formal analysis | Alejandro (11), Darwin (5), Ricardo (4) | Análisis estadístico de los datos de rendimiento y usabilidad (intervalos, distribución t). |
 | Funding acquisition | — | No aplica (proyecto académico sin financiación externa). |
@@ -49,11 +49,12 @@ nota ¹).
 | Supervision | Darwin¹ | Coordinación del equipo y seguimiento del repositorio (revisión e integración del trabajo de los tres integrantes en `main`, expediente `CONTRIBUCIONES.md`) — no se refleja en rutas de archivo; ver nota ¹. |
 | Validation | Alejandro (72), Darwin (43), Ricardo (11) | Pruebas de cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. |
 | Visualization | Darwin (7), Alejandro (4), Ricardo (3) | Diagramas C4 y de arquitectura del sistema. |
-| Writing – original draft | Darwin (61), Alejandro (60), Ricardo (15) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
-| Writing – review & editing | Darwin (104), Alejandro (87), Ricardo (26) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
+| Writing – original draft | Darwin (63), Alejandro (60), Ricardo (15) | Redacción del informe, del documento de requisitos (SRS) y de la documentación técnica. |
+| Writing – review & editing | Darwin (108), Alejandro (87), Ricardo (26) | Revisión y corrección de la documentación y su consistencia con el código (commits que modifican, no crean por primera vez, un archivo de `docs/`). |
 
-*(Conteos regenerados el 2026-09-17 con `scripts/credit-counts.py` sobre
-`main` actual; cambian ligeramente con cada commit porque corren sobre
+*(Conteos regenerados el 2026-09-19 con `scripts/credit-counts.py f2c0f11`,
+es decir, contados hasta ese commit y no hasta el `main` del momento, para que no
+caduquen con cada commit nuevo. Sin fijar commit cambiarían porque corren sobre
 el historial vivo — ver nota metodológica en "Conteo por rol".)*
 
 ¹ Investigation, Methodology, Project administration y Supervision incluyen
@@ -77,7 +78,7 @@ declarado y coherente con los archivos que cada uno escribió").
 
 | Rol | Pallo Pinto Alejandro | Vélez López Ricardo | Arcalle Grefa Darwin |
 |---|---:|---:|---:|
-| Conceptualization | 26 | 6 | 44 |
+| Conceptualization | 26 | 6 | 45 |
 | Data curation | 49 | 6 | 27 |
 | Formal analysis | 11 | 4 | 5 |
 | Investigation | 3 | 0 | 2 |
@@ -86,11 +87,11 @@ declarado y coherente con los archivos que cada uno escribió").
 | Software | 128 | 12 | 54 |
 | Validation | 72 | 11 | 43 |
 | Visualization | 4 | 3 | 7 |
-| Writing – original draft | 60 | 15 | 61 |
-| Writing – review & editing | 87 | 26 | 104 |
+| Writing – original draft | 60 | 15 | 63 |
+| Writing – review & editing | 87 | 26 | 108 |
 
-_Medido 2026-09-17 sobre `main`. Reproducible con
-`python3 scripts/credit-counts.py`. (Corrección 2026-09-17: hasta
+_Medido 2026-09-19 hasta el commit `f2c0f11`. Reproducible con
+`python3 scripts/credit-counts.py f2c0f11`. (Corrección 2026-09-17: hasta
 entonces convivían dos corridas congeladas de fechas distintas —
 14-sep en esta tabla, 16-sep en la de arriba— que ya no coincidían
 entre sí ni con el script en HEAD; ambas se regeneraron juntas, en la
