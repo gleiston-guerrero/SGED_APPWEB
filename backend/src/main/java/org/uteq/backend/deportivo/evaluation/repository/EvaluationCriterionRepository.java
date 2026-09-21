@@ -12,6 +12,8 @@ import java.util.List;
 public interface EvaluationCriterionRepository extends JpaRepository<EvaluationCriterion, Long> {
 
     /**
+     * Devuelve los criterios activos, ordenados por identificador ascendente.
+     *
      * @return los criterios activos, ordenados por identificador ascendente
      */
     @Query("SELECT c FROM EvaluationCriterion c WHERE c.activo = true ORDER BY c.idCriterio ASC")

@@ -15,6 +15,8 @@ import java.util.Optional;
  */
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     /**
+     * Devuelve los horarios activos de ese entrenador, ordenados por día y hora de inicio.
+     *
      * @param idEntrenador identificador del entrenador
      * @return los horarios activos de ese entrenador, ordenados por día y hora de inicio
      */
@@ -22,6 +24,8 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findActiveByCoachOrderByDayAndStartTime(@Param("idEntrenador") Long idEntrenador);
 
     /**
+     * Devuelve los horarios activos de ese día.
+     *
      * @param diaSemana día de la semana a filtrar (1 = lunes ... 7 = domingo)
      * @return los horarios activos de ese día
      */

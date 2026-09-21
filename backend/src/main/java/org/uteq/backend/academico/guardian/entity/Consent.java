@@ -65,6 +65,8 @@ public class Consent {
     private UserAccount revokedBy;
 
     /**
+     * Indica si el consentimiento no fue revocado.
+     *
      * @return {@code true} si el consentimiento no fue revocado
      */
     @Transient

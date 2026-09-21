@@ -17,6 +17,8 @@ import java.util.List;
  */
 public interface TrainingSessionRepository extends JpaRepository<TrainingSession, Long> {
     /**
+     * Devuelve las sesiones de esa fecha, ordenadas por hora de inicio.
+     *
      * @param fecha fecha a filtrar
      * @return las sesiones de esa fecha, ordenadas por hora de inicio
      */
@@ -24,6 +26,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
     List<TrainingSession> findByDateOrderByStartTimeAsc(@Param("fecha") LocalDate fecha);
 
     /**
+     * Devuelve las sesiones de ese entrenador, primero las próximas (de la más cercana a la más lejana) y luego las pasadas (de la más reciente a la más antigua).
+     *
      * @param idEntrenador identificador del entrenador
      * @param pageable página y tamaño solicitados
      * @return las sesiones de ese entrenador, primero las próximas (de la más
@@ -42,6 +46,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
                                                     Pageable pageable);
 
     /**
+     * Devuelve las sesiones de esa categoría anteriores a esa fecha, de la más reciente a la más antigua.
+     *
      * @param idCategoria identificador de la categoría
      * @param fecha fecha límite, exclusiva
      * @param pageable página y tamaño solicitados
@@ -52,6 +58,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
             @Param("idCategoria") Long idCategoria, @Param("fecha") LocalDate fecha, Pageable pageable);
 
     /**
+     * Indica si ya existe una sesión generada de ese horario para esa fecha.
+     *
      * @param idHorario identificador del horario fijo
      * @param fecha fecha a comprobar
      * @return {@code true} si ya existe una sesión generada de ese horario para esa fecha
@@ -60,6 +68,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
     boolean existsBySchedule_IdAndDate(@Param("idHorario") Long idHorario, @Param("fecha") LocalDate fecha);
 
     /**
+     * Devuelve las sesiones generadas de ese horario desde esa fecha.
+     *
      * @param idHorario identificador del horario fijo
      * @param desde fecha desde la que se buscan sesiones, inclusive
      * @return las sesiones generadas de ese horario desde esa fecha
@@ -68,6 +78,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
     List<TrainingSession> findBySchedule_IdAndDateGreaterThanEqual(@Param("idHorario") Long idHorario, @Param("desde") LocalDate desde);
 
     /**
+     * Devuelve las sesiones de esa categoría desde esa fecha, de la más próxima a la más lejana.
+     *
      * @param idCategoria identificador de la categoría
      * @param fecha fecha desde la que se buscan sesiones, inclusive
      * @param pageable página y tamaño solicitados
@@ -123,6 +135,8 @@ public interface TrainingSessionRepository extends JpaRepository<TrainingSession
                          @Param("horaFin") java.time.LocalTime horaFin);
 
     /**
+     * Devuelve la cantidad de sesiones de esa categoría en ese rango de fechas.
+     *
      * @param idCategoria identificador de la categoría
      * @param desde fecha inicial del rango, inclusive
      * @param hasta fecha final del rango, inclusive

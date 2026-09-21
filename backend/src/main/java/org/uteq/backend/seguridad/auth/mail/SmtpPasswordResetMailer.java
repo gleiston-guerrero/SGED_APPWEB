@@ -37,6 +37,8 @@ public class SmtpPasswordResetMailer implements PasswordResetMailer {
     private int minutosVigencia;
 
     /**
+     * Envía por SMTP el enlace de restablecimiento de contraseña al destinatario.
+     *
      * @param correo correo destinatario del enlace de restablecimiento
      * @param url enlace de restablecimiento de un solo uso
      */

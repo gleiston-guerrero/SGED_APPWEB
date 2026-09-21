@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 public class TooManyRequestsException extends ApiException {
 
     /**
+     * Crea la excepción para una petición que excede el límite permitido, con el detalle que verá el cliente.
+     *
      * @param mensaje detalle legible para el cliente sobre el límite excedido
      */
     public TooManyRequestsException(String mensaje) {

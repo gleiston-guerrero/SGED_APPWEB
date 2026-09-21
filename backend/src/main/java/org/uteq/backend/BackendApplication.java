@@ -14,6 +14,8 @@ import org.springframework.cache.annotation.EnableCaching;
 public class BackendApplication {
 
 	/**
+	 * Punto de entrada de la aplicación: arranca el contexto de Spring Boot.
+	 *
 	 * @param args argumentos de línea de comandos, delegados a Spring Boot sin modificación
 	 */
 	public static void main(String[] args) {

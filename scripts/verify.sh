@@ -60,6 +60,54 @@ if [ -z "$csv_errores" ]; then
 else
     fail "respuestas.csv con filas mal formadas: $csv_errores"
 fi
+# (Corrección 2026-09-21, evaluación del 21-sep: la validación de forma de
+# arriba no impedía inventar un participante -- una fila con fechas de 2030
+# pasaba. Ahora cada fila debe tener una fecha real (no futura) y cruzar con
+# una fila de consentimiento OBTENIDO en registro.md: mismo id, mismo perfil
+# y misma fecha de sesión; y ningún consentimiento puede quedar sin fila.)
+sus_cruce=$(python3 - docs/mediciones/sus/respuestas.csv docs/etica/consentimiento/registro.md <<'PYEOF'
+import csv, datetime, re, sys
+csv_path, reg_path = sys.argv[1], sys.argv[2]
+hoy = datetime.date.today()
+filas = list(csv.DictReader(open(csv_path, newline='', encoding='utf-8')))
+registro = {}
+patron = r'^\| (ENC-\d+) \| ([^|]*?) \| (\d{4}-\d{2}-\d{2}) \| (\w+) \|'
+for m in re.finditer(patron, open(reg_path, encoding='utf-8').read(), re.M):
+    registro[m.group(1)] = (m.group(2).strip(), m.group(3), m.group(4))
+errores = []
+for f in filas:
+    pid, fecha, perfil = f.get('participante', ''), f.get('fecha', ''), f.get('perfil', '')
+    try:
+        d = datetime.date.fromisoformat(fecha)
+    except ValueError:
+        errores.append(f"{pid}: fecha '{fecha}' no es AAAA-MM-DD")
+        continue
+    if d > hoy or d < datetime.date(2026, 1, 1):
+        errores.append(f"{pid}: fecha {fecha} fuera de un rango plausible (2026-01-01 .. hoy)")
+    if pid not in registro:
+        errores.append(f"{pid}: no figura en registro.md (participante sin consentimiento registrado)")
+        continue
+    r_perfil, r_fecha, r_estado = registro[pid]
+    if r_fecha != fecha:
+        errores.append(f"{pid}: fecha {fecha} != registro.md {r_fecha}")
+    if r_perfil != perfil:
+        errores.append(f"{pid}: perfil {perfil} != registro.md {r_perfil}")
+    if r_estado != 'OBTENIDO':
+        errores.append(f"{pid}: consentimiento {r_estado}, no OBTENIDO")
+ids_csv = {f.get('participante', '') for f in filas}
+for pid in registro:
+    if pid not in ids_csv:
+        errores.append(f"{pid}: tiene consentimiento en registro.md pero no fila en respuestas.csv")
+print('; '.join(errores[:5]))
+sys.exit(1 if errores else 0)
+PYEOF
+)
+ec_sus_cruce=$?
+if [ "$ec_sus_cruce" -eq 0 ] && [ -z "$sus_cruce" ]; then
+    pass "respuestas.csv cruza con registro.md: mismo id, perfil y fecha de sesion, consentimiento OBTENIDO, fechas reales"
+else
+    fail "respuestas.csv no cruza con el registro de consentimientos (codigo $ec_sus_cruce): $sus_cruce"
+fi
 if grep -qi "brooke" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md cita a Brooke (1996)"; else fail "REPORT.md no cita a Brooke"; fi
 if grep -qi "t de Student" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md calcula el IC con t de Student"; else fail "REPORT.md no documenta el metodo del IC"; fi
 # (Corrección 2026-09-20, evaluación del 19-sep: los chequeos de arriba solo
@@ -291,6 +339,14 @@ if git rev-parse -q --verify "refs/tags/v1.1.0" >/dev/null; then
     # existiera; moverla dos commits atrás pasaba sin aviso. Ahora exige
     # que apunte a HEAD, que es lo que hace que el docente evalúe el
     # último commit.)
+    # (Corrección 2026-09-21, evaluación del 21-sep: una etiqueta ligera
+    # pasaba. La guía pide una etiqueta anotada -- con autor, fecha y
+    # mensaje --, y "git cat-file -t" devuelve "tag" solo si lo es.)
+    if [ "$(git cat-file -t refs/tags/v1.1.0)" = "tag" ]; then
+        pass "la etiqueta v1.1.0 es anotada (tiene autor, fecha y mensaje propios)"
+    else
+        fail "la etiqueta v1.1.0 es ligera (apunta directo a un commit): debe ser anotada (git tag -a)"
+    fi
     tag_commit=$(git rev-parse 'v1.1.0^{commit}')
     head_commit=$(git rev-parse HEAD)
     if [ "$tag_commit" = "$head_commit" ]; then
@@ -412,7 +468,7 @@ fi
 # con cada commit nuevo y el chequeo caducaria solo -- y se compara celda a
 # celda con las dos tablas de CONTRIBUTORS.md.)
 CREDIT_REV="f2c0f11"
-p10_cifras=$(PYTHONIOENCODING=utf-8 python3 - CONTRIBUTORS.md "$CREDIT_REV" <<'PYEOF'
+p10_cifras=$(PYTHONIOENCODING=utf-8 python3 - CONTRIBUTORS.md "$CREDIT_REV" docs/informe/main.tex <<'PYEOF'
 import os, re, subprocess, sys
 texto = open(sys.argv[1], encoding="utf-8").read()
 rev = sys.argv[2]
@@ -443,11 +499,38 @@ for rol, cifras in real.items():
                 errores.append(f"{rol}: {alias} ({n}) != script {cifras[clave]}")
 if not real:
     errores.append("credit-counts.py no devolvio ninguna fila")
+# (Corrección 2026-09-21, evaluación del 21-sep: el informe entregado tenia
+# una tabla CRediT congelada que omitia a Pallo Pinto en tres roles y nada lo
+# comparaba con los datos. Ahora la tabla "Cobertura de los catorce roles" de
+# main.tex tambien se cruza con credit-counts.py sobre el mismo commit fijo.)
+tex = open(sys.argv[3], encoding="utf-8").read()
+orden = ["Conceptualization", "Data curation", "Formal analysis", "Funding acquisition",
+         "Investigation", "Methodology", "Project administration", "Resources", "Software",
+         "Supervision", "Validation", "Visualization", "Writing – original draft",
+         "Writing – review & editing"]
+tabla = re.search(r"\\textbf\{Rol CRediT\}.*?\\midrule\n(.*?)\\bottomrule", tex, re.S)
+if not tabla:
+    errores.append("main.tex: no se encontro la tabla de cobertura de los catorce roles CRediT")
+else:
+    filas_tex = [l for l in tabla.group(1).split("\n") if l.strip()]
+    if len(filas_tex) != len(orden):
+        errores.append(f"main.tex: la tabla de roles tiene {len(filas_tex)} filas, se esperaban {len(orden)}")
+    else:
+        for rol, fila in zip(orden, filas_tex):
+            celda = fila.split("&")[1] if "&" in fila else ""
+            en_tex = {a: int(n) for a, n in re.findall(r"(Darwin|Alejandro|Ricardo) \((\d+)\)", celda)}
+            if rol not in real:
+                continue
+            esperado = {"Darwin": real[rol]["Darwin"], "Alejandro": real[rol]["Pallo"], "Ricardo": real[rol]["Velez"]}
+            esperado = {a: n for a, n in esperado.items() if n > 0}
+            if en_tex != esperado:
+                errores.append(f"main.tex, rol {rol}: {en_tex} != script {esperado}")
 print("; ".join(errores[:5]))
 sys.exit(1 if errores else 0)
 PYEOF
 )
-if [ -z "$p10_cifras" ]; then
+ec_p10_cifras=$?
+if [ "$ec_p10_cifras" -eq 0 ] && [ -z "$p10_cifras" ]; then
     pass "las cifras de CRediT de CONTRIBUTORS.md coinciden celda a celda con scripts/credit-counts.py $CREDIT_REV"
 else
     fail "cifras de CRediT desactualizadas o alteradas respecto a credit-counts.py $CREDIT_REV: $p10_cifras"
@@ -504,7 +587,7 @@ ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
 # "cobertura" cerca -- deliberadamente NO se buscan sin ancla: colisionan
 # con strings ajenos como ">= 0.6" de ingenieria de paquetes npm en
 # frontend/package-lock.json. Siempre requieren un ancla al lado.)
-stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}${NUM60}(\s*${PORCENTAJE})?|${NUM60}(\s*${PORCENTAJE})?[^.]{0,60}(${ANCLA})|≥\s*${NUM60}\s*${PORCENTAJE}?|>=?\s*0\.60|>=\s*${NUM60}\s*${PORCENTAJE}" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!frontend/package-lock.json' ':!*.lock' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|vigente|nunca fue el valor|históri|umbral actual' || true)
+stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}${NUM60}(\s*${PORCENTAJE})?|${NUM60}(\s*${PORCENTAJE})?[^.]{0,60}(${ANCLA})|≥\s*${NUM60}\s*${PORCENTAJE}?|>=?\s*0\.60|>=\s*${NUM60}\s*${PORCENTAJE}" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!frontend/package-lock.json' ':!*.lock' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|nunca fue el valor|históri|umbral actual' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
     pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"
@@ -571,6 +654,101 @@ if [ -f "$REPORT_PERF" ]; then
         fail "$stats_script no pudo regenerar REPORT.md (revisar PYTHONIOENCODING=utf-8 y las dependencias)"
     fi
     mv -f "$REPORT_PERF.bak-verify" "$REPORT_PERF"
+fi
+
+# ---------------------------------------------------------------------
+section "EV-1 -- lo que publica el informe coincide con los datos crudos (SUS y Lighthouse)"
+# (Corrección 2026-09-21, evaluación del 21-sep: "el verificador compara los
+# datos crudos con sus derivados, pero no con lo que publica el informe".
+# Cambiar la media del SUS en main.tex, o subir una cifra de Lighthouse en
+# REPORT.md, pasaba. Aqui se recalcula desde los JSON/CSV crudos y se compara
+# con lo que dicen main.tex y docs/mediciones/lighthouse/REPORT.md.)
+informe_vs_datos=$(PYTHONIOENCODING=utf-8 python3 - <<'PYEOF'
+import csv, glob, json, re, statistics as st, sys
+errores = []
+tex = open("docs/informe/main.tex", encoding="utf-8").read()
+def coma(x, dec=1):
+    return f"{x:.{dec}f}".replace(".", ",")
+
+# --- SUS: media e IC recalculados desde respuestas.csv ---
+filas = list(csv.DictReader(open("docs/mediciones/sus/respuestas.csv", newline="", encoding="utf-8")))
+punt = []
+for f in filas:
+    v = [int(f[f"p{i}"]) for i in range(1, 11)]
+    punt.append(sum((x - 1) if i % 2 == 0 else (5 - x) for i, x in enumerate(v)) * 2.5)
+n = len(punt); media = st.mean(punt); dt = st.stdev(punt)
+import importlib.util
+sp = importlib.util.spec_from_file_location("sus_analysis", "scripts/sus-analysis.py")
+sa = importlib.util.module_from_spec(sp)
+sp.loader.exec_module(sa)
+ic = sa.t_critico(n - 1) * dt / (n ** 0.5)
+m_txt, lo_txt, hi_txt, ic_txt = coma(media, 2), coma(media - ic, 2), coma(media + ic, 2), coma(ic, 2)
+fila_media = re.search(r"Media SUS & ([\d,]+) ", tex)
+if not fila_media or fila_media.group(1) != m_txt:
+    errores.append(f"main.tex: 'Media SUS' {fila_media.group(1) if fila_media else 'ausente'} != {m_txt} (recalculado del CSV)")
+fila_ic = re.search(r"Media SUS.*?\n.*?IC 95.*?& ([\d,]+) \$\\pm\$ ([\d,]+) .*?\(([\d,]+) -- ([\d,]+)\)", tex, re.S)
+if not fila_ic or list(fila_ic.groups()) != [m_txt, ic_txt, lo_txt, hi_txt]:
+    errores.append(f"main.tex: IC del SUS {list(fila_ic.groups()) if fila_ic else 'ausente'} != {[m_txt, ic_txt, lo_txt, hi_txt]}")
+for otra in re.findall(r"media SUS (?:de )?(\d+,\d+)", tex):
+    if otra != m_txt:
+        errores.append(f"main.tex: 'media SUS {otra}' != {m_txt}")
+
+# --- Lighthouse: tabla publica de main.tex vs JSON crudos ---
+def medias(patron):
+    fs = sorted(glob.glob(patron))
+    cats = {k: [] for k in ("performance", "accessibility", "best-practices", "seo")}
+    for f in fs:
+        d = json.load(open(f, encoding="utf-8"))
+        for k in cats:
+            cats[k].append(d["categories"][k]["score"] * 100)
+    return {k: round(st.mean(v), 1) for k, v in cats.items() if v}, len(fs)
+def celda(x, entero=False):
+    if x == 100 or (entero and x == int(x)):
+        return str(int(x))
+    return coma(x, 1)
+tabla = re.search(r"Resultados de Lighthouse en el despliegue p.blico.*?\\midrule\n(.*?)\\bottomrule", tex, re.S)
+if not tabla:
+    errores.append("main.tex: no se encontro la tabla publica de Lighthouse")
+else:
+    filas_tex = [l for l in tabla.group(1).split("\n") if l.strip()]
+    orden = [("mobile", "dashboard"), ("mobile", "inventario"), ("desktop", "dashboard"), ("desktop", "inventario")]
+    if len(filas_tex) != 4:
+        errores.append(f"main.tex: la tabla publica de Lighthouse tiene {len(filas_tex)} filas, se esperaban 4")
+    else:
+        for (perfil, ruta), fila in zip(orden, filas_tex):
+            m, cnt = medias(f"docs/mediciones/lighthouse/public-{perfil}-{ruta}-run*.report.json")
+            celdas = [c.strip().rstrip("\\").strip() for c in fila.split("&")][2:6]
+            esperado = [celda(m["performance"]), celda(m["accessibility"]), celda(m["best-practices"], True), celda(m["seo"], True)]
+            if celdas != esperado:
+                errores.append(f"main.tex Lighthouse {perfil}/{ruta}: {celdas} != JSON {esperado}")
+
+# --- Lighthouse: tablas Run1-3 de REPORT.md vs mobile-run*/desktop-run* ---
+rep = open("docs/mediciones/lighthouse/REPORT.md", encoding="utf-8").read()
+nombres = {"Rendimiento": "performance", "Accesibilidad": "accessibility", "Buenas prácticas": "best-practices", "SEO": "seo"}
+for titulo, prefijo in (("Perfil móvil", "mobile"), ("Perfil escritorio", "desktop")):
+    bloque = re.search(r"### " + titulo + r"\n\n\| Categoría.*?\n\|---.*?\n((?:\|.*\n)+)", rep)
+    if not bloque:
+        errores.append(f"REPORT.md: falta la tabla '{titulo}' de las corridas 1-3")
+        continue
+    for linea in bloque.group(1).splitlines():
+        c = [x.strip() for x in linea.strip("|").split("|")]
+        if c[0] not in nombres:
+            continue
+        reales = []
+        for r in (1, 2, 3):
+            d = json.load(open(f"docs/mediciones/lighthouse/{prefijo}-run{r}.report.json", encoding="utf-8"))
+            reales.append(round(d["categories"][nombres[c[0]]]["score"] * 100))
+        if [int(x) for x in c[1:4]] != reales:
+            errores.append(f"REPORT.md {titulo}/{c[0]}: {c[1:4]} != JSON {reales}")
+print("; ".join(errores[:5]))
+sys.exit(1 if errores else 0)
+PYEOF
+)
+ec_informe=$?
+if [ "$ec_informe" -eq 0 ] && [ -z "$informe_vs_datos" ]; then
+    pass "el informe (SUS y tabla publica de Lighthouse) y REPORT.md de Lighthouse coinciden con los datos crudos"
+else
+    fail "lo publicado no coincide con los datos crudos (codigo $ec_informe): $informe_vs_datos"
 fi
 
 # ---------------------------------------------------------------------

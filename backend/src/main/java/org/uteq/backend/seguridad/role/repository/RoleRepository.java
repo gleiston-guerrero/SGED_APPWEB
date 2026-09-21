@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
     /**
+     * Devuelve el rol con ese nombre, si existe.
+     *
      * @param nombre nombre del rol
      * @return el rol con ese nombre, si existe
      */

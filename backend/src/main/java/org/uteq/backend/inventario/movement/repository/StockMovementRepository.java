@@ -14,6 +14,8 @@ import org.uteq.backend.inventario.movement.entity.StockMovement;
 public interface StockMovementRepository extends JpaRepository<StockMovement, Long> {
 
     /**
+     * Devuelve todos los movimientos, del más reciente al más antiguo.
+     *
      * @param pageable página y tamaño solicitados
      * @return todos los movimientos, del más reciente al más antiguo
      */
@@ -21,6 +23,8 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
     Page<StockMovement> findAllByOrderByMovementDateDesc(Pageable pageable);
 
     /**
+     * Devuelve los movimientos de ese artículo, del más reciente al más antiguo.
+     *
      * @param idArticulo identificador del artículo
      * @param pageable página y tamaño solicitados
      * @return los movimientos de ese artículo, del más reciente al más antiguo

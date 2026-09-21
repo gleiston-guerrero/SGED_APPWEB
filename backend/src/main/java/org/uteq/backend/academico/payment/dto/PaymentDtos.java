@@ -78,6 +78,8 @@ public final class PaymentDtos {
             String voidReason
     ) {
         /**
+         * Indica si el pago no fue anulado.
+         *
          * @return {@code true} si el pago no fue anulado
          */
         public boolean active() {

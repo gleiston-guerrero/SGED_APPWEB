@@ -12,6 +12,8 @@ import java.util.List;
 public interface PositionRepository extends JpaRepository<Position, Long> {
 
     /**
+     * Devuelve las posiciones activas, ordenadas por identificador ascendente.
+     *
      * @return las posiciones activas, ordenadas por identificador ascendente
      */
     @Query("SELECT p FROM Position p WHERE p.activo = true ORDER BY p.idPosicion ASC")

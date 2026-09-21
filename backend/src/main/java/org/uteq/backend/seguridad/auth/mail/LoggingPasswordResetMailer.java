@@ -20,6 +20,8 @@ public class LoggingPasswordResetMailer implements PasswordResetMailer {
     private static final Logger log = LoggerFactory.getLogger(LoggingPasswordResetMailer.class);
 
     /**
+     * Registra en el log el enlace de restablecimiento de contraseña en lugar de enviarlo (entorno sin SMTP).
+     *
      * @param correo correo destinatario, solo para el mensaje de log
      * @param url enlace de restablecimiento, escrito en el log en vez de enviarse
      */

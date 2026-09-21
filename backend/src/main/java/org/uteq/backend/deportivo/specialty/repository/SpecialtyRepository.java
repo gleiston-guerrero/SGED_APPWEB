@@ -16,6 +16,8 @@ import java.util.List;
 public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
 
     /**
+     * Devuelve la página de especialidades activas.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de especialidades activas
      */
@@ -23,12 +25,16 @@ public interface SpecialtyRepository extends JpaRepository<Specialty, Long> {
     Page<Specialty> findActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve todas las especialidades activas, sin paginar.
+     *
      * @return todas las especialidades activas, sin paginar
      */
     @Query("SELECT s FROM Specialty s WHERE s.activo = true")
     List<Specialty> findActiveTrue();
 
     /**
+     * Indica si ya existe una especialidad con ese nombre, sin distinguir mayúsculas/minúsculas.
+     *
      * @param nombre nombre de la especialidad a comprobar
      * @return {@code true} si ya existe una especialidad con ese nombre, sin distinguir mayúsculas/minúsculas
      */

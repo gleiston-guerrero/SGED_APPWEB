@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     /**
+     * Devuelve la página de categorías activas.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de categorías activas
      */
@@ -21,12 +23,16 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Page<Category> findActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve todas las categorías activas, sin paginar.
+     *
      * @return todas las categorías activas, sin paginar
      */
     @Query("SELECT c FROM Category c WHERE c.activo = true")
     List<Category> findActiveTrue();
 
     /**
+     * Indica si ya existe una categoría con ese nombre, sin distinguir mayúsculas/minúsculas.
+     *
      * @param nombre nombre de la categoría a comprobar
      * @return {@code true} si ya existe una categoría con ese nombre, sin distinguir mayúsculas/minúsculas
      */

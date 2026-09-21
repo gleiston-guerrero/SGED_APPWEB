@@ -41,6 +41,8 @@ public class SecurityConfig {
     private final ProblemDetailsAuthHandlers problemHandlers;
 
     /**
+     * Devuelve la cadena de filtros configurada: CORS, sin CSRF (API sin estado), sin sesión de servidor, rutas públicas explícitas y el resto autenticado.
+     *
      * @param http constructor de configuración HTTP inyectado por Spring Security
      * @return la cadena de filtros configurada: CORS, sin CSRF (API sin estado),
      *         sin sesión de servidor, rutas públicas explícitas y el resto autenticado
@@ -74,6 +76,8 @@ public class SecurityConfig {
     }
 
     /**
+     * Devuelve la configuración CORS: orígenes exactos (sin comodín de dominio), métodos y cabeceras explícitos, y credenciales habilitadas.
+     *
      * @return la configuración CORS: orígenes exactos (sin comodín de dominio),
      *         métodos y cabeceras explícitos, y credenciales habilitadas
      */
@@ -93,6 +97,8 @@ public class SecurityConfig {
     }
 
     /**
+     * Devuelve el codificador de contraseñas BCrypt con factor de coste 12 (RNF-03).
+     *
      * @return el codificador de contraseñas BCrypt con factor de coste 12 (RNF-03)
      */
     @Bean
@@ -101,6 +107,8 @@ public class SecurityConfig {
     }
 
     /**
+     * Devuelve el gestor de autenticación por defecto, usado por el flujo de login.
+     *
      * @param config configuración de autenticación de Spring Security
      * @return el gestor de autenticación por defecto, usado por el flujo de login
      * @throws Exception si Spring Security no puede resolver el gestor de autenticación

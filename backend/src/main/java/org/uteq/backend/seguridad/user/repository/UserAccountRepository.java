@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
     /**
+     * Devuelve la cuenta activa, con roles y persona precargados, si existe.
+     *
      * @param idUsuario identificador de la cuenta
      * @return la cuenta activa, con roles y persona precargados, si existe
      */
@@ -25,6 +27,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     Optional<UserAccount> findByIdAndActiveTrue(@Param("idUsuario") Long idUsuario);
 
     /**
+     * Devuelve la página de cuentas con baja lógica excluida.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de cuentas con baja lógica excluida
      */
@@ -32,6 +36,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     Page<UserAccount> findByActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve la cuenta con ese nombre de usuario, activa o no, si existe.
+     *
      * @param username nombre de usuario
      * @return la cuenta con ese nombre de usuario, activa o no, si existe
      */
@@ -61,18 +67,24 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     Optional<UserAccount> findByUsernameIgnoreCaseAndActiveTrue(@Param("username") String username);
 
     /**
+     * Indica si ya existe una cuenta con ese nombre de usuario.
+     *
      * @param username nombre de usuario a comprobar
      * @return {@code true} si ya existe una cuenta con ese nombre de usuario
      */
     boolean existsByUsername(String username);
 
     /**
+     * Indica si ya existe una cuenta con ese nombre de usuario.
+     *
      * @param username nombre de usuario a comprobar, sin distinguir mayúsculas/minúsculas
      * @return {@code true} si ya existe una cuenta con ese nombre de usuario
      */
     boolean existsByUsernameIgnoreCase(String username);
 
     /**
+     * Indica si esa persona ya tiene una cuenta de acceso, activa o no.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona ya tiene una cuenta de acceso, activa o no
      */
@@ -80,6 +92,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     boolean existsByPerson_Id(@Param("idPersona") Long idPersona);
 
     /**
+     * Devuelve la cuenta activa de esa persona, con roles precargados, si existe.
+     *
      * @param idPersona identificador de la persona
      * @return la cuenta activa de esa persona, con roles precargados, si existe
      */

@@ -66,7 +66,7 @@ class javadoc_ast_coverage {
             String repr = file.substring(file.lastIndexOf('/') + 1) + ":"
               + ((ClassTree) cls).getSimpleName() + "." + mt.getName()
               + "(" + params(mt) + ")";
-            if (doc == null || !hasText(doc)) { detalle.add("SIN_JAVADOC  " + repr); return null; }
+            if (doc == null || !hasMainText(dc)) { detalle.add("SIN_JAVADOC  " + repr); return null; }
             documented++;
             boolean ok = true;
             for (VariableTree p : mt.getParameters())
@@ -111,7 +111,13 @@ class javadoc_ast_coverage {
     return found[0];
   }
 
-  static boolean hasText(String doc) { return doc.replaceAll("[*@{}]", "").trim().length() > 0; }
+  // Descripcion principal (el texto ANTES de la primera etiqueta) con letras
+  // propias; un "{@inheritDoc}" solo o un bloque que solo trae @param/@return
+  // no cuenta (javadoc lo avisa como "no main description").
+  static boolean hasMainText(DocCommentTree dc) {
+    String body = dc.getFullBody().toString().replaceAll("\\{@inheritDoc[^}]*\\}", "");
+    return body.replaceAll("[^\\p{L}]", "").length() >= 3;
+  }
 
   static boolean hasReturn(String doc) {
     String d = doc.replace('*', ' ');

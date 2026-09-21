@@ -14,6 +14,8 @@ import org.uteq.backend.inventario.assignment.entity.Assignment;
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
     /**
+     * Devuelve todas las asignaciones, de la más reciente a la más antigua.
+     *
      * @param pageable página y tamaño solicitados
      * @return todas las asignaciones, de la más reciente a la más antigua
      */
@@ -21,6 +23,8 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     Page<Assignment> findAllByOrderByAssignmentDateDesc(Pageable pageable);
 
     /**
+     * Devuelve las asignaciones de ese estudiante, de la más reciente a la más antigua.
+     *
      * @param idEstudiante identificador del estudiante
      * @param pageable página y tamaño solicitados
      * @return las asignaciones de ese estudiante, de la más reciente a la más antigua
@@ -29,6 +33,8 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
     Page<Assignment> findByStudent_IdOrderByAssignmentDateDesc(@Param("idEstudiante") Long idEstudiante, Pageable pageable);
 
     /**
+     * Devuelve las asignaciones de ese entrenador, de la más reciente a la más antigua.
+     *
      * @param idEntrenador identificador del entrenador
      * @param pageable página y tamaño solicitados
      * @return las asignaciones de ese entrenador, de la más reciente a la más antigua

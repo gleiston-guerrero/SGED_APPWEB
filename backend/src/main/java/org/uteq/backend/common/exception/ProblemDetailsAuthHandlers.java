@@ -26,6 +26,8 @@ public class ProblemDetailsAuthHandlers {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
+     * Devuelve el manejador que responde {@code 401} cuando la petición no trae una sesión válida.
+     *
      * @return el manejador que responde {@code 401} cuando la petición no trae una sesión válida
      */
     @Bean
@@ -37,6 +39,8 @@ public class ProblemDetailsAuthHandlers {
     }
 
     /**
+     * Devuelve el manejador que responde {@code 403} cuando el rol autenticado no tiene permiso sobre el recurso.
+     *
      * @return el manejador que responde {@code 403} cuando el rol autenticado no tiene permiso sobre el recurso
      */
     @Bean

@@ -31,6 +31,8 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
+     * Devuelve el detalle del problema con el estado HTTP que declara la excepción.
+     *
      * @param ex excepción de negocio lanzada por el código de la aplicación
      * @return el detalle del problema con el estado HTTP que declara la excepción
      */
@@ -43,6 +45,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 422} con la lista de errores campo por campo.
+     *
      * @param ex excepción con los errores de validación de Bean Validation ({@code @Valid})
      * @return {@code 422} con la lista de errores campo por campo
      */
@@ -62,6 +66,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve una respuesta HTTP {@code 401} genérica (no distingue usuario inexistente de contraseña incorrecta).
+     *
      * @param ex excepción lanzada por Spring Security ante usuario/contraseña inválidos
      * @return {@code 401} genérico (no distingue usuario inexistente de contraseña incorrecta)
      */
@@ -76,6 +82,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 403} (RNF-06: la comprobación siempre ocurre del lado del servidor).
+     *
      * @param ex excepción lanzada cuando el rol autenticado no tiene permiso sobre el recurso
      * @return {@code 403} (RNF-06: la comprobación siempre ocurre del lado del servidor)
      */
@@ -90,6 +98,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 400}.
+     *
      * @param ex excepción lanzada cuando el cuerpo de la petición falta o no es JSON válido
      * @return {@code 400}
      */
@@ -105,6 +115,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 400} con el nombre del parámetro faltante en {@code parametro}.
+     *
      * @param ex excepción lanzada cuando falta un parámetro de consulta obligatorio
      * @return {@code 400} con el nombre del parámetro faltante en {@code parametro}
      */
@@ -121,6 +133,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 400} con el nombre del parámetro inválido en {@code parametro}.
+     *
      * @param ex excepción lanzada cuando un parámetro no puede convertirse al tipo esperado
      *           (ej. texto no numérico en un identificador)
      * @return {@code 400} con el nombre del parámetro inválido en {@code parametro}
@@ -138,6 +152,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve una respuesta HTTP {@code 404} genérica.
+     *
      * @param ex excepción lanzada cuando la ruta pedida no existe en la aplicación
      * @return {@code 404} genérico
      */
@@ -157,6 +173,8 @@ public class GlobalExceptionHandler {
     // filtraba nada (el cuerpo ya era el ProblemDetail generico, sin traza),
     // pero un metodo no soportado es un 405, no un error del servidor.
     /**
+     * Devuelve la respuesta HTTP {@code 405}, con el método rechazado en el mensaje.
+     *
      * @param ex excepción lanzada cuando la ruta existe pero no admite el método HTTP usado
      *           (ej. {@code GET} a un endpoint que solo acepta {@code POST})
      * @return {@code 405}, con el método rechazado en el mensaje
@@ -193,6 +211,8 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Devuelve la respuesta HTTP {@code 400} con el mensaje de la excepción como detalle.
+     *
      * @param ex excepción lanzada por una regla de negocio incumplida en la capa de servicio
      * @return {@code 400} con el mensaje de la excepción como detalle
      */

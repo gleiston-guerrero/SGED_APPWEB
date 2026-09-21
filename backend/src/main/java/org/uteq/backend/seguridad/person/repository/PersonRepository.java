@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
     /**
+     * Devuelve la página de personas con baja lógica excluida.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de personas con baja lógica excluida
      */
@@ -22,6 +24,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Page<Person> findByActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve la persona activa con esa cédula, si existe.
+     *
      * @param cedula cédula a buscar (puede no estar presente, ver RF-49)
      * @return la persona activa con esa cédula, si existe
      */
@@ -29,6 +33,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Optional<Person> findByNationalIdAndActiveTrue(@Param("cedula") String cedula);
 
     /**
+     * Devuelve la persona, si existe y está activa.
+     *
      * @param idPersona identificador de la persona
      * @return la persona, si existe y está activa
      */
@@ -36,6 +42,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Optional<Person> findByIdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Devuelve la persona con ese correo, activa o no, si existe.
+     *
      * @param correo correo electrónico a buscar
      * @return la persona con ese correo, activa o no, si existe
      */
@@ -43,6 +51,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     Optional<Person> findByEmail(@Param("correo") String correo);
 
     /**
+     * Indica si existe una persona activa con esa cédula.
+     *
      * @param cedula cédula a comprobar
      * @return {@code true} si existe una persona activa con esa cédula
      */
@@ -50,6 +60,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     boolean existsByNationalIdAndActiveTrue(@Param("cedula") String cedula);
 
     /**
+     * Indica si ya existe una persona con ese correo.
+     *
      * @param correo correo electrónico a comprobar
      * @return {@code true} si ya existe una persona con ese correo
      */

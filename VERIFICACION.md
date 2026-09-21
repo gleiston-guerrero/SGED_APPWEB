@@ -73,28 +73,38 @@ ignorado mientras tanto.
 
 ---
 
-**Re-corrida de las mutaciones del informe 20-sep sobre el HEAD vigente
-(2026-09-21, clon limpio en `9810639e`, `make verify` 32/0/2 de base):**
-todas las mutaciones que la evaluación registró como supervivientes
-ahora **FALLA** en `verify.sh` (código 1), con el ancla que lo detecta:
+**Corrección 2026-09-21 — mutaciones del informe del 20-sep y del 21-sep.**
+La versión anterior de este bloque decía que «no queda ninguna mutación
+del informe 20-sep viva». **Era falso**: la evaluación del 21-sep encontró
+siete supervivientes, y el bloque además situaba la re-corrida en el commit
+`9810639e`, donde todavía no existía el analizador AST que cita. Estado
+real, medido aplicando cada mutación al árbol, corriendo `verify.sh` y
+restaurando después (todas dan `FALLA`, código 1, salvo la última):
 
-| Mutación (del informe 20-sep) | Ancla que ahora la detecta |
+| Mutación | Ancla que la detecta |
 | --- | --- |
-| Mover la etiqueta v1.1.0 2 commits atrás (P8) | un tag de release debe apuntar exactamente a `HEAD` |
-| Vaciar todo el Javadoc a `{@inheritDoc}` (P4) | `javadoc-coverage.py` exige texto real |
-| Quitar `@throws` de métodos que lanzan (P4) | análisis AST real de javac (ver sección P4) |
-| «sesenta por ciento» en letras (P12) | `NUM60` acepta `[Ss]esenta` en al menos una afirmación viva |
-| Falsear la media SUS publicada (P1) | `REPORT.md` regenerado se compara con el versionado |
-| Falsear la cifra de CRediT (P10) | recálculo celda a celda contra `credit-counts.py f2c0f11` |
-| Alterar a mano un p-valor de `REPORT.md` (P14) | `REPORT.md` regenerado se compara con el versionado |
-| Crear una segunda etiqueta de release (P8) | etiquetas inesperadas no declaradas en `VERSIONING.md` |
-| Quitar la frase de confirmación docente de `SRS.md` (P7) | P7 puede fallar si falta la frase; ancla `Confirmación del docente-director \(2026-09-18\)` |
-| `JWT_SECRET` con un valor que parece real (P11) | marcador evidente exigido en `.env.example` |
+| Mover la etiqueta v1.1.0 atrás (P8) | debe apuntar a `HEAD` |
+| Etiqueta ligera en vez de anotada (P8) | `git cat-file -t` debe devolver `tag` |
+| Segunda etiqueta de release (P8) | etiquetas inesperadas no declaradas |
+| Vaciar el Javadoc a `{@inheritDoc}` o a `/** . */` (P4) | descripción principal con letras propias, en `javadoc-coverage.py` y en el analizador AST |
+| Quitar la descripción principal de un bloque (P4) | analizador AST al 100 % |
+| Quitar `@param`/`@return`, o dejarlos sin descripción (P4) | completitud 0,4 % / 4,0 % |
+| Quitar los `@throws` (P4) | `Metodos que hacen throw new con @throws: 0/46` y `RESULTADO: FALLA` (el script imprime también cobertura y completitud al 100 %: la línea que falla es la de `@throws`) |
+| «sesenta por ciento» en letras (P12) | `NUM60` reconoce `[Ss]esenta` |
+| Una afirmación de umbral falsa en una línea que contiene la palabra «vigente» (P12) | la palabra «vigente» ya no está en la lista blanca del barrido (los ejemplos de redacciones falsas no se transcriben literales en este documento: el barrido no distingue una cita de una afirmación viva) |
+| Falsear la media del SUS en `REPORT.md` o en el informe (P1) | regeneración de `REPORT.md` y cotejo del informe con el CSV |
+| Participante inventado con fechas de 2030 (P1) | cruce fila a fila con `registro.md` y rango de fechas reales |
+| Falsear una cifra CRediT en `CONTRIBUTORS.md` o en el informe (P10) | recálculo con `credit-counts.py f2c0f11` |
+| Omitir a un integrante de un rol en la tabla del informe (P10) | el mismo recálculo, sobre `main.tex` |
+| Subir el rendimiento de Lighthouse en `REPORT.md` (82 → 99) o en el informe (P2) | cotejo con los JSON crudos de cada corrida |
+| Alterar a mano un p-valor de `REPORT.md` (P14) | regeneración de `REPORT.md` |
+| Quitar la frase de confirmación docente de `SRS.md` (P7) | P7 falla si existe el acta y falta la frase |
+| **Conservar el título de esa confirmación y negar su contenido (P7)** | **sigue pasando** |
 
-Con esto, la afirmación del informe sobre P4 («ya no por el instrumento,
-sino por los ocho métodos realmente incompletos») también queda cerrada
-con el mismo método del evaluador, y no queda ninguna mutación del
-informe 20-sep viva sobre el HEAD.
+**Sobrevive una, declarada:** el chequeo de P7 busca la frase, no
+interpreta lo que dice. Que la firma de la v1.8 siga vigente para el SRS
+actual lo confirma el docente; ningún script puede comprobarlo, y el texto
+del SRS lo escribió el propio equipo.
 
 ---
 
@@ -365,6 +375,23 @@ del backend, todas con `FALLA` y código 1: borrar los `@param`/`@return`
 Límite honesto: la evaluación del 19-sep contó 8 métodos incompletos con
 su propio análisis por AST y este medidor, que es heurístico, no reproduce
 esa cifra: no encuentra ninguno más con los criterios anteriores.
+
+**Corrección 2026-09-21 (descripción principal):** la evaluación del 21-sep
+cifró en 140-145 los bloques de Javadoc sin descripción principal, y
+tenía razón: `javadoc-coverage.py` daba 100 % porque solo miraba que el bloque
+tuviera algún texto, y un bloque con solo `@param`/`@return` lo tiene. Recuento
+propio: **145 de los 503 métodos públicos** (casi todos consultas de
+repositorio, manejadores de error y constructores) no tenían frase
+descriptiva antes de las etiquetas. Ahora los 145 la tienen (una frase que
+resume qué hace el método; en las consultas y manejadores se deriva de su
+`@return`, en los `void` está escrita a mano) y los dos medidores exigen
+descripción principal: `javadoc-coverage.py` y `javadoc-ast-coverage.java`,
+que además ya no cuenta un `{@inheritDoc}` solo como texto propio, contra
+lo que decía su propio comentario. Comprobado quitando la descripción
+principal de un bloque: el analizador AST, con umbral 100 %, da 99,8 % →
+`FALLA`; el heurístico, con su umbral de 90 %, aún pasa con un solo bloque
+(por eso el AST es el que vigila el 100 %). `mvn javadoc:javadoc` sigue en
+código 0.
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
@@ -1147,7 +1174,7 @@ docker run --rm -v "$(pwd)/docs:/work" -w /work/informe texlive/texlive \
          pdflatex -interaction=nonstopmode main.tex"
 ```
 
-Salida relevante (4ª y última pasada, cero advertencias):
+Salida relevante (4ª pasada del 2026-09-16, cero advertencias; las 72 páginas de esta y de las líneas de abajo eran las de entonces, la compilación de hoy da 74):
 ```
 Output written on main.pdf (72 pages, 1365470 bytes).
 ```

@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface DailyEvaluationRepository extends JpaRepository<DailyEvaluation, Long> {
 
     /**
+     * Devuelve la evaluación diaria de esa sesión, si existe.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @return la evaluación diaria de esa sesión, si existe
      */
@@ -21,6 +23,8 @@ public interface DailyEvaluationRepository extends JpaRepository<DailyEvaluation
     Optional<DailyEvaluation> findBySession_Id(@Param("idSesion") Long idSesion);
 
     /**
+     * Indica si esa sesión ya tiene una evaluación diaria registrada.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @return {@code true} si esa sesión ya tiene una evaluación diaria registrada
      */

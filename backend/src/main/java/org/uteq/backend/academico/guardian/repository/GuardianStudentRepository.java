@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface GuardianStudentRepository extends JpaRepository<GuardianStudent, Long> {
 
     /**
+     * Indica si el vínculo entre ambos existe y está activo.
+     *
      * @param idRepresentante identificador del representante
      * @param idEstudiante identificador del estudiante
      * @return {@code true} si el vínculo entre ambos existe y está activo
@@ -24,6 +26,8 @@ public interface GuardianStudentRepository extends JpaRepository<GuardianStudent
             @Param("idRepresentante") Long idRepresentante, @Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve los estudiantes activos vinculados a ese representante.
+     *
      * @param idRepresentante identificador del representante
      * @return los estudiantes activos vinculados a ese representante
      */
@@ -31,6 +35,8 @@ public interface GuardianStudentRepository extends JpaRepository<GuardianStudent
     List<GuardianStudent> findByGuardian_IdAndActiveTrue(@Param("idRepresentante") Long idRepresentante);
 
     /**
+     * Devuelve los representantes activos vinculados a ese estudiante.
+     *
      * @param idEstudiante identificador del estudiante
      * @return los representantes activos vinculados a ese estudiante
      */
@@ -38,6 +44,8 @@ public interface GuardianStudentRepository extends JpaRepository<GuardianStudent
     List<GuardianStudent> findByStudent_IdAndActiveTrue(@Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve el vínculo entre ambos, activo o no, si existe.
+     *
      * @param idRepresentante identificador del representante
      * @param idEstudiante identificador del estudiante
      * @return el vínculo entre ambos, activo o no, si existe

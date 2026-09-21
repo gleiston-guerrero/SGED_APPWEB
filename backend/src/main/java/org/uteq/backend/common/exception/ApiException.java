@@ -14,6 +14,8 @@ public class ApiException extends RuntimeException {
     private final HttpStatus status;
 
     /**
+     * Crea una excepción de negocio con el estado HTTP y el mensaje que verá el cliente.
+     *
      * @param status estado HTTP a devolver
      * @param mensaje detalle legible del error
      */
@@ -23,6 +25,8 @@ public class ApiException extends RuntimeException {
     }
 
     /**
+     * Devuelve el estado HTTP asociado a esta excepción.
+     *
      * @return el estado HTTP asociado a esta excepción
      */
     public HttpStatus getStatus() {
@@ -30,6 +34,8 @@ public class ApiException extends RuntimeException {
     }
 
     /**
+     * Devuelve el detalle del problema con el estado, tipo y título indicados.
+     *
      * @param tipo segmento final de la URL de {@code type} (RFC 9457)
      * @param titulo título legible del problema
      * @return el detalle del problema con el estado, tipo y título indicados

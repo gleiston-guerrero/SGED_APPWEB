@@ -16,6 +16,8 @@ import java.util.Optional;
  */
 public interface MatchRepository extends JpaRepository<Match, Long> {
     /**
+     * Devuelve la página de partidos, del más reciente al más antiguo.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de partidos, del más reciente al más antiguo
      */
@@ -24,6 +26,8 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     Page<Match> findAllOrderByDateDescTimeDesc(Pageable pageable);
 
     /**
+     * Devuelve la página de partidos de esa categoría, del más reciente al más antiguo.
+     *
      * @param idCategoria identificador de la categoría a filtrar
      * @param pageable página y tamaño solicitados
      * @return página de partidos de esa categoría, del más reciente al más antiguo
@@ -33,6 +37,8 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     Page<Match> findByCategoryOrderByDateDescTimeDesc(@Param("idCategoria") Long idCategoria, Pageable pageable);
 
     /**
+     * Devuelve el partido con su categoría precargada, si existe.
+     *
      * @param idPartido identificador del partido
      * @return el partido con su categoría precargada, si existe
      */

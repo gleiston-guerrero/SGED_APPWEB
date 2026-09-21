@@ -15,6 +15,8 @@ import java.util.List;
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
     /**
+     * Devuelve la página de artículos con baja lógica excluida.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de artículos con baja lógica excluida
      */
@@ -22,18 +24,24 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve todos los artículos activos, sin paginar.
+     *
      * @return todos los artículos activos, sin paginar
      */
     @Query("SELECT a FROM Item a WHERE a.active = true")
     List<Item> findByActiveTrue();
 
     /**
+     * Devuelve artículos activos cuyo stock actual llegó o quedó por debajo del mínimo configurado.
+     *
      * @return artículos activos cuyo stock actual llegó o quedó por debajo del mínimo configurado
      */
     @Query("SELECT a FROM Item a WHERE a.active = true AND a.currentStock <= a.minimumStock")
     List<Item> findLowStock();
 
     /**
+     * Devuelve la cantidad de artículos en stock bajo, calculada por el procedimiento almacenado.
+     *
      * @return la cantidad de artículos en stock bajo, calculada por el procedimiento almacenado
      */
     @Procedure(procedureName = "inventario.sp_reporte_stock_bajo")

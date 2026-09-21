@@ -2836,10 +2836,10 @@ todos con \texttt{requestedUrl} y \texttt{finalUrl} en la URL pública
 \toprule
 \textbf{Perfil} & \textbf{Ruta} & \textbf{Rend.} & \textbf{Acces.} & \textbf{Buenas prác.} & \textbf{SEO} \\
 \midrule
-Móvil & \texttt{/dashboard}  & 99,3 & 91,0 & 100 & 63 \\
-Móvil & \texttt{/inventario} & 99,7 & 100 & 100 & 63 \\
-Escritorio & \texttt{/dashboard}  & 80,0 & 91,0 & 100 & 63 \\
-Escritorio & \texttt{/inventario} & 99,3 & 95,0 & 100 & 63 \\
+Móvil & \texttt{/dashboard}  & 99,3 & 91,0 & 96 & 63 \\
+Móvil & \texttt{/inventario} & 99,7 & 100 & 96 & 63 \\
+Escritorio & \texttt{/dashboard}  & 100 & 91,0 & 96 & 63 \\
+Escritorio & \texttt{/inventario} & 100 & 95,0 & 96 & 63 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2847,8 +2847,10 @@ Escritorio & \texttt{/inventario} & 99,3 & 95,0 & 100 & 63 \\
 Todas las parejas superan los umbrales (rendimiento $\geq$ 80,
 accesibilidad $\geq$ 90, buenas prácticas $\geq$ 90); el SEO de 63 es
 la penalización deliberada de \texttt{is-crawlable} explicada en la
-sección~\ref{sec:seo}. La escritorio/\texttt{/dashboard} queda exactamente en
-el umbral de rendimiento (80,0) en las tres corridas, y la
+sección~\ref{sec:seo}. Las cifras de la tabla son las medias de los LHR crudos
+archivados (las recalcula \texttt{scripts/verify.sh}); la escritorio/\texttt{/dashboard}
+pasó de 79,3 en la primera corrida a 100 tras reservar el espacio de los
+gráficos del panel (sección~\ref{sec:lighthouse-public}), y la
 accesibilidad mínima es 91 (en \texttt{/dashboard}, frente a 100 en
 \texttt{/inventario} móvil) — ambas superan el umbral y se reportan sin
 promediarlas para no ocultar la variación por ruta. Los seis LHR de la
@@ -3265,9 +3267,11 @@ Velez Lopez Ricardo Elias & 55 & 11\,912 & 153 \\
 
 \subsection{Roles por integrante}
 
-\textbf{Pallo Pinto Alejandro Daniel} — \emph{Software}, \emph{Análisis
-formal}, \emph{Validación}, \emph{Curación de datos}, \emph{Redacción
-(borrador original)}, \emph{Visualización}.
+\textbf{Pallo Pinto Alejandro Daniel} — \emph{Conceptualización},
+\emph{Curación de datos}, \emph{Análisis formal}, \emph{Investigación},
+\emph{Metodología}, \emph{Recursos}, \emph{Software}, \emph{Validación},
+\emph{Visualización}, \emph{Redacción (borrador original)}, \emph{Redacción
+(revisión y edición)}.
 
 Responsable de la totalidad del eje de verificación que define esta
 entrega. En seguridad: migración del JWT de \texttt{localStorage} a cookie
@@ -3289,8 +3293,11 @@ de las diez encuestas. En redacción: este informe y el corpus documental
 diccionario de datos, gobernanza del repositorio).
 
 \textbf{Arcalle Grefa Darwin Orlando} — \emph{Conceptualización},
-\emph{Software}, \emph{Investigación}, \emph{Administración del proyecto},
-\emph{Supervisión}.
+\emph{Curación de datos}, \emph{Análisis formal}, \emph{Investigación},
+\emph{Metodología}, \emph{Administración del proyecto}, \emph{Recursos},
+\emph{Software}, \emph{Supervisión}, \emph{Validación},
+\emph{Visualización}, \emph{Redacción (borrador original)}, \emph{Redacción
+(revisión y edición)}.
 
 Estructura inicial del repositorio y del modelo de datos
 (\texttt{DataBase/}), trabajo sobre el \emph{frontend} Angular
@@ -3304,8 +3311,9 @@ y coordinación del equipo, calendario y entregas a lo largo de las cuatro
 fases (\emph{Administración del proyecto} y \emph{Supervisión}).
 
 \textbf{Velez Lopez Ricardo Elias} — \emph{Conceptualización},
-\emph{Software}, \emph{Validación}, \emph{Metodología}, \emph{Recursos},
-\emph{Redacción (revisión y edición)}.
+\emph{Curación de datos}, \emph{Análisis formal}, \emph{Metodología},
+\emph{Recursos}, \emph{Software}, \emph{Validación}, \emph{Visualización},
+\emph{Redacción (borrador original)}, \emph{Redacción (revisión y edición)}.
 
 Arranque del \emph{frontend} Angular y del módulo de autenticación, CRUD
 inicial de \texttt{Estudiante}, y aportes a \ruta{docs/requisitos/} y
@@ -3339,26 +3347,26 @@ se declaran así en vez de asignarles un número inventado.
 \begin{table}[htbp]
 \centering
 \scriptsize
-\caption{Cobertura de los catorce roles de la taxonomía CRediT.}
+\caption{Cobertura de los catorce roles de la taxonomía CRediT (conteos de \texttt{scripts/credit-counts.py f2c0f11}).}
 \label{tab:credit-cobertura}
 \begin{tabular}{@{}p{3.2cm}p{3.4cm}p{7.2cm}@{}}
 \toprule
 \textbf{Rol CRediT} & \textbf{Integrante(s)} & \textbf{Cobertura} \\
 \midrule
-Conceptualización & Darwin (40), Alejandro (26), Ricardo (6) & Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. \\
+Conceptualización & Darwin (45), Alejandro (26), Ricardo (6) & Diseño de los cuatro dominios (académico, deportivo, inventario, seguridad) y de la estrategia híbrida de acceso a datos. \\
 Curación de datos & Alejandro (49), Darwin (27), Ricardo (6) & Diseño del esquema, procedimientos almacenados y limpieza de los datos crudos de medición. \\
-Análisis formal & Alejandro (11), Darwin (4), Ricardo (3) & Análisis estadístico de los datos de rendimiento y usabilidad (intervalos de confianza, distribución \emph{t}). \\
+Análisis formal & Alejandro (11), Darwin (5), Ricardo (4) & Análisis estadístico de los datos de rendimiento y usabilidad (intervalos de confianza, distribución \emph{t}). \\
 Adquisición de fondos & --- & No aplica (proyecto académico sin financiación externa). \\
-Investigación & Darwin (2)* & Relevamiento de requisitos con la escuela ProFútbol y recolección de evidencia empírica. \\
-Metodología & Ricardo (2)* & Proceso de investigación (DSR) y protocolo de medición. \\
+Investigación & Alejandro (3), Darwin (2)* & Relevamiento de requisitos con la escuela ProFútbol y recolección de evidencia empírica. \\
+Metodología & Alejandro (4), Ricardo (2), Darwin (2)* & Proceso de investigación (DSR) y protocolo de medición. \\
 Administración del proyecto & Darwin* & Administración del proyecto, calendario y gestión de entregas. \\
-Recursos & Ricardo (7), Darwin (14) & Configuración del entorno de despliegue (Render), contenedores Docker y base de datos. \\
-Software & Alejandro (128), Darwin (50), Ricardo (11) & Implementación de backend (Spring~Boot), \emph{frontend} (Angular) y procedimientos almacenados. \\
+Recursos & Alejandro (12), Darwin (14), Ricardo (7) & Configuración del entorno de despliegue (Render), contenedores Docker y base de datos. \\
+Software & Alejandro (128), Darwin (54), Ricardo (12) & Implementación de backend (Spring~Boot), \emph{frontend} (Angular) y procedimientos almacenados. \\
 Supervisión & Darwin* & Coordinación del equipo y seguimiento del repositorio. \\
-Validación & Alejandro (72), Darwin (41), Ricardo (9) & Cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. \\
-Visualización & Darwin (6), Alejandro (4), Ricardo (3) & Diagramas C4 y de arquitectura del sistema. \\
-Redacción (borrador original) & Darwin (55), Alejandro (60), Ricardo (14) & Redacción del informe, del SRS y de la documentación técnica. \\
-Redacción (revisión y edición) & Alejandro (87), Darwin (87), Ricardo (24) & Revisión y corrección de la documentación y su consistencia con el código. \\
+Validación & Alejandro (72), Darwin (43), Ricardo (11) & Cobertura (JaCoCo), pruebas de carga (k6), estudio de usabilidad (SUS) y auditoría de seguridad. \\
+Visualización & Darwin (7), Alejandro (4), Ricardo (3) & Diagramas C4 y de arquitectura del sistema. \\
+Redacción (borrador original) & Darwin (63), Alejandro (60), Ricardo (15) & Redacción del informe, del SRS y de la documentación técnica. \\
+Redacción (revisión y edición) & Darwin (108), Alejandro (87), Ricardo (26) & Revisión y corrección de la documentación y su consistencia con el código. \\
 \bottomrule
 \end{tabular}
 \end{table}

@@ -18,6 +18,8 @@ public class LoggingEmailVerificationMailer implements EmailVerificationMailer {
     private static final Logger log = LoggerFactory.getLogger(LoggingEmailVerificationMailer.class);
 
     /**
+     * Registra en el log el enlace de confirmación de correo en lugar de enviarlo (entorno sin SMTP).
+     *
      * @param correo correo destinatario, solo para el mensaje de log
      * @param url enlace de confirmación, escrito en el log en vez de enviarse
      */

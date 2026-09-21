@@ -12,18 +12,24 @@ import java.util.List;
 public interface AIFeedbackGenerator {
 
     /**
+     * Devuelve el comentario generado, o un resultado no disponible si el proveedor falla.
+     *
      * @param profile perfil seudonimizado del jugador
      * @return el comentario generado, o un resultado no disponible si el proveedor falla
      */
     FeedbackResult generatePlayerComment(AnonymousPlayerProfile profile);
 
     /**
+     * Devuelve el comentario generado, o un resultado no disponible si el proveedor falla.
+     *
      * @param lineup perfiles seudonimizados de los jugadores de la alineación
      * @return el comentario generado, o un resultado no disponible si el proveedor falla
      */
     FeedbackResult generateLineupComment(List<AnonymousPlayerProfile> lineup);
 
     /**
+     * Indica si el proveedor está habilitado y configurado.
+     *
      * @return {@code true} si el proveedor está habilitado y configurado
      */
     boolean isAvailable();
@@ -38,18 +44,24 @@ public interface AIFeedbackGenerator {
     record FeedbackResult(String text, String reason) {
 
         /**
+         * Devuelve un resultado disponible con ese texto.
+         *
          * @param text texto generado
          * @return un resultado disponible con ese texto
          */
         public static FeedbackResult ok(String text) { return new FeedbackResult(text, null); }
 
         /**
+         * Devuelve un resultado no disponible con ese motivo.
+         *
          * @param reason motivo por el que no hay texto disponible
          * @return un resultado no disponible con ese motivo
          */
         public static FeedbackResult unavailable(String reason) { return new FeedbackResult(null, reason); }
 
         /**
+         * Indica si este resultado trae un texto generado.
+         *
          * @return {@code true} si este resultado trae un texto generado
          */
         public boolean isAvailable() { return text != null && !text.isBlank(); }

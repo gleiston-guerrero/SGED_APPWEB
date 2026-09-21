@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface GeneralStatusRepository extends JpaRepository<GeneralStatus, Long> {
 
     /**
+     * Devuelve el estado con ese nombre, si existe.
+     *
      * @param nombre nombre del estado
      * @return el estado con ese nombre, si existe
      */
@@ -21,6 +23,8 @@ public interface GeneralStatusRepository extends JpaRepository<GeneralStatus, Lo
     Optional<GeneralStatus> findByName(@Param("nombre") String nombre);
 
     /**
+     * Indica si ya existe un estado con ese nombre.
+     *
      * @param nombre nombre del estado a comprobar
      * @return {@code true} si ya existe un estado con ese nombre
      */

@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
     /**
+     * Devuelve las notificaciones de ese representante, de la más reciente a la más antigua.
+     *
      * @param idRepresentante identificador del representante
      * @return las notificaciones de ese representante, de la más reciente a la más antigua
      */
@@ -21,6 +23,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByGuardian_IdOrderByCreatedAtDesc(@Param("idRepresentante") Long idRepresentante);
 
     /**
+     * Devuelve la cantidad de notificaciones sin leer de ese representante.
+     *
      * @param idRepresentante identificador del representante
      * @return la cantidad de notificaciones sin leer de ese representante
      */

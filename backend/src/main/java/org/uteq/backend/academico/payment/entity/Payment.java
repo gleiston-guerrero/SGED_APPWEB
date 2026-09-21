@@ -66,6 +66,8 @@ public class Payment {
     private String cancellationReason;
 
     /**
+     * Indica si el pago no fue anulado.
+     *
      * @return {@code true} si el pago no fue anulado
      */
     public boolean isActive() {

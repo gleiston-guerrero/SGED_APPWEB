@@ -15,6 +15,8 @@ import java.util.Optional;
  */
 public interface LineupRepository extends JpaRepository<Lineup, Long> {
     /**
+     * Devuelve la plantilla de ese partido, con jugadores/persona/posición precargados, si existe.
+     *
      * @param idPartido identificador del partido
      * @return la plantilla de ese partido, con jugadores/persona/posición precargados, si existe
      */
@@ -24,6 +26,8 @@ public interface LineupRepository extends JpaRepository<Lineup, Long> {
     Optional<Lineup> findByMatch_Id(@Param("idPartido") Long idPartido);
 
     /**
+     * Indica si ese partido ya tiene una plantilla guardada.
+     *
      * @param idPartido identificador del partido
      * @return {@code true} si ese partido ya tiene una plantilla guardada
      */
@@ -31,6 +35,8 @@ public interface LineupRepository extends JpaRepository<Lineup, Long> {
     boolean existsByMatch_Id(@Param("idPartido") Long idPartido);
 
     /**
+     * Devuelve filas {@code [idPartido, cantidad de titulares]} de las plantillas de esos partidos.
+     *
      * @param ids identificadores de los partidos a considerar
      * @return filas {@code [idPartido, cantidad de titulares]} de las plantillas de esos partidos
      */

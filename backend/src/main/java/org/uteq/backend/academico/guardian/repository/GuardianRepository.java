@@ -24,6 +24,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, Long> {
     Page<Guardian> findByActiveTrue(Pageable pageable);
 
     /**
+     * Indica si esa persona ya tiene una ficha de representante, activa o no.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona ya tiene una ficha de representante,
      *         activa o no
@@ -32,6 +34,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, Long> {
     boolean existsByPerson_Id(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si esa persona tiene una ficha de representante activa.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona tiene una ficha de representante activa
      */
@@ -39,6 +43,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, Long> {
     boolean existsByPerson_IdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Devuelve la ficha de representante activa asociada a esa persona, si existe.
+     *
      * @param idPersona identificador de la persona
      * @return la ficha de representante activa asociada a esa persona, si existe
      */
@@ -46,6 +52,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, Long> {
     Optional<Guardian> findByPerson_IdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si esa cuenta está vinculada a una ficha de representante.
+     *
      * @param idUsuario identificador de la cuenta de usuario
      * @return {@code true} si esa cuenta está vinculada a una ficha de representante
      */
@@ -53,6 +61,8 @@ public interface GuardianRepository extends JpaRepository<Guardian, Long> {
     boolean existsByUserAccount_Id(@Param("idUsuario") Long idUsuario);
 
     /**
+     * Devuelve el representante cuya cuenta tiene ese nombre de usuario, si existe.
+     *
      * @param username nombre de usuario de la cuenta
      * @return el representante cuya cuenta tiene ese nombre de usuario, si existe
      */

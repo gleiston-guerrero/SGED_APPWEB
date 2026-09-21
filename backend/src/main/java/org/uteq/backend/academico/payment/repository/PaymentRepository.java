@@ -37,6 +37,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
             @Param("anio") Short anio, @Param("mes") Short mes);
 
     /**
+     * Devuelve los pagos de ese estudiante, del más reciente al más antiguo.
+     *
      * @param idEstudiante identificador del estudiante
      * @return los pagos de ese estudiante, del más reciente al más antiguo
      */
@@ -44,6 +46,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
     List<Payment> findByStudent_IdOrderByPaymentDateDesc(@Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve la suma de los montos no anulados pagados en ese rango de fechas.
+     *
      * @param inicio fecha inicial del rango, inclusive
      * @param fin fecha final del rango, inclusive
      * @return la suma de los montos no anulados pagados en ese rango de fechas
@@ -56,6 +60,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>, JpaSpec
     BigDecimal sumAmountBetweenDates(LocalDate inicio, LocalDate fin);
 
     /**
+     * Devuelve la cantidad de pagos no anulados registrados en ese rango de fechas.
+     *
      * @param inicio fecha inicial del rango, inclusive
      * @param fin fecha final del rango, inclusive
      * @return la cantidad de pagos no anulados registrados en ese rango de fechas

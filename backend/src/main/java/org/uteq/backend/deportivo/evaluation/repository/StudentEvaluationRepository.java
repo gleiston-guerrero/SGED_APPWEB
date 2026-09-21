@@ -17,6 +17,8 @@ import java.util.Optional;
  */
 public interface StudentEvaluationRepository extends JpaRepository<StudentEvaluation, Long>, JpaSpecificationExecutor<StudentEvaluation> {
     /**
+     * Devuelve los puntajes de ese estudiante en esa evaluación, si existen.
+     *
      * @param idEvaluacion identificador de la evaluación diaria
      * @param idEstudiante identificador del estudiante
      * @return los puntajes de ese estudiante en esa evaluación, si existen
@@ -26,6 +28,8 @@ public interface StudentEvaluationRepository extends JpaRepository<StudentEvalua
             @Param("idEvaluacion") Long idEvaluacion, @Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve filas {@code [nombre del criterio, promedio histórico]} de todas las evaluaciones de ese estudiante.
+     *
      * @param idEstudiante identificador del estudiante
      * @return filas {@code [nombre del criterio, promedio histórico]} de todas las evaluaciones de ese estudiante
      */
@@ -40,6 +44,8 @@ public interface StudentEvaluationRepository extends JpaRepository<StudentEvalua
     List<Object[]> historicalAverageByCriterion(@Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve filas {@code [nombre del criterio, puntaje]} de ese estudiante en esa evaluación.
+     *
      * @param idEstudiante identificador del estudiante
      * @param idEvaluacionPrevia identificador de la evaluación diaria cuyos puntajes se consultan
      * @return filas {@code [nombre del criterio, puntaje]} de ese estudiante en esa evaluación
@@ -56,6 +62,8 @@ public interface StudentEvaluationRepository extends JpaRepository<StudentEvalua
                                         @Param("idEvaluacionPrevia") Long idEvaluacionPrevia);
 
     /**
+     * Devuelve filas {@code [idEstudiante, promedio general de puntaje]} de esos estudiantes.
+     *
      * @param ids identificadores de los estudiantes a considerar
      * @return filas {@code [idEstudiante, promedio general de puntaje]} de esos estudiantes
      */
@@ -69,6 +77,8 @@ public interface StudentEvaluationRepository extends JpaRepository<StudentEvalua
     List<Object[]> overallAverageByStudent(@Param("ids") List<Long> ids);
 
     /**
+     * Devuelve filas {@code [idEstudiante, promedio de puntaje]} de esos estudiantes en ese rango de fechas.
+     *
      * @param ids identificadores de los estudiantes a considerar
      * @param desde fecha inicial del rango, inclusive
      * @param hasta fecha final del rango, inclusive

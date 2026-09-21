@@ -52,6 +52,8 @@ public class RedisCacheConfig implements CachingConfigurer {
     private long ttlUsuariosSeconds;
 
     /**
+     * Devuelve el gestor de caché con una configuración de TTL y serialización propia para cada caché ({@code estudiantes}, {@code entrenadores}, {@code usuarios}).
+     *
      * @param factory conexión a Redis inyectada por Spring
      * @return el gestor de caché con una configuración de TTL y serialización
      *         propia para cada caché ({@code estudiantes}, {@code entrenadores}, {@code usuarios})
@@ -115,6 +117,8 @@ public class RedisCacheConfig implements CachingConfigurer {
     public CacheErrorHandler errorHandler() {
         return new CacheErrorHandler() {
             /**
+             * Registra el fallo de Redis al leer de la caché y deja que la aplicación continúe sin ella.
+             *
              * @param ex excepción lanzada por Redis al leer
              * @param cache caché afectada
              * @param key clave que se intentaba leer
@@ -126,6 +130,8 @@ public class RedisCacheConfig implements CachingConfigurer {
             }
 
             /**
+             * Registra el fallo de Redis al escribir en la caché y deja que la aplicación continúe sin ella.
+             *
              * @param ex excepción lanzada por Redis al escribir
              * @param cache caché afectada
              * @param key clave que se intentaba escribir
@@ -138,6 +144,8 @@ public class RedisCacheConfig implements CachingConfigurer {
             }
 
             /**
+             * Registra el fallo de Redis al invalidar una entrada de la caché y deja que la aplicación continúe.
+             *
              * @param ex excepción lanzada por Redis al invalidar
              * @param cache caché afectada
              * @param key clave que se intentaba invalidar
@@ -149,6 +157,8 @@ public class RedisCacheConfig implements CachingConfigurer {
             }
 
             /**
+             * Registra el fallo de Redis al vaciar la caché y deja que la aplicación continúe.
+             *
              * @param ex excepción lanzada por Redis al limpiar
              * @param cache caché afectada
              */

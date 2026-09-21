@@ -20,6 +20,8 @@ import java.util.Optional;
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
     /**
+     * Devuelve la página de estudiantes con baja lógica excluida.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de estudiantes con baja lógica excluida
      */
@@ -27,6 +29,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Page<Student> findByActiveTrue(Pageable pageable);
 
     /**
+     * Devuelve todos los estudiantes activos, ordenados por apellido, con persona y categoría precargadas para evitar N+1.
+     *
      * @return todos los estudiantes activos, ordenados por apellido, con
      *         persona y categoría precargadas para evitar N+1
      */
@@ -35,6 +39,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByActiveTrueOrderByPerson_LastNameAsc();
 
     /**
+     * Devuelve la cantidad de estudiantes activos de esa categoría.
+     *
      * @param idCategoria identificador de la categoría
      * @return la cantidad de estudiantes activos de esa categoría
      */
@@ -42,6 +48,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     long countByCategory_CategoryIdAndActiveTrue(@Param("idCategoria") Long idCategoria);
 
     /**
+     * Devuelve el estudiante, si existe y está activo.
+     *
      * @param idEstudiante identificador del estudiante
      * @return el estudiante, si existe y está activo
      */
@@ -49,6 +57,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByIdAndActiveTrue(@Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Indica si esa persona ya tiene una ficha de estudiante, activa o no.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona ya tiene una ficha de estudiante, activa o no
      */
@@ -56,6 +66,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByPerson_Id(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si esa persona tiene una ficha de estudiante activa.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona tiene una ficha de estudiante activa
      */
@@ -63,6 +75,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByPerson_IdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si ya existe un estudiante con ese código.
+     *
      * @param codigoEstudiante código único del estudiante
      * @return {@code true} si ya existe un estudiante con ese código
      */
@@ -70,6 +84,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByStudentCode(@Param("codigoEstudiante") String codigoEstudiante);
 
     /**
+     * Devuelve la ficha de estudiante de esa persona, activa o no, si existe.
+     *
      * @param idPersona identificador de la persona
      * @return la ficha de estudiante de esa persona, activa o no, si existe
      */
@@ -77,6 +93,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByPerson_Id(@Param("idPersona") Long idPersona);
 
     /**
+     * Devuelve la ficha de estudiante activa de esa persona, si existe.
+     *
      * @param idPersona identificador de la persona
      * @return la ficha de estudiante activa de esa persona, si existe
      */
@@ -95,6 +113,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByStudentCodeAndIdNot(@Param("codigoEstudiante") String codigoEstudiante, @Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve el estudiante cuya cuenta tiene ese nombre de usuario, si existe.
+     *
      * @param username nombre de usuario de la cuenta de acceso
      * @return el estudiante cuya cuenta tiene ese nombre de usuario, si existe
      */
@@ -102,6 +122,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     Optional<Student> findByUserAccount_Username(@Param("username") String username);
 
     /**
+     * Devuelve estudiantes activos de esa categoría, sin incluir al indicado.
+     *
      * @param idCategoria identificador de la categoría
      * @param idEstudiante identificador del estudiante que se excluye del resultado
      * @return estudiantes activos de esa categoría, sin incluir al indicado
@@ -110,6 +132,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByCategory_CategoryIdAndActiveTrueAndIdNot(@Param("idCategoria") Long idCategoria, @Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve estudiantes activos de esa categoría, ordenados por apellido.
+     *
      * @param idCategoria identificador de la categoría
      * @return estudiantes activos de esa categoría, ordenados por apellido
      */
@@ -117,6 +141,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByCategory_CategoryIdAndActiveTrueOrderByPerson_LastNameAsc(@Param("idCategoria") Long idCategoria);
 
     /**
+     * Indica si esa cuenta está vinculada a una ficha de estudiante.
+     *
      * @param idUsuario identificador de la cuenta de usuario
      * @return {@code true} si esa cuenta está vinculada a una ficha de estudiante
      */
@@ -124,6 +150,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     boolean existsByUserAccount_Id(@Param("idUsuario") Long idUsuario);
 
     /**
+     * Devuelve la cantidad de estudiantes activos, calculada por el procedimiento almacenado.
+     *
      * @param idCategoria identificador de la categoría, o {@code null} para el total general
      * @return la cantidad de estudiantes activos, calculada por el procedimiento almacenado
      */
@@ -140,6 +168,8 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
         void deactivateStudentsByCategory(@Param("p_categoria") Long idCategoria);
 
     /**
+     * Devuelve el siguiente código de estudiante disponible para ese año.
+     *
      * @param anio año que forma parte del código a generar
      * @return el siguiente código de estudiante disponible para ese año
      */

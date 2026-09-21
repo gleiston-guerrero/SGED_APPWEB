@@ -304,8 +304,11 @@ def main():
                 lanzan += 1
                 if "@throws" in text or "{@inheritDoc}" in text:
                     lanzan_documentado += 1
-            # "{@inheritDoc}" solo no cuenta: es un bloque sin texto propio.
-            if end is not None and re.search(r"[A-Za-z]{3,}", text.replace("{@inheritDoc}", "")):
+            # Descripcion principal = el texto ANTES de la primera etiqueta. Un
+            # "{@inheritDoc}" solo, o un bloque con solo @param/@return, no
+            # cuenta (javadoc lo avisa como "no main description").
+            principal = re.split(r"(?<!\{)@\w+", text)[0].replace("{@inheritDoc}", "")
+            if end is not None and re.search(r"[A-Za-z]{3,}", principal):
                 documented += 1
                 names, returns = signature_parts(lines, idx)
                 if is_complete(text, names, returns):

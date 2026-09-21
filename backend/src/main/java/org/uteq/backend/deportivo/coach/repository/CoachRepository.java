@@ -15,6 +15,8 @@ import java.util.Optional;
  */
 public interface CoachRepository extends JpaRepository<Coach, Long> {
     /**
+     * Devuelve la página de entrenadores activos.
+     *
      * @param pageable página y tamaño solicitados
      * @return página de entrenadores activos
      */
@@ -22,6 +24,8 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
     Page<Coach> findActiveTrue(Pageable pageable);
 
     /**
+     * Indica si esa persona ya tiene una ficha de entrenador, activa o no.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona ya tiene una ficha de entrenador, activa o no
      */
@@ -29,6 +33,8 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
     boolean existsByPerson_Id(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si esa persona tiene una ficha de entrenador activa.
+     *
      * @param idPersona identificador de la persona
      * @return {@code true} si esa persona tiene una ficha de entrenador activa
      */
@@ -36,6 +42,8 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
     boolean existsByPerson_IdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Devuelve la ficha de entrenador activa de esa persona, si existe.
+     *
      * @param idPersona identificador de la persona
      * @return la ficha de entrenador activa de esa persona, si existe
      */
@@ -43,6 +51,8 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
     Optional<Coach> findByPerson_IdAndActiveTrue(@Param("idPersona") Long idPersona);
 
     /**
+     * Indica si esa cuenta está vinculada a una ficha de entrenador.
+     *
      * @param idUsuario identificador de la cuenta de usuario
      * @return {@code true} si esa cuenta está vinculada a una ficha de entrenador
      */
@@ -50,6 +60,8 @@ public interface CoachRepository extends JpaRepository<Coach, Long> {
     boolean existsByUserAccount_Id(@Param("idUsuario") Long idUsuario);
 
     /**
+     * Devuelve el entrenador cuya cuenta tiene ese nombre de usuario, si existe.
+     *
      * @param username nombre de usuario de la cuenta de acceso
      * @return el entrenador cuya cuenta tiene ese nombre de usuario, si existe
      */

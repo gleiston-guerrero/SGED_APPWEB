@@ -35,6 +35,8 @@ public class SmtpEmailVerificationMailer implements EmailVerificationMailer {
     private int horasVigencia;
 
     /**
+     * Envía por SMTP el enlace de confirmación de correo al destinatario.
+     *
      * @param correo correo destinatario del enlace de confirmación
      * @param url enlace de confirmación de un solo uso
      */

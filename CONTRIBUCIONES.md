@@ -274,11 +274,31 @@ mutaciones de las evaluaciones del 17 y 18-sep.
 |---|---|
 | `20135de7` | Cierra la **lectura estricta de P4** con el mismo método del evaluador: versiona `scripts/javadoc-ast-coverage.java` — un analizador con el **AST real de javac** que exige texto propio, `@param`/`@return` con descripción y `@throws` por cada excepción declarada y por cada `throw new` (503/503 = 100 %, umbral 100). `verify.sh` lo invoca y falla si la completitud baja del 100 %. Asienta además en `VERIFICACION.md` que **todas las mutaciones del informe 20-sep fallan** sobre el HEAD (etiqueta a 2 commits, Javadoc a `{@inheritDoc}`, menos `@throws`, «sesenta por ciento», media SUS, cifra CRediT, p-valor, segunda etiqueta, frase de P7, `JWT_SECRET`) |
 
-**21-sep (2):** se incorpora al repositorio el documento de defensa
-individual **`docs/defensa/DEFENSA.md`** de Vélez López Ricardo Elías,
-con los commits que respaldan cada punto que declara (P1 `d973292`, P2
-`0ecf27a`, P12 `5f99078`, P13, P7 `9810639e`) y respuestas preparadas
-a las preguntas anticipadas por la evaluación del 20-sep.
+**21-sep (2), retirado:** los commits `634fe7a` y `4b73b7d` (de Arcalle
+Grefa) subieron `docs/defensa/DEFENSA.md`, un guion de preparación escrito
+en primera persona como si fuera la defensa individual de Vélez López. La
+guía pide una defensa **oral**, no un documento, y el historial no
+respalda que ese texto sea de Vélez López: lo escribió y lo modificó
+Arcalle Grefa, y el segundo commit reescribió frases para que el barrido
+de P12 no las detectara. Era material interno del equipo y no correspondía
+al repositorio; se retiró en el commit que acompaña este cambio (sigue en
+el historial de git, no se oculta). Cada integrante prepara su defensa por
+su cuenta y la da de viva voz.
+
+**21-sep (3), Arcalle Grefa Darwin Orlando** (correo institucional): cierra
+los hallazgos de la evaluación final v2 que se podían resolver en el
+repositorio: retira `docs/defensa/DEFENSA.md`; quita la palabra «vigente»
+de la lista blanca del barrido de P12; exige etiqueta anotada (P8); cruza
+`respuestas.csv` con `registro.md` y con fechas reales (P1); compara con los
+datos crudos lo que publican el informe (media y IC del SUS, tabla pública
+de Lighthouse) y `REPORT.md` de Lighthouse (P1, P2); alinea con
+`credit-counts.py f2c0f11` la tabla CRediT del informe, que omitía a Pallo
+Pinto en tres roles (P10); corrige en el informe las cifras de Lighthouse
+(mejor rendimiento de escritorio y 96 en buenas prácticas, no 100); añade
+descripción principal a 145 bloques de Javadoc y la exige en los dos
+medidores (P4); y sustituye en `VERIFICACION.md` la afirmación falsa de que
+«no quedaba ninguna mutación viva» por la tabla real, con la que sobrevive.
+
 ---
 
 ## Entregables EV-1/EV-2/EV-3 (sin peso propio, pero condicionan los 14 puntos)
@@ -308,14 +328,13 @@ declara suyos.
 |---|---|---|
 | Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** por los cierres del 20-21/09 |
 | Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16) |
-| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** — declara `9810639e` (P7 puede fallar, Drive P13) y la defensa de `docs/defensa/DEFENSA.md` |
+| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** — declara `9810639e` (P7 puede fallar, Drive P13) |
 
 La **re-firma pendiente** documenta el trabajo cerrado tras el
 2026-09-16 y queda a la espera del aval de cada integrante: Arcalle
 Grefa debe confirmar los cierres de P4 (AST, `20135de7`), P1, P10 y P12
 del 20/21-sep; Vélez López debe confirmar que declara suyo `9810639e`
-(P7 endurecido + verificación de acceso del Drive) y el documento de
-defensa; Pallo Pinto es notificado del cierre de P4/HARDENING posterior
+(P7 endurecido + verificación de acceso del Drive); Pallo Pinto es notificado del cierre de P4/HARDENING posterior
 a su salida del proyecto y no se le atribuye trabajo que no haya
 realizado. Ninguna firma se extiende por otro integrante.
 

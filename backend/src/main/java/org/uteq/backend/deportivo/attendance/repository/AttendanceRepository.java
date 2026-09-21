@@ -21,6 +21,8 @@ import java.util.Optional;
  */
 public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
     /**
+     * Devuelve la marca de asistencia de ese estudiante en esa sesión, si existe.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @param idEstudiante identificador del estudiante
      * @return la marca de asistencia de ese estudiante en esa sesión, si existe
@@ -29,6 +31,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
     Optional<Attendance> findBySession_IdAndStudent_Id(@Param("idSesion") Long idSesion, @Param("idEstudiante") Long idEstudiante);
 
     /**
+     * Devuelve las marcas de asistencia registradas en esa sesión.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @return las marcas de asistencia registradas en esa sesión
      */
@@ -36,6 +40,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
     List<Attendance> findBySession_Id(@Param("idSesion") Long idSesion);
 
     /**
+     * Devuelve el historial de asistencia de ese estudiante, de la sesión más reciente a la más antigua.
+     *
      * @param idEstudiante identificador del estudiante
      * @param pageable página y tamaño solicitados
      * @return el historial de asistencia de ese estudiante, de la sesión más reciente a la más antigua
@@ -44,6 +50,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
     Page<Attendance> findByStudent_IdOrderBySession_DateDesc(@Param("idEstudiante") Long idEstudiante, Pageable pageable);
 
     /**
+     * Devuelve los estudiantes marcados presentes o tarde en esa sesión, evaluables en la sesión diaria.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @return los estudiantes marcados presentes o tarde en esa sesión, evaluables en la sesión diaria
      */
@@ -55,6 +63,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
     List<Attendance> findEligibleForEvaluation(@Param("idSesion") Long idSesion);
 
     /**
+     * Devuelve la cantidad de sesiones en que el estudiante estuvo presente o llegó tarde desde esa fecha.
+     *
      * @param idEstudiante identificador del estudiante
      * @param desde fecha desde la que se cuenta, inclusive
      * @return la cantidad de sesiones en que el estudiante estuvo presente o llegó tarde desde esa fecha
@@ -129,6 +139,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
             @Param("desde") LocalDate desde, @Param("corte") LocalDate corte);
 
     /**
+     * Devuelve filas {@code [idEstudiante, cantidad de presencias]} de esos estudiantes en el rango.
+     *
      * @param ids identificadores de los estudiantes a considerar
      * @param desde fecha inicial del rango, inclusive
      * @param hasta fecha final del rango, inclusive
@@ -147,6 +159,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>, J
                                        @Param("hasta") LocalDate hasta);
 
     /**
+     * Devuelve la nómina de esa sesión con persona y posición precargadas, ordenada por apellido.
+     *
      * @param idSesion identificador de la sesión de entrenamiento
      * @return la nómina de esa sesión con persona y posición precargadas, ordenada por apellido
      */
