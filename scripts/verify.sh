@@ -243,8 +243,17 @@ fi
 # no hace falta una firma nueva.)
 CONFIRMACION_DOCENTE='Confirmación del docente-director \(2026-09-18\)'
 acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
+# (Corrección 2026-09-20, evaluación del 19-sep: quitar la frase de la
+# confirmación bajaba a "manual" y el verificador seguía saliendo 0, o
+# sea, el punto no podía fallar. Ahora: si existe un acta pero la
+# confirmación escrita no está, es FALLA — esa frase ES la única prueba
+# versionada de que la firma de la v1.8 sigue vigente; sin ella el punto
+# no está comprobado. Solo es "manual" cuando no existe ningún acta,
+# caso que de verdad depende de la firma externa del docente.)
 if [ -n "$acta_mas_reciente" ] && grep -qE "$CONFIRMACION_DOCENTE" docs/requisitos/SRS.md 2>/dev/null; then
     pass "acta de aprobacion firmada por el docente-director existe ($acta_mas_reciente); confirmo por escrito (SRS.md) que sigue vigente sin necesidad de una firma nueva"
+elif [ -n "$acta_mas_reciente" ]; then
+    fail "existe el acta ($acta_mas_reciente) pero SRS.md ya no contiene la confirmacion escrita 'Confirmación del docente-director (2026-09-18)': si se quita esa frase el punto deja de estar comprobado"
 else
     srs_version=$(grep -oE 'Versión del documento:\*\* [0-9]+\.[0-9]+' docs/requisitos/SRS.md | grep -oE '[0-9]+\.[0-9]+')
     acta_vigente="docs/requisitos/ACTA-APROBACION-SRS-v${srs_version}.pdf"

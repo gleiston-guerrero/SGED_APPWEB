@@ -560,6 +560,17 @@ Markdown → HTML autocontenido (`pandoc --embed-resources`, incrusta las
 firmas como *data URI*) → PDF (`WeasyPrint`, motor de render HTML/CSS
 real, con `fonts-noto-color-emoji` instalado).
 
+**Prueba de mutación (2026-09-20):** la evaluación del 19-sep mostró que
+quitar la frase de la confirmación hacía bajar el punto a "revisión
+manual" y el verificador seguía saliendo 0 — el chequeo de P7 no podía
+fallar. Se endureció `scripts/verify.sh`: si existe un acta pero la
+frase `Confirmación del docente-director (2026-09-18)` ya no está en
+`SRS.md`, ahora es `FALLA` (código 1), porque esa frase es la única
+prueba versionada de que la firma de la v1.8 sigue vigente. Reproducido
+quitando la frase en una copia: `grep` deja de encontrar la confirmación
+→ la rama `else` usa `fail`, no `manual`. Solo queda "manual" cuando no
+existe ningún acta, caso que sí depende de la firma externa del docente.
+
 **Por qué no el mismo pipeline que el informe (`pdflatex`):** el primer
 intento (`pandoc` apuntado directo a LaTeX/`xelatex`, como `make docs`)
 no era confiable: (a) los emoji de estado ✅/⬜ no tienen glifo en las

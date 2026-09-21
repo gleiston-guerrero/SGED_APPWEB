@@ -89,12 +89,19 @@ fuera del control de versiones), tal como exige la nota de cierre de
 
 Para que el docente evaluador pueda ver las constancias sin publicarlas,
 los 15 originales firmados se subieron a una carpeta de Google Drive de
-**acceso restringido**: solo pueden abrirla el docente y Darwin Arcalle
-(por invitación individual), no cualquiera con el enlace. El consentimiento firmado lo
-permite: `plantilla.md` (§4) prevé compartir los datos con "el docente
-evaluador del PFC" y archivarlos en un lugar de acceso restringido.
+**acceso restringido**: solo pueden abrirla, por invitación individual,
+el docente y los dos integrantes que participaron en la verificación del
+registro (Darwin Arcalle y Ricardo Vélez López), no cualquiera con el
+enlace. El consentimiento firmado lo permite: `plantilla.md` (§4) prevé
+compartir los datos con "el docente evaluador del PFC" y archivarlos en
+un lugar de acceso restringido.
 
 Carpeta: <https://drive.google.com/drive/folders/1Qotl9UsnFcW9FjJqQTclWIV-CHINiS_f?usp=sharing>
+
+**Verificación de acceso (2026-09-20):** Ricardo Vélez López, como
+investigador responsable, confirmó desde su cuenta que el enlace abre la
+carpeta y que los 15 `.docx` se visualizan correctamente. Darwin Arcalle
+conserva la administración de accesos.
 
 Los archivos de la carpeta son los mismos `.docx` sin modificar cuya
 huella SHA-256 figura abajo; se pueden comparar con `sha256sum` o
