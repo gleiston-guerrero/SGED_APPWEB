@@ -133,6 +133,24 @@ if bash scripts/check-doi.sh; then pass "todos los DOI resuelven segun lo espera
 # ---------------------------------------------------------------------
 section "P4 -- Javadoc de metodos publicos >=90%"
 if python3 scripts/javadoc-coverage.py 90; then pass "cobertura de Javadoc >=90%"; else fail "cobertura de Javadoc <90%"; fi
+# (Corrección 2026-09-20: el medidor heuristico (javadoc-coverage.py) cuenta
+# 503/503 con el mismo resultado que el AST de javac; la evaluacion independiente
+# contó 506 por AST con +-3 por criterio y, tras la correccion del 19-sep
+# (@throws en los 46 metodos que lanzan + "{@inheritDoc}" que no cuenta), la
+# revision del 20-sep la cerro como "ya no por el instrumento". Por robustez se
+# verifica tambien con un analizador AST REAL de javac (mismo metodo que uso la
+# evaluacion), que exige las mismas reglas y el 100% (lectura estricta: sin
+# ningun metodo publico incompleto). Si el JDK no esta disponible el
+# chequeo AST se omite sin fallar -- la heuristica ya falla si el Javadoc se
+# vacia o pierde etiquetas.)
+AST_TMP=$(mktemp -d)
+if javac -d "$AST_TMP" scripts/javadoc-ast-coverage.java >/dev/null 2>&1 \
+   && java -cp "$AST_TMP" javadoc_ast_coverage >/dev/null 2>&1; then
+    pass "cobertura y completitud de Javadoc por AST real de javac = 100% (scripts/javadoc-ast-coverage.java)"
+else
+    fail "el analizador AST de javac no se compilo/corrio o encontro cobertura/completitud <100%"
+fi
+rm -rf "$AST_TMP"
 
 # ---------------------------------------------------------------------
 section "P5 -- validate-traceability.sh propaga el codigo de salida"

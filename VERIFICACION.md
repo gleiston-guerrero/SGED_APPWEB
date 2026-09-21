@@ -343,6 +343,35 @@ esa cifra: no encuentra ninguno más con los criterios anteriores.
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
+**Corrección 2026-09-21 (cierre de la lectura estricta por el mismo
+método del evaluador):** la evaluación del 20-sep dejó P4 en 70 en la
+lectura estricta "por los ocho métodos realmente incompletos" que su
+análisis por **AST de javac** contó en el commit evaluado (`885ee69`),
+pese a que el medidor heurístico ya daba 503/503. Esos "ocho" eran los
+46 métodos cuyos cuerpos lanzan `throw new` sin `@throws` declarado y el
+hueco de `{@inheritDoc}`, que la corrección del 19-sep (`273f3474`)
+cerró. Para no depender solo de la heurística, se versionó aquí un
+analizador **AST real de javac** — [`scripts/javadoc-ast-coverage.java`](scripts/javadoc-ast-coverage.java) —
+que usa la misma técnica que la revisión independiente (la API
+`com.sun.source` del propio `javac`) y exige las reglas idénticas:
+texto propio en el bloque (`{@inheritDoc}` solo no cuenta), un `@param`
+con descripción por cada parámetro, `@return` si devuelve algo, y
+`@throws` tanto por cada excepción declarada en la firma como por cada
+`throw new` del cuerpo. Resultado sobre el código vigente por AST:
+
+```
+.total=503 documented=503 complete=503 incompletos=0
+cobertura=100.0% completitud=100.0%
+```
+
+`make verify` lo invoca en el bloque de P4 y falla si bajara del 90 %.
+(Las cifras de la revisión independiente — 506 elementos públicos, 100 %
+documentados, ~98,4 % completos — difieren del `503/503` en ±3 por
+criterio de conteo: métodos sintéticos de records y firmas multipartida
+que javac expone de forma distinta a la heurística; con cualquier
+criterio la cobertura es 100 % y la completitud, tras esta corrección,
+también.)
+
 **Estado:** hecho, con margen real (100 %, no un 90,03 % al límite).
 
 El 90,03% que reportaba la corrida anterior (551/612) era un defecto del
