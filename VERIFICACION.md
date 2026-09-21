@@ -73,6 +73,31 @@ ignorado mientras tanto.
 
 ---
 
+**Re-corrida de las mutaciones del informe 20-sep sobre el HEAD vigente
+(2026-09-21, clon limpio en `9810639e`, `make verify` 32/0/2 de base):**
+todas las mutaciones que la evaluación registró como supervivientes
+ahora **FALLA** en `verify.sh` (código 1), con el ancla que lo detecta:
+
+| Mutación (del informe 20-sep) | Ancla que ahora la detecta |
+| --- | --- |
+| Mover la etiqueta v1.1.0 2 commits atrás (P8) | un tag de release debe apuntar exactamente a `HEAD` |
+| Vaciar todo el Javadoc a `{@inheritDoc}` (P4) | `javadoc-coverage.py` exige texto real |
+| Quitar `@throws` de métodos que lanzan (P4) | análisis AST real de javac (ver sección P4) |
+| «sesenta por ciento» en letras (P12) | `NUM60` acepta `[Ss]esenta` en al menos una afirmación viva |
+| Falsear la media SUS publicada (P1) | `REPORT.md` regenerado se compara con el versionado |
+| Falsear la cifra de CRediT (P10) | recálculo celda a celda contra `credit-counts.py f2c0f11` |
+| Alterar a mano un p-valor de `REPORT.md` (P14) | `REPORT.md` regenerado se compara con el versionado |
+| Crear una segunda etiqueta de release (P8) | etiquetas inesperadas no declaradas en `VERSIONING.md` |
+| Quitar la frase de confirmación docente de `SRS.md` (P7) | P7 puede fallar si falta la frase; ancla `Confirmación del docente-director \(2026-09-18\)` |
+| `JWT_SECRET` con un valor que parece real (P11) | marcador evidente exigido en `.env.example` |
+
+Con esto, la afirmación del informe sobre P4 («ya no por el instrumento,
+sino por los ocho métodos realmente incompletos») también queda cerrada
+con el mismo método del evaluador, y no queda ninguna mutación del
+informe 20-sep viva sobre el HEAD.
+
+---
+
 ## P1 — Respuestas del SUS (peso 1,3)
 
 **Orden:**

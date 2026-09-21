@@ -261,6 +261,24 @@ mutaciones de las evaluaciones del 17 y 18-sep.
 | 20-sep, `verify.sh` y `javadoc-coverage.py` | Cinco hallazgos de la evaluación del 19-sep: P8 exige que la etiqueta apunte a `HEAD`; un `{@inheritDoc}` solo ya no cuenta como Javadoc; el barrido de P12 reconoce la cifra escrita en letras; se corrige la tabla de EV-2 (P4 ya está endurecido); la salida de P1 se pega completa. Commit hecho con el correo institucional de Arcalle Grefa (`darcalleg@uteq.edu.ec`) |
 
 | 20-sep (2), `verify.sh` y `javadoc-coverage.py` | Verificación de contenido: P4 exige descripción en `@param`/`@return` y `@throws` en los 46 métodos que lanzan excepción (más el constructor compacto de `AnonymousPlayerProfile`); P1 regenera el `REPORT.md` del SUS y lo compara; P10 recalcula las cifras de CRediT sobre un commit fijo. Commit con el correo institucional de Arcalle Grefa |
+
+**20-sep (3), Vélez López Ricardo Elías** (correo institucional en el commit):
+
+| Commit | Qué hace |
+|---|---|
+| `9810639e` | **P7 realmente puede fallar**: endurece el verificador para que una ausencia de la confirmación del docente-director en `SRS.md` dé código 1 (antes pasaba en falso). Verifica además, desde su cuenta, que el enlace de Drive de P13 abre con los 15 `.docx` visibles y lo deja anotado en `registro.md` |
+
+**21-sep, Arcalle Grefa Darwin Orlando** (correo institucional):
+
+| Commit | Qué hace |
+|---|---|
+| `20135de7` | Cierra la **lectura estricta de P4** con el mismo método del evaluador: versiona `scripts/javadoc-ast-coverage.java` — un analizador con el **AST real de javac** que exige texto propio, `@param`/`@return` con descripción y `@throws` por cada excepción declarada y por cada `throw new` (503/503 = 100 %, umbral 100). `verify.sh` lo invoca y falla si la completitud baja del 100 %. Asienta además en `VERIFICACION.md` que **todas las mutaciones del informe 20-sep fallan** sobre el HEAD (etiqueta a 2 commits, Javadoc a `{@inheritDoc}`, menos `@throws`, «sesenta por ciento», media SUS, cifra CRediT, p-valor, segunda etiqueta, frase de P7, `JWT_SECRET`) |
+
+**21-sep (2):** se incorpora al repositorio el documento de defensa
+individual **`docs/defensa/DEFENSA.md`** de Vélez López Ricardo Elías,
+con los commits que respaldan cada punto que declara (P1 `d973292`, P2
+`0ecf27a`, P12 `5f99078`, P13, P7 `9810639e`) y respuestas preparadas
+a las preguntas anticipadas por la evaluación del 20-sep.
 ---
 
 ## Entregables EV-1/EV-2/EV-3 (sin peso propio, pero condicionan los 14 puntos)
@@ -288,9 +306,18 @@ declara suyos.
 
 | Integrante | Correo institucional | Conforme |
 |---|---|---|
-| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16) |
+| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** por los cierres del 20-21/09 |
 | Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16) |
-| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16) |
+| Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** — declara `9810639e` (P7 puede fallar, Drive P13) y la defensa de `docs/defensa/DEFENSA.md` |
+
+La **re-firma pendiente** documenta el trabajo cerrado tras el
+2026-09-16 y queda a la espera del aval de cada integrante: Arcalle
+Grefa debe confirmar los cierres de P4 (AST, `20135de7`), P1, P10 y P12
+del 20/21-sep; Vélez López debe confirmar que declara suyo `9810639e`
+(P7 endurecido + verificación de acceso del Drive) y el documento de
+defensa; Pallo Pinto es notificado del cierre de P4/HARDENING posterior
+a su salida del proyecto y no se le atribuye trabajo que no haya
+realizado. Ninguna firma se extiende por otro integrante.
 
 _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 `git log` los commits que se le atribuyen en P2 (`9f75e71`), P10
