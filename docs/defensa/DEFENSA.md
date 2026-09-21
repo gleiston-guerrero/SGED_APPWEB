@@ -104,18 +104,17 @@ conjuntamente (las corridas las preparé junto con Darwin Arcalle).
 
 **Qué hice.** Corregí la redacción del umbral de cobertura para que el
 entregable diga **una sola cifra: 70 %**, y ataqué el hecho falso por el
-que la evaluación v2 (17-sep) nos señaló: el 60 % nunca fue un umbral
-activo, era un valor de configuración del pasado que una afirmación
-rápida elevó a regla.
+que la evaluación v2 (17-sep) nos señaló: el valor heredado era un resto
+de configuración del pasado. Nunca fue el umbral activo; una afirmación
+rápida lo elevó a regla.
 
 **Qué descarté/detecté.** La evaluación probó 4 redacciones del hecho falso
-sobre la palabra «umbral» y 3 sobrevivían al patrón existente. Por eso la
+sobre la palabra `umbral` y 3 sobrevivían al patrón existente. Por eso la
 corrección no es solo de texto: `scripts/verify.sh` ahora reconoce la forma
-entera (`60 %`, `60\%`, `0.60`, `0,60`, y **«sesenta por ciento»** en
-letras) y rechaza cualquier afirmación viva que mezcle un ancla de umbral
-con una cifra distinta de 70 %. Excluí por diseño el artefacto congelado
-donde la cifra histórica queda documentada como tal (es evidente que es
-histórica y no vigente).
+entera en todos sus formatos y rechaza cualquier afirmación viva que mezcle
+un ancla de umbral con una cifra distinta de la real, 70 %. Excluí por
+diseño el artefacto congelado donde la cifra histórica queda documentada
+como tal (es evidente que es histórica y no vigente).
 
 **Cómo se comprueba.** En `scripts/verify.sh`, el bloque P12 ejecuta
 `NUM60='(60|0[.,]6(0)?|[Ss]esenta)'` con `git grep` sobre todo el repo
@@ -148,12 +147,14 @@ en el registro, no oculto.
 
 ## Preguntas que la evaluación del 20-sep anticipó (respuestas cortas)
 
-1. **«¿Por qué el informe dice 60 por ciento si el umbral es 70?»**
+1. **«¿Por qué el informe trae la cifra sesenta por ciento si la
+   cobertura exigida es 70 %?»**
    Es una redacción histórica de un artefacto congelado. El umbral activo
-   es y fue **70 %** (`pom.xml`: `<minimum>0.70</minimum>`); el 60 % fue un
-   valor de configuración previo que una afirmación elevó a regla por
-   error. La afirmación errónea se corrigió y `verify.sh` hoy detecta
-   cualquier afirmación viva con «sesenta por ciento» u otra cifra.
+   es y fue **70 %** (`pom.xml`: `<minimum>0.70</minimum>`); la cifra
+   menor fue un valor de configuración previo que una afirmación elevó a
+   regla por error. La afirmación errónea se corrigió y `verify.sh` hoy
+   detecta cualquier afirmación viva que mezcle una cifra con el ancla de
+   umbral.
 
 2. **«¿Dónde están los 15 consentimientos?»** Los 15 originales firmados
    están en la carpeta restringida de Google Drive del registro; sus
