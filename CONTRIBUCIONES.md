@@ -260,6 +260,7 @@ mutaciones de las evaluaciones del 17 y 18-sep.
 | el commit posterior a `f2c0f11` | Corrige la frase caducada de P11 (`.env.example` sí contenía el literal antiguo), los bloques P2/P8/P10 desactualizados de `VERIFICACION.md`, `scripts/credit-counts.py` con revisión fija, `scripts/javadoc-coverage.py` que ahora exige texto y `@param`/`@return`, y este expediente |
 | 20-sep, `verify.sh` y `javadoc-coverage.py` | Cinco hallazgos de la evaluación del 19-sep: P8 exige que la etiqueta apunte a `HEAD`; un `{@inheritDoc}` solo ya no cuenta como Javadoc; el barrido de P12 reconoce la cifra escrita en letras; se corrige la tabla de EV-2 (P4 ya está endurecido); la salida de P1 se pega completa. Commit hecho con el correo institucional de Arcalle Grefa (`darcalleg@uteq.edu.ec`) |
 
+| 20-sep (2), `verify.sh` y `javadoc-coverage.py` | Verificación de contenido: P4 exige descripción en `@param`/`@return` y `@throws` en los 46 métodos que lanzan excepción (más el constructor compacto de `AnonymousPlayerProfile`); P1 regenera el `REPORT.md` del SUS y lo compara; P10 recalcula las cifras de CRediT sobre un commit fijo. Commit con el correo institucional de Arcalle Grefa |
 ---
 
 ## Entregables EV-1/EV-2/EV-3 (sin peso propio, pero condicionan los 14 puntos)

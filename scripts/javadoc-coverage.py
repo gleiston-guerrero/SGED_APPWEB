@@ -11,8 +11,9 @@ Cubre dos casos:
 
 Un metodo cuenta como documentado si tiene un bloque Javadoc CON TEXTO
 (un "/** . */" vacio no cuenta) y, aparte, como completo si ademas trae un
-"@param" por cada parametro y un "@return" cuando devuelve algo. Ambos
-porcentajes deben alcanzar el umbral. (Antes solo se comprobaba que el
+"@param" por cada parametro y un "@return" cuando devuelve algo, cada uno
+con descripcion. Ambos porcentajes deben alcanzar el umbral, y todo metodo
+que hace `throw new` debe traer @throws (100 %). (Antes solo se comprobaba que el
 bloque existiera: vaciar todo el Javadoc a "/** . */" seguia dando 100 %.)
 
 Un metodo cuenta como documentado si, subiendo desde su firma y saltando
@@ -107,6 +108,9 @@ MODIFIERS = {"public", "static", "final", "abstract", "default", "synchronized",
 
 def signature_parts(lines, idx):
     """Devuelve (nombres_de_parametros, devuelve_algo) de la firma en idx."""
+    if re.match(r"public\s+\w+\s*\{", lines[idx].strip()):
+        # constructor compacto de un record: no lleva parentesis ni retorno
+        return [], False
     sig = lines[idx].strip()
     j = idx
     depth = sig.count("(") - sig.count(")")
@@ -146,9 +150,28 @@ def signature_parts(lines, idx):
 def is_complete(text, names, returns):
     if "{@inheritDoc}" in text:
         return True
-    if any(not re.search(r"@param\s+" + re.escape(n) + r"\b", text) for n in names):
+    # cada etiqueta debe traer descripcion: "@param x" o "@return" solos,
+    # seguidos de otra etiqueta o del fin del bloque, no cuentan.
+    if any(not re.search(r"@param\s+" + re.escape(n) + r"\b\s*[^@\s]", text) for n in names):
         return False
-    return not returns or "@return" in text
+    return not returns or bool(re.search(r"@return\b\s*[^@\s]", text))
+
+
+def body_of(lines, idx, max_lines=200):
+    """Texto del cuerpo del metodo que empieza en idx (hasta cerrar su llave)."""
+    depth, started, body = 0, False, []
+    for j in range(idx, min(len(lines), idx + max_lines)):
+        depth += lines[j].count("{") - lines[j].count("}")
+        started = started or "{" in lines[j]
+        body.append(lines[j])
+        if started and depth <= 0:
+            break
+    return "\n".join(body)
+
+
+def lanza_excepcion(lines, idx):
+    """True si el cuerpo hace `throw new X`: entonces el Javadoc debe traer @throws."""
+    return bool(re.search(r"\bthrow\s+new\s+\w+", body_of(lines, idx)))
 
 
 def join_signature(lines, idx, max_extra=4):
@@ -262,6 +285,8 @@ def main():
     total = 0
     documented = 0
     complete = 0
+    lanzan = 0
+    lanzan_documentado = 0
     undocumented_locations = []
 
     for java_file in sorted(SRC.rglob("*.java")):
@@ -275,6 +300,10 @@ def main():
             total += 1
             end = is_documented(lines, idx)
             text = javadoc_text(lines, end) if end is not None else ""
+            if lanza_excepcion(lines, idx):
+                lanzan += 1
+                if "@throws" in text or "{@inheritDoc}" in text:
+                    lanzan_documentado += 1
             # "{@inheritDoc}" solo no cuenta: es un bloque sin texto propio.
             if end is not None and re.search(r"[A-Za-z]{3,}", text.replace("{@inheritDoc}", "")):
                 documented += 1
@@ -288,7 +317,8 @@ def main():
     pct_complete = (complete / total * 100) if total else 0.0
     print(f"Metodos/constructores publicos encontrados: {total}")
     print(f"Con Javadoc con texto inmediatamente encima: {documented}")
-    print(f"Completos (@param por parametro y @return si devuelve): {complete}")
+    print(f"Completos (@param y @return con descripcion): {complete}")
+    print(f"Metodos que hacen throw new con @throws: {lanzan_documentado}/{lanzan}")
     print(f"Cobertura: {pct:.1f}%  Completitud: {pct_complete:.1f}%  (umbral exigido: {threshold:.0f}%)")
 
     if undocumented_locations:
@@ -297,7 +327,7 @@ def main():
         out_path.write_text("\n".join(undocumented_locations) + "\n", encoding="utf-8")
         print(f"Lista de {len(undocumented_locations)} metodos sin Javadoc: {out_path.relative_to(ROOT)}")
 
-    if pct >= threshold and pct_complete >= threshold:
+    if pct >= threshold and pct_complete >= threshold and lanzan_documentado == lanzan:
         print("RESULTADO: PASA")
         return 0
     print("RESULTADO: FALLA")

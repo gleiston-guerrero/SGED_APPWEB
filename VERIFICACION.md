@@ -91,6 +91,12 @@ participantes: 15
 Con 15 participantes externos, el sistema obtiene una media SUS de 69.33 (IC 95 % 58.87–79.79, calculado con t de Student, gl=14, t=2.145), lo que corresponde al grado **C (Aceptable)** en la escala adjetival de Bangor, Kortum y Miller (2009).
 ```
 
+(Corrección 2026-09-20 (contenido, no solo forma): `scripts/verify.sh`
+ahora regenera `REPORT.md` desde `respuestas.csv` con `sus-analysis.py` y
+lo compara con el versionado (ignorando Fecha y Commit). Mutación: cambiar
+la media publicada de 69.33 a 79.33 → `FALLA`, código 1; restaurada, vuelve
+a pasar.)
+
 (Corrección 2026-09-20: la salida anterior omitía una fila y mostraba la
 línea del método del IC con otro formato; la de arriba es la salida
 literal de la orden, que da dos líneas para `t de Student`, no una.)
@@ -286,8 +292,9 @@ cd backend && ./mvnw -q javadoc:javadoc; echo "exit=$?"
 ```
 Metodos/constructores publicos encontrados: 503
 Con Javadoc con texto inmediatamente encima: 503
-Completos (@param por parametro y @return si devuelve): 502
-Cobertura: 100.0%  Completitud: 99.8%  (umbral exigido: 90%)
+Completos (@param y @return con descripcion): 503
+Metodos que hacen throw new con @throws: 46/46
+Cobertura: 100.0%  Completitud: 100.0%  (umbral exigido: 90%)
 RESULTADO: PASA
 
 exit=0
@@ -318,6 +325,21 @@ código 1. Sobre el código real: 503/503 con texto y 502/503 completos
 a `/** {@inheritDoc} */` seguía dando 100 %; ahora un `{@inheritDoc}`
 sin texto propio no cuenta como documentado y esa mutación da 0,4 % →
 `FALLA`, código 1.)
+
+**Corrección 2026-09-20 (más exigente todavía):** el medidor ahora
+también (a) exige descripción en cada `@param` y `@return` (una etiqueta
+vacía no cuenta), (b) exige `@throws` en los 46 métodos cuyo cuerpo hace
+`throw new` (100 %, no un umbral), y (c) trata el constructor compacto de
+un `record` sin inventarle parámetros: antes lo contaba mal y era el
+"1 incompleto" (`AnonymousPlayerProfile`); ese constructor documenta ahora
+además cada componente con `@param`. Mutaciones repetidas sobre una copia
+del backend, todas con `FALLA` y código 1: borrar los `@param`/`@return`
+(0,4 % de completitud), vaciar el Javadoc a `/** . */` (0,4 %), borrar los
+`@throws` (0/46 métodos con excepción documentada) y dejar `@param x` y
+`@return` sin descripción (4,0 %). `mvn javadoc:javadoc` sigue en código 0.
+Límite honesto: la evaluación del 19-sep contó 8 métodos incompletos con
+su propio análisis por AST y este medidor, que es heurístico, no reproduce
+esa cifra: no encuentra ninguno más con los criterios anteriores.
 
 **Respalda:** [`scripts/javadoc-coverage.py`](scripts/javadoc-coverage.py)
 
@@ -704,6 +726,14 @@ la cifra. Ahora `scripts/credit-counts.py` acepta una revisión, la tabla
 de arriba y las de `CONTRIBUTORS.md` se calcularon con `f2c0f11` y son
 reproducibles tal cual con esa orden, sin importar cuántos commits se
 añadan después.)
+
+**Corrección 2026-09-20 (cifras, no solo forma):** `scripts/verify.sh`
+recalcula el conteo con `python3 scripts/credit-counts.py f2c0f11` y lo
+compara celda a celda con las dos tablas de `CONTRIBUTORS.md`. Mutación:
+cambiar `Software` de Arcalle de 54 a 99 → `FALLA` con "tabla completa
+128/12/99 != script 128/12/54", código 1; restaurada, vuelve a pasar.
+(Si se cambia `CREDIT_REV` en `verify.sh` hay que regenerar las dos
+tablas con el mismo commit.)
 
 **Respalda:** [`CONTRIBUTORS.md`](CONTRIBUTORS.md), [`scripts/credit-counts.py`](scripts/credit-counts.py)
 

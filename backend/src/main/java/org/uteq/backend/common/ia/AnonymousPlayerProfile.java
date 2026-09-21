@@ -24,6 +24,13 @@ public record AnonymousPlayerProfile(
      * de puntajes a copias inmutables no nulas ({@link Map#of()} si vienen
      * nulos), para que el resto del código no tenga que comprobar null.
      *
+     * @param reference             referencia anónima; obligatoria, no puede ser nula ni estar en blanco
+     * @param category              categoría deportiva del jugador
+     * @param position              posición de juego
+     * @param scores                puntajes actuales; si es nulo se sustituye por un mapa vacío
+     * @param previousScores        puntajes del periodo anterior; si es nulo se sustituye por un mapa vacío
+     * @param lastMonthAttendances  asistencias del último mes
+     * @param injured               {@code true} si tiene una lesión activa
      * @throws IllegalArgumentException si {@code reference} es nulo o está en blanco
      */
     public AnonymousPlayerProfile {

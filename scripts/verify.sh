@@ -62,6 +62,26 @@ else
 fi
 if grep -qi "brooke" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md cita a Brooke (1996)"; else fail "REPORT.md no cita a Brooke"; fi
 if grep -qi "t de Student" docs/mediciones/sus/REPORT.md 2>/dev/null; then pass "REPORT.md calcula el IC con t de Student"; else fail "REPORT.md no documenta el metodo del IC"; fi
+# (Corrección 2026-09-20, evaluación del 19-sep: los chequeos de arriba solo
+# miran la forma de REPORT.md; alguien podria editar a mano la media o el IC
+# publicados y todo seguiria pasando. Se regenera REPORT.md desde
+# respuestas.csv con scripts/sus-analysis.py y se compara con el versionado,
+# ignorando las dos lineas de metadato que cambian por diseño -- Fecha y
+# Commit -- y restaurando el archivo al terminar.)
+REPORT_SUS=docs/mediciones/sus/REPORT.md
+cp "$REPORT_SUS" "$REPORT_SUS.bak-verify"
+if PYTHONIOENCODING=utf-8 python3 scripts/sus-analysis.py >/dev/null 2>&1; then
+    diff_sus=$(diff <(grep -vE '^- (Fecha del analisis|Commit):' "$REPORT_SUS.bak-verify" | tr -d '\r') \
+                    <(grep -vE '^- (Fecha del analisis|Commit):' "$REPORT_SUS" | tr -d '\r') || true)
+    if [ -z "$diff_sus" ]; then
+        pass "REPORT.md del SUS regenerado desde respuestas.csv es identico al versionado (fuera de Fecha/Commit)"
+    else
+        fail "REPORT.md del SUS difiere del que produce sus-analysis.py sobre respuestas.csv: $(echo "$diff_sus" | head -6 | tr '\n' ' ')"
+    fi
+else
+    fail "scripts/sus-analysis.py no pudo regenerar REPORT.md del SUS"
+fi
+mv -f "$REPORT_SUS.bak-verify" "$REPORT_SUS"
 echo "  Nota: P1 tambien exige consentimiento de cada participante -- ver P13."
 
 # ---------------------------------------------------------------------
@@ -357,6 +377,53 @@ if [ -z "$p10_incoherencias" ]; then
     pass "la tabla resumen de roles coincide con la tabla de conteo real (sin roles con conteo > 0 ausentes de la lista de alguien)"
 else
     fail "tabla resumen desincronizada de la tabla de conteo: $p10_incoherencias"
+fi
+
+# (Corrección 2026-09-20, evaluación del 19-sep: nada comprobaba las CIFRAS de
+# CONTRIBUTORS.md; falsear una celda pasaba. Se recalcula con
+# scripts/credit-counts.py sobre un commit FIJO -- sin fijarlo la cifra crece
+# con cada commit nuevo y el chequeo caducaria solo -- y se compara celda a
+# celda con las dos tablas de CONTRIBUTORS.md.)
+CREDIT_REV="f2c0f11"
+p10_cifras=$(PYTHONIOENCODING=utf-8 python3 - CONTRIBUTORS.md "$CREDIT_REV" <<'PYEOF'
+import os, re, subprocess, sys
+texto = open(sys.argv[1], encoding="utf-8").read()
+rev = sys.argv[2]
+env = dict(os.environ, PYTHONIOENCODING="utf-8")
+try:
+    out = subprocess.check_output([sys.executable, "scripts/credit-counts.py", rev],
+                                  text=True, encoding="utf-8", env=env, stderr=subprocess.DEVNULL)
+except Exception as exc:
+    print(f"no se pudo ejecutar credit-counts.py {rev}: {exc}")
+    sys.exit(1)
+real = {}
+for linea in out.splitlines():
+    m = re.match(r"^(.+?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s*$", linea)
+    if m and m.group(1) != "Rol":
+        real[m.group(1).strip()] = {"Pallo": int(m.group(2)), "Velez": int(m.group(3)), "Darwin": int(m.group(4))}
+errores = []
+for rol, cifras in real.items():
+    fila = re.search(r"^\| " + re.escape(rol) + r" \| (\d+) \| (\d+) \| (\d+) \|$", texto, re.M)
+    if not fila:
+        errores.append(f"{rol}: falta en la tabla completa")
+    elif [int(x) for x in fila.groups()] != [cifras["Pallo"], cifras["Velez"], cifras["Darwin"]]:
+        errores.append(f"{rol}: tabla completa {'/'.join(fila.groups())} != script {cifras['Pallo']}/{cifras['Velez']}/{cifras['Darwin']}")
+    resumen = re.search(r"^\| " + re.escape(rol) + r" \| ([^|]*\(\d+\)[^|]*) \|", texto, re.M)
+    if resumen:
+        for alias, n in re.findall(r"(Darwin|Alejandro|Ricardo) \((\d+)\)", resumen.group(1)):
+            clave = {"Darwin": "Darwin", "Alejandro": "Pallo", "Ricardo": "Velez"}[alias]
+            if int(n) != cifras[clave]:
+                errores.append(f"{rol}: {alias} ({n}) != script {cifras[clave]}")
+if not real:
+    errores.append("credit-counts.py no devolvio ninguna fila")
+print("; ".join(errores[:5]))
+sys.exit(1 if errores else 0)
+PYEOF
+)
+if [ -z "$p10_cifras" ]; then
+    pass "las cifras de CRediT de CONTRIBUTORS.md coinciden celda a celda con scripts/credit-counts.py $CREDIT_REV"
+else
+    fail "cifras de CRediT desactualizadas o alteradas respecto a credit-counts.py $CREDIT_REV: $p10_cifras"
 fi
 
 # ---------------------------------------------------------------------
