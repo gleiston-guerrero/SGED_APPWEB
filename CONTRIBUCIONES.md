@@ -326,17 +326,30 @@ declara suyos.
 
 | Integrante | Correo institucional | Conforme |
 |---|---|---|
-| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** por los cierres del 20-21/09 |
-| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16) |
+| Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16); **renovada el 2026-09-21** por los cierres del 19 al 21/09 |
+| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16). Salió del proyecto: **no renueva** y no se firma por él |
 | Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16); **requiere re-firma** — declara `9810639e` (P7 puede fallar, Drive P13) |
 
-La **re-firma pendiente** documenta el trabajo cerrado tras el
-2026-09-16 y queda a la espera del aval de cada integrante: Arcalle
-Grefa debe confirmar los cierres de P4 (AST, `20135de7`), P1, P10 y P12
-del 20/21-sep; Vélez López debe confirmar que declara suyo `9810639e`
-(P7 endurecido + verificación de acceso del Drive); Pallo Pinto es notificado del cierre de P4/HARDENING posterior
-a su salida del proyecto y no se le atribuye trabajo que no haya
-realizado. Ninguna firma se extiende por otro integrante.
+**Re-firma de Arcalle Grefa Darwin Orlando (2026-09-21), registrada por su
+indicación expresa.** Confirma que la atribución de arriba es correcta y que
+puede defender ante el docente el código y la evidencia de sus puntos,
+incluidos los cierres posteriores al 2026-09-16, contrastados contra
+`git log`: `f2c0f11` y `885ee69` (P3, P13, P11, P4, P10, P8, P2, con el
+correo personal declarado en `.mailmap`), `86902a0`, `273f347`, `20135de`
+y `fbe19fc` (P4, P8, P12, P1, P10, P2, con el correo institucional).
+También responde por dos commits que retiró él mismo: `634fe7a` y
+`4b73b7d` subieron `docs/defensa/DEFENSA.md`, un guion que no debía estar
+en el repositorio y que `fbe19fc` retira (ver «21-sep (2), retirado»).
+
+**Pallo Pinto Alejandro Daniel** salió del proyecto: no renueva su
+conformidad y no se le atribuye trabajo posterior a su salida ni se firma
+en su nombre; la del 2026-09-16 se limita a los commits suyos que verificó
+entonces (más abajo).
+
+**Velez Lopez Ricardo Elias** sigue pendiente: debe confirmar por sí mismo
+que declara suyo `9810639e` (P7 endurecido + verificación de acceso del
+Drive) y que su conformidad del 2026-09-16 sigue vigente. Ninguna firma se
+extiende por otro integrante.
 
 _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 `git log` los commits que se le atribuyen en P2 (`9f75e71`), P10
