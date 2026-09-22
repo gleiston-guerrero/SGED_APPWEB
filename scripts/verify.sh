@@ -753,7 +753,13 @@ section "EV-1 -- lo que publica el informe coincide con los datos crudos (SUS y 
 # perfil"): subir un 82,0 a un 96,0 en esa fila pasaba porque aqui solo se
 # contrastaba la tabla publica del despliegue (dashboard/inventario) y las
 # tablas Run1-3 de REPORT.md. Ahora tambien se recalculan las medias de
-# mobile-run*/desktop-run* y se comparan con las celdas de la tabla local.)
+# mobile-run*/desktop-run* y se comparan con las celdas de la tabla local.
+#
+# Corrección 2026-09-21 (punto 4 del 22-sep): la tabla publica omitia la
+# portada (r2rs-home) donde el escritorio mide 53,7 (<80) y el texto decia
+# "doce LHR" habiendo dieciocho public-*.report.json. main.tex ahora trae
+# 6 filas (dashboard, inventario y portada / por perfil) con el valor real
+# y su explicacion; aqui se contrastan las seis contra los JSON.)
 informe_vs_datos=$(PYTHONIOENCODING=utf-8 python3 - <<'PYEOF'
 import csv, glob, json, re, statistics as st, sys
 errores = []
@@ -802,9 +808,10 @@ if not tabla:
     errores.append("main.tex: no se encontro la tabla publica de Lighthouse")
 else:
     filas_tex = [l for l in tabla.group(1).split("\n") if l.strip()]
-    orden = [("mobile", "dashboard"), ("mobile", "inventario"), ("desktop", "dashboard"), ("desktop", "inventario")]
-    if len(filas_tex) != 4:
-        errores.append(f"main.tex: la tabla publica de Lighthouse tiene {len(filas_tex)} filas, se esperaban 4")
+    orden = [("mobile", "dashboard"), ("mobile", "inventario"), ("mobile", "r2rs-home"),
+             ("desktop", "dashboard"), ("desktop", "inventario"), ("desktop", "r2rs-home")]
+    if len(filas_tex) != 6:
+        errores.append(f"main.tex: la tabla publica de Lighthouse tiene {len(filas_tex)} filas, se esperaban 6 (incluye la portada /)")
     else:
         for (perfil, ruta), fila in zip(orden, filas_tex):
             m, cnt = medias(f"docs/mediciones/lighthouse/public-{perfil}-{ruta}-run*.report.json")

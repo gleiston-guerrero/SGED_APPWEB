@@ -2824,7 +2824,7 @@ reproducible en GitHub Actions:
 Las doce corridas cubren dos perfiles $\times$ dos rutas autenticadas
 (\texttt{/dashboard} e \texttt{/inventario}), tres por pareja
 (Tabla~\ref{tab:lighthouse-public}); los doce LHR crudos quedan
-archivados como \texttt{docs/mediciones/lighthouse/public-*.report.json},
+archivados como \texttt{docs/mediciones/lighthouse/public-\{mobile,desktop\}-\{dashboard,inventario\}-run\{1,2,3\}.report.json},
 todos con \texttt{requestedUrl} y \texttt{finalUrl} en la URL pública
 (la sesión funciona: ninguna terminó redirigida a \texttt{/login}).
 
@@ -2838,14 +2838,17 @@ todos con \texttt{requestedUrl} y \texttt{finalUrl} en la URL pública
 \midrule
 Móvil & \texttt{/dashboard}  & 99,3 & 91,0 & 96 & 63 \\
 Móvil & \texttt{/inventario} & 99,7 & 100 & 96 & 63 \\
+Móvil & \texttt{/} (portada, login) & 87,7 & 100 & 96 & 63 \\
 Escritorio & \texttt{/dashboard}  & 100 & 91,0 & 96 & 63 \\
 Escritorio & \texttt{/inventario} & 100 & 95,0 & 96 & 63 \\
+Escritorio & \texttt{/} (portada, login) & 53,7 & 100 & 96 & 63 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Todas las parejas superan los umbrales (rendimiento $\geq$ 80,
-accesibilidad $\geq$ 90, buenas prácticas $\geq$ 90); el SEO de 63 es
+Las cuatro parejas de rutas autenticadas superan los umbrales
+(rendimiento $\geq$ 80, accesibilidad $\geq$ 90, buenas prácticas
+$\geq$ 90); el SEO de 63 es
 la penalización deliberada de \texttt{is-crawlable} explicada en la
 sección~\ref{sec:seo}. Las cifras de la tabla son las medias de los LHR crudos
 archivados (las recalcula \texttt{scripts/verify.sh}); la escritorio/\texttt{/dashboard}
@@ -2856,6 +2859,22 @@ accesibilidad mínima es 91 (en \texttt{/dashboard}, frente a 100 en
 promediarlas para no ocultar la variación por ruta. Los seis LHR de la
 medición local de 2026-08-14 se conservan como referencia temporal; la
 evidencia vigente para el Bloque C.5 es esta suite pública.
+
+\textbf{La portada (\texttt{/}, pantalla de login) se incluye en la tabla
+por transparencia y \emph{no} forma parte de la evidencia del
+Bloque~C.5:} las corridas públicas de la portada (2026-09-16, con
+Lighthouse~v12 \emph{api}, archivos
+\texttt{public-\{mobile,desktop\}-r2rs-home-run\{1,2,3\}.report.json})
+se midieron a ras del entorno de medición y sin sesión, antes de la
+suite autenticada. La portada móvil cumple (98/91/74, media 87,7), pero
+la de escritorio no (53/54/54, media 53,7): esa corrida usó renderizado
+por software (SwiftShader, sin GPU) sobre CPU compartida, con TBT
+$\approx$ 500\,ms y \emph{Speed Index} $\approx$ 5\,s con respuesta del
+servidor en 21\,ms — el costo está en el hilo principal del cliente de
+medición, no en el despliegue, como demuestra que la misma ruta en móvil
+da 74--98 y que las rutas autenticadas (las que sí satisfacen el
+Bloque~C.5) dan 80--100. Se declara el valor real en vez de omitir la
+fila.
 
 \subsection{Usabilidad: SUS (Bloque C.3)}
 \label{sec:sus}
