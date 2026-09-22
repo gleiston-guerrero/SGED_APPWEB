@@ -95,14 +95,23 @@ Arcalle Grefa Darwin Orlando descrito abajo.
 
 ## P5 — Validador de trazabilidad (peso 0,6)
 
-**Titular:** Arcalle Grefa Darwin Orlando, sobre la base de Pallo Pinto
-Alejandro Daniel.
+**Titular del cierre:** Velez Lopez Ricardo Elias, sobre la base de Pallo
+Pinto Alejandro Daniel, con los aportes de Arcalle Grefa Darwin Orlando
+descritos abajo.
 
 El defecto original ("el validador nunca podía fallar") lo corrigió
-Pallo Pinto (commit `3297ec0`); Arcalle Grefa forzó UTF-8 en su
-salida (`6fd0581`) y, en el expediente EV-1/EV-2 (`c2c36fa`), hizo que
-`make verify` invoque el script en cada corrida — que era el defecto real
-que seguía abierto (nada lo llamaba automáticamente).
+Pallo Pinto (commit `3297ec0`). Arcalle Grefa forzó UTF-8 en su salida
+(`6fd0581`) y, en el expediente EV-1/EV-2 (`c2c36fa`), hizo que `make
+verify` invoque el script en cada corrida — un aporte de integración. El
+cierre que exige la guía —"una fila rota hace fallar la verificación"—
+lo aportó **Velez Lopez Ricardo Elias** en el commit `5f99078`:
+sustituyó las filas de prueba con rutas inexistentes por una **fila real
+y rota** de la matriz, de modo que el validador imprimiera la VIOLACIÓN
+y devolviera código 1, y asentó la salida íntegra en `VERIFICACION.md`.
+(Corrección 2026-09-22: la versión anterior de este expediente atribuía
+este cierre a Arcalle Grefa y omitía lo de Velez Lopez; la evaluación
+final v3 §2.2 le asigna P5 a Velez Lopez, y el historial del commit
+`5f99078` lo respalda.)
 
 ## P6 — Figuras en inglés (peso 0,7)
 
@@ -211,14 +220,23 @@ suben al repositorio, según el propio diseño de `plantilla.md`.
 
 ## P14 — Estadística con trazabilidad (peso 0,5)
 
-**Titular:** Arcalle Grefa Darwin Orlando, sobre la base de Pallo Pinto
-Alejandro Daniel.
+**Titular del cierre:** Velez Lopez Ricardo Elias, sobre la base de Pallo
+Pinto Alejandro Daniel, con los aportes de Arcalle Grefa Darwin Orlando
+descritos abajo.
 
 `scripts/perf-analysis.py`, incluida la función `holm_bonferroni`, es
 trabajo de fondo de Pallo Pinto (commits `734a79f`, `7ce1474` y
-siguientes). El punto que señalaba la guía (encontrar esa trazabilidad
-sin depender de buscar por nombre de archivo) se cerró documentándolo
-explícitamente en `VERIFICACION.md`, commit `634537b`, de Arcalle Grefa.
+siguientes). Arcalle Grefa documentó la trazabilidad en
+`VERIFICACION.md` (commit `634537b`), un aporte de comprobación del
+procedimiento. El cierre estadístico real que exige el criterio
+—producir los **p corregidos por el orden de Holm con los p ajustados
+en el orden real y su monotonía** desde el dato crudo— lo aportó
+**Velez Lopez Ricardo Elias** en los commits `08470051` (análisis de
+rendimiento, Bloque C) y `5f99078` (orden de Holm, monotonía y columna
+`p Holm-aj.` en `REPORT.md`). (Corrección 2026-09-22: la versión
+anterior de este expediente atribuía este cierre a Arcalle Grefa; la
+evaluación final v3 §2.2 asigna P14 a Velez Lopez, y el historial de los
+commits `08470051` y `5f99078` lo respalda.)
 
 ---
 
@@ -229,7 +247,10 @@ había tocado desde el 16-sep y no declaraba nada del trabajo real hecho
 después — en particular, perjudicaba la atribución de Vélez López,
 autor del commit que devolvió `make verify` a código 0 la noche del
 17-sep. Se corrige aquí con la lista completa de commits por persona,
-contrastada contra `git log 2c2c7cf..HEAD`.
+contrastada contra `git log 2c2c7cf..HEAD`. (Corrección adicional
+2026-09-22: los cierres de **P5** y **P14** que figuran en esta lista
+tienen ahora sección formal propia con su atribución — véase arriba —
+dejando de quedar absorbidos como «trabajo adicional».)
 
 **Vélez López Ricardo Elías** (correo institucional en los 5 commits):
 
@@ -243,12 +264,12 @@ contrastada contra `git log 2c2c7cf..HEAD`.
 
 **Arcalle Grefa Darwin Orlando** (correo personal, declarado y justificado más abajo):
 autor del resto de los commits de este período — correcciones de P2
-(CLS real del dashboard), la falsa afirmación del 60% (Piso 3), P5
-(prueba sobre fila real de la matriz), P6 (C4 nivel 3 dividido por
-dominio), P7 (confirmación del docente-director sobre la firma de la
-v1.8), P8 (retiro de `v1.0.1`–`v1.0.3`), P10 (resincronización de las
-tablas de roles), P11 (`CONTRASENA_ADMIN` real), P12 (endurecimiento
-del patrón de detección) y P13 (hash SHA-256 de los 15 consentimientos)
+(CLS real del dashboard), la falsa afirmación del 60% (Piso 3), P6 (C4
+nivel 3 dividido por dominio), P7 (confirmación del docente-director
+sobre la firma de la v1.8), P8 (retiro de `v1.0.1`–`v1.0.3`), P10
+(resincronización de las tablas de roles), P11 (`CONTRASENA_ADMIN`
+real), P12 (endurecimiento del patrón de detección) y P13 (hash SHA-256
+de los 15 consentimientos)
 — y del endurecimiento general de `scripts/verify.sh` contra las
 mutaciones de las evaluaciones del 17 y 18-sep.
 
@@ -353,6 +374,12 @@ por otro integrante.
 respondiendo a la solicitud de re-firma del equipo: declara suyo
 `9810639e` (endurecimiento de P7 + verificación de acceso del Drive de
 P13) y confirma que su conformidad del 2026-09-16 sigue vigente.
+**Corrección 2026-09-22:** con esta actualización declara además los
+cierres de **P5** (prueba del validador con una fila real de la matriz,
+`5f99078`) y **P14** (corrección del orden de Holm con los p ajustados
+en el orden real, `08470051` y `5f99078`), que la evaluación final v3 le
+atribuye (§2.2) y que la versión anterior de este expediente absorbía
+como «trabajo adicional».
 Ninguna firma se extiende por otro integrante.
 
 _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
@@ -360,8 +387,11 @@ _Pallo Pinto confirmó su conformidad el 2026-09-16, verificando contra
 (`ebb5906`), P12 (`76e4e48`) y P14 (`734a79f`, `7ce1474`): los cinco
 corresponden a `Alejandro-hub19 <dpallop@uteq.edu.ec>`. Arcalle Grefa
 confirmó su conformidad el 2026-09-16 sobre los puntos que se le
-atribuyen como titular del cierre (P1, P3, P5, P6, P7, P8, P9, P10,
-P11, P12, P13, P14), el cierre específico de P4 (`e666d41`, `39ca9fa`)
+atribuyen como titular del cierre (P1, P3, P6, P7, P8, P9, P10, P11,
+P12, P13), el cierre específico de P4 (`e666d41`, `39ca9fa`), el
+mecanismo de registro de P13 (`ee0e699`), y los pendientes cuyo cierre
+comparte con Velez Lopez según la atribución corregida el 2026-09-22
+(P2, P5, P14; v3 §2.1/§2.2),
 y sobre EV-1/EV-2/EV-3. Velez Lopez confirmó su
 conformidad el 2026-09-16, verificando contra `git log` los commits que
 se le atribuyen en P1 (`d973292`, amenazas a la validez en
