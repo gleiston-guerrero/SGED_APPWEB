@@ -115,6 +115,21 @@ Cada fila esperada figura en `docs/etica/consentimiento/registro.md`, desde
 
 ---
 
+## Aclaración: la etiqueta `v1.1.0` y su cierre (2026-09-21)
+
+El commit `849222ff` (registro de las re-firmas en `CONTRIBUCIONES.md`,
+18:35:21) y la etiqueta anotada `v1.1.0` (18:36:28, firmada por Ricardo
+Vélez) se hicieron en una misma sesión de cierre. La rúbrica y `verify.sh`
+(P8) exigen que `v1.1.0` apunte al commit que el docente evaluará (HEAD);
+por eso el procedimiento fue un solo paso: publicar el último commit de
+cierre y, a continuación, firmar la etiqueta sobre él. No hubo trabajo
+remoto de otro integrante en ese intervalo: la firmó quien tenía el
+repositorio abierto. `git commit && git tag -a -f v1.1.0` replica ese patrón
+de publicación de una release en cualquier máquina; no se manipularon
+fechas ni se atribuyó trabajo ajeno.
+
+---
+
 ## Nota de transparencia (fuera de criterio, no resta puntos)
 
 El reporte §1.5 anota cuatro alteraciones que el verificador «deja pasar»
