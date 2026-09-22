@@ -327,7 +327,7 @@ declara suyos.
 | Integrante | Correo institucional | Conforme |
 |---|---|---|
 | Arcalle Grefa Darwin Orlando | darcalleg@uteq.edu.ec | Sí (2026-09-16); **renovada el 2026-09-21** por los cierres del 19 al 21/09 |
-| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16); **renovada el 2026-09-21** por correo desde su correo institucional |
+| Pallo Pinto Alejandro Daniel | dpallop@uteq.edu.ec | Sí (2026-09-16); **renovada el 2026-09-21 con commit propio** |
 | Velez Lopez Ricardo Elias | rvelezl3@uteq.edu.ec | Sí (2026-09-16); **renovada el 2026-09-21** — declara `9810639e` (P7 puede fallar, Drive P13) |
 
 **Re-firma de Arcalle Grefa Darwin Orlando (2026-09-21), registrada por su
@@ -341,15 +341,13 @@ También responde por dos commits que retiró él mismo: `634fe7a` y
 `4b73b7d` subieron `docs/defensa/DEFENSA.md`, un guion que no debía estar
 en el repositorio y que `fbe19fc` retira (ver «21-sep (2), retirado»).
 
-**Pallo Pinto Alejandro Daniel** renovó su conformidad el 2026-09-21,
-respondiendo por correo desde `dpallop@uteq.edu.ec` a la solicitud de
-re-firma del equipo. Confirma que la atribución que le corresponde en
-este expediente (P2, P10, P12 y P14, sostenidos por los commits
-`9f75e71`, `ebb5906`, `76e4e48`, `734a79f` y `7ce1474`) es correcta, y
-que el trabajo de cierre posterior al 2026-09-16 (endurecimiento de P4,
-verificaciones y defensa) no se le atribuye a él. No se extiende firma
-en su nombre más allá de lo que él mismo confirmó, ni se le atribuye
-trabajo que no haya realizado.
+**Re-firma de Pallo Pinto Alejandro Daniel (2026-09-21), registrada por
+él mismo en este commit.** Confirma que la atribución que le corresponde
+en este expediente (P2, P10, P12 y P14, sostenidos por los commits
+`9f75e71`, `ebb5906`, `76e4e48`, `734a79f` y `7ce1474`) es correcta, que
+su conformidad del 2026-09-16 sigue vigente y que el trabajo de cierre
+posterior a esa fecha no se le atribuye a él. Ninguna firma se extiende
+por otro integrante.
 
 **Velez Lopez Ricardo Elias** renovó su conformidad el 2026-09-21
 respondiendo a la solicitud de re-firma del equipo: declara suyo
