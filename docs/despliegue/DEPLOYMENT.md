@@ -57,7 +57,7 @@ tipo de defecto que este proyecto ya encontró y corrigió una vez
 | `DB_URL` / `DB_USER` / `DB_PASSWORD` | Postgres local o Supabase de desarrollo | Credenciales del proyecto de Supabase de **producción** (recomendado: un proyecto Supabase separado del de desarrollo, no el mismo con datos de prueba mezclados con datos reales del tribunal). |
 | `REDIS_HOST` / `REDIS_PORT` | `localhost` / `6379` | Host y puerto que entregue Upstash (normalmente requiere también TLS — revisar si el cliente Redis de Spring necesita `rediss://` en vez de `redis://`). |
 | `JWT_SECRET` | Valor de ejemplo, público en el repo | Uno nuevo generado solo para producción, **nunca** el mismo que aparece en `.env.example`. |
-| `USUARIO_ADMIN` / `CONTRASENA_ADMIN` | `admin` / `sged2026` (documentado a propósito en el README para el tribunal) | Se mantiene igual **a propósito** — el Bloque A.4.1 exige un usuario demo con credenciales publicadas, así que este es el único secreto de la lista que no se rota para producción. |
+| `USUARIO_ADMIN` / `CONTRASENA_ADMIN` | `admin` / `sged2026` (documentado a propósito en el README para el tribunal) | La cuenta demo del README (`admin`/`sged2026`) se conserva **a propósito**: el Bloque A.4.1 exige un usuario demo con credenciales publicadas, así que esta es la credencial de *demostración* que se publica. Desde el 2026-09-21 (punto 5 del reporte del 22-sep) la plantilla `.env.example` dejó de traerla en claro y lleva `CONTRASENA_ADMIN=cambiar_antes_de_produccion`: el `.env` real de un despliegue con datos que no sean demo debe rotar este valor inmediatamente tras el primer arranque (RUNBOOK §3). La demo del README/`db/seed.sql` no cambia. |
 
 ## 4. Procedimiento de despliegue
 

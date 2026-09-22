@@ -569,6 +569,14 @@ if echo "$jwt_line" | grep -qiE "cambiar|changeme|change_me|tu_|your_|placeholde
 else
     fail ".env.example: JWT_SECRET ('$jwt_line') no tiene aspecto de marcador"
 fi
+admin_line=$(grep "^CONTRASENA_ADMIN=" .env.example 2>/dev/null || echo "")
+if echo "$admin_line" | grep -qiE "cambiar|changeme|change_me|tu_|your_|placeholder|xxx|<.*>"; then
+    pass ".env.example: CONTRASENA_ADMIN usa un marcador evidente"
+elif [ -n "$admin_line" ] && [ "$admin_line" = "CONTRASENA_ADMIN=sged2026" ]; then
+    fail ".env.example: CONTRASENA_ADMIN es la demo publicada del README ('sged2026') sin rotar -- punto 5 del 22-sep; la plantilla debe llevar un marcador (cambiar_antes_de_produccion) y dejar la demo solo en README/db/seed.sql"
+else
+    fail ".env.example: CONTRASENA_ADMIN ('$admin_line') no tiene aspecto de marcador"
+fi
 
 # ---------------------------------------------------------------------
 section "P12 -- una sola cifra de umbral de cobertura en todo el entregable"
