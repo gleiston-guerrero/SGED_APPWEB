@@ -128,6 +128,18 @@ repositorio abierto. `git commit && git tag -a -f v1.1.0` replica ese patrón
 de publicación de una release en cualquier máquina; no se manipularon
 fechas ni se atribuyó trabajo ajeno.
 
+**Seguimiento (22-sep, tras la respuesta del docente a esta carta):** el
+reporte v3 evaluó el commit `849222f` «sin límite de fecha ni de
+etiqueta» y cerró los tres pendientes; los cinco puntos que el docente
+señaló después se resolvieron en los commits `7abfdd1e`, `d0264512`,
+`0b67115c`, `5894954c` y `1a9c081d` (aclaración de la etiqueta, cuatro
+mutaciones del verificador, portada en la tabla pública de Lighthouse,
+rotación de la contraseña de ejemplo en `.env.example` y alineación de
+la atribución de P5/P14 en `CONTRIBUCIONES.md`). Por P8, la etiqueta
+`v1.1.0` avanzó con cada cierre y hoy apunta a `1a9c081d`; `git
+rev-parse v1.1.0^{commit}` devuelve el HEAD actual, y `make verify`
+cierra con 37 pasan / 0 fallan / 2 revisión manual.
+
 ---
 
 ## Nota de transparencia (fuera de criterio, no resta puntos)
