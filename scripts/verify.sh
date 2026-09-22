@@ -312,12 +312,37 @@ acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | 
 # (Corrección 2026-09-20, evaluación del 19-sep: quitar la frase de la
 # confirmación bajaba a "manual" y el verificador seguía saliendo 0, o
 # sea, el punto no podía fallar. Ahora: si existe un acta pero la
-# confirmación escrita no está, es FALLA — esa frase ES la única prueba
+# confirmación escrita no está, es FALLA -- esa frase ES la única prueba
 # versionada de que la firma de la v1.8 sigue vigente; sin ella el punto
 # no está comprobado. Solo es "manual" cuando no existe ningún acta,
-# caso que de verdad depende de la firma externa del docente.)
+# caso que de verdad depende de la firma externa del docente.
+#
+# Corrección 2026-09-21 (punto 3 del 22-sep): conservar el título
+# "Confirmación del docente-director (2026-09-18)" y escribir al lado
+# "NO sigue vigente" / "no sigue siendo vigente" seguía aprobando, porque
+# el grep solo comprobaba la presencia del título. Ahora se extrae el
+# bloque que sigue a la frase y se busca una negación de vigencia; si la
+# hay, es FALLA aunque el título siga presente.)
+CONFIRMACION_DOCENTE='Confirmación del docente-director \(2026-09-18\)'
+acta_mas_reciente=$(ls docs/requisitos/ACTA-APROBACION-SRS-v*.pdf 2>/dev/null | sort -V | tail -1)
 if [ -n "$acta_mas_reciente" ] && grep -qE "$CONFIRMACION_DOCENTE" docs/requisitos/SRS.md 2>/dev/null; then
-    pass "acta de aprobacion firmada por el docente-director existe ($acta_mas_reciente); confirmo por escrito (SRS.md) que sigue vigente sin necesidad de una firma nueva"
+    bloque_confirmacion=$(python3 - docs/requisitos/SRS.md <<'PYEOF'
+import re, sys
+texto = open(sys.argv[1], encoding="utf-8").read().splitlines()
+srx = re.compile(r'Confirmación del docente-director \(2026-09-18\)')
+for i, l in enumerate(texto):
+    if srx.search(l):
+        bloque = "\n".join(texto[i:i+12])
+        print(bloque)
+        sys.exit(0)
+print("")
+PYEOF
+)
+    if printf '%s\n' "$bloque_confirmacion" | grep -qEi 'no\s+(sigue|est[áa]|estand)e?\b.*vigent|deja(de)?\s+de\s+ser\s+vigent|ya\s+no\s+es\s+vigent|dej[óo]\s+de\s+estar\s+vigent|sin\s+vigencia|deja\s+de\s+viger|n[iíí]tida\s+?las?\s+firma|caducad[oa]|inactiv[oa]|retirad[ao]\s+la\s+firma|anulad[oa]\b'; then
+        fail "SRS.md contiene la frase de confirmación pero su propio bloque dice que la firma ya no sigue vigente ($acta_mas_reciente) -- el título no basta si el texto la niega"
+    else
+        pass "acta de aprobacion firmada por el docente-director existe ($acta_mas_reciente); confirmo por escrito (SRS.md) que sigue vigente sin necesidad de una firma nueva"
+    fi
 elif [ -n "$acta_mas_reciente" ]; then
     fail "existe el acta ($acta_mas_reciente) pero SRS.md ya no contiene la confirmacion escrita 'Confirmación del docente-director (2026-09-18)': si se quita esa frase el punto deja de estar comprobado"
 else
@@ -579,7 +604,18 @@ pom_threshold=$(grep -oE '<minimum>0\.[0-9]+</minimum>' backend/pom.xml | sort -
 # simbolo %), "0,6" (un solo decimal, sin el cero final de "0,60") y
 # "60~\%" (tilde de LaTeX antes del %, no es un espacio para \s).
 # NUM60 cubre 60 / 0.60 / 0,60 / 0.6 / 0,6; PORCENTAJE cubre
-# %/\%/\,\%/~\% y la palabra "por ciento".)
+# %/\%/\,\%/~\% y la palabra "por ciento".
+#
+# Corrección 2026-09-21 (punto 3 del 22-sep): se retira "históri" y
+# "umbral actual" de la lista blanca -- ambas palabras permitian afirmar
+# en vivo "el umbral actual es 60 %" o "la cobertura, historica y actual,
+# es de 60 %" sin ser detectadas. Ninguna cita historica legitima del 60 %
+# necesita ese comodin: las dos frases reales (VERSIONING.md:61 y
+# inventario-design.md:222) dicen "el umbral actual es 70 %" y las citas
+# historicas del 60 % estan en OBSERVACIONES.md o inventario-design.md,
+# ya excluidos por ruta o cubiertos por la excepcion "nunca fue el
+# valor". Segun barrido 2026-09-21, sin "históri|umbral actual" el mismo
+# grep queda sin ningun resultado en contenido legitimo (NO_HIT).)
 NUM60='(60|0[.,]6(0)?|[Ss]esenta)'
 PORCENTAJE='(~?\\?,?\s*\\?%|por\s+ciento)'
 ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
@@ -587,7 +623,7 @@ ANCLA='umbral|m[ií]nim[oa]|cobertura|coverage|threshold'
 # "cobertura" cerca -- deliberadamente NO se buscan sin ancla: colisionan
 # con strings ajenos como ">= 0.6" de ingenieria de paquetes npm en
 # frontend/package-lock.json. Siempre requieren un ancla al lado.)
-stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}${NUM60}(\s*${PORCENTAJE})?|${NUM60}(\s*${PORCENTAJE})?[^.]{0,60}(${ANCLA})|≥\s*${NUM60}\s*${PORCENTAJE}?|>=?\s*0\.60|>=\s*${NUM60}\s*${PORCENTAJE}" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!frontend/package-lock.json' ':!*.lock' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|nunca fue el valor|históri|umbral actual' || true)
+stray=$(git grep -n -E "COVEREDRATIO\s*>=\s*0\.60|(${ANCLA})[^.]{0,60}${NUM60}(\s*${PORCENTAJE})?|${NUM60}(\s*${PORCENTAJE})?[^.]{0,60}(${ANCLA})|≥\s*${NUM60}\s*${PORCENTAJE}?|>=?\s*0\.60|>=\s*${NUM60}\s*${PORCENTAJE}" -- ':!docs/observaciones/OBSERVACIONES.md' ':!docs/superpowers/specs/2026-08-12-inventario-design.md' ':!scripts/verify.sh' ':!frontend/package-lock.json' ':!*.lock' . 2>/dev/null | grep -vE '70\s*(\\?,\s*\\?%|%)|nunca fue el valor' || true)
 echo "  umbral en pom.xml: $pom_threshold"
 if [ -z "$stray" ]; then
     pass "ninguna afirmación viva de umbral distinto de 70% en el repo versionado"
@@ -598,18 +634,66 @@ fi
 # ---------------------------------------------------------------------
 section "P13 -- consentimientos informados del SUS, uno por participante"
 REGISTRO=docs/etica/consentimiento/registro.md
+# (Corrección 2026-09-21, punto 3 del 22-sep: el chequeo solo contaba filas
+# OBTENIDO; alterar la tabla del "resumen criptografico" (SHA-256) del
+# registro --por ejemplo duplicar un hash, poner uno mal formado o un
+# archivo que no corresponde a ninguna fila ENC-- pasaba sin ser visto,
+# pese a que la carta al evaluador atribuye a P13 comprobar "el resumen
+# criptografico". No se recalcula ningun hash (los originales estan fuera
+# del repo) pero si se valida la estructura: 15 filas, hash de 64 hex,
+# sin duplicados, y nombre de archivo identico al de la columna Archivo de
+# las filas ENC.)
 if [ ! -f "$REGISTRO" ]; then
     fail "no existe $REGISTRO"
 else
     filas=$(grep -cE '^\| ENC-' "$REGISTRO")
     pendientes=$(grep -cE '^\| ENC-[0-9]+ \|[^|]*\|[^|]*\| PENDIENTE \|' "$REGISTRO")
     obtenidos=$(grep -cE '^\| ENC-[0-9]+ \|[^|]*\|[^|]*\| OBTENIDO \|' "$REGISTRO")
+    resumen_sha=$(PYTHONIOENCODING=utf-8 python3 - "$REGISTRO" <<'PYEOF'
+import re, sys
+REG = sys.argv[1]
+texto = open(REG, encoding="utf-8").read()
+errores = []
+
+archivo_enc = re.findall(r'^\| ENC-[0-9]+ \|[^|]*\|[^|]*\| OBTENIDO \| [^|]*\| `([^`]+\.docx)`', texto, re.M)
+n_enc = len(archivo_enc)
+
+tabla_cab = re.search(r'## Verificación de integridad \(SHA-256\).*?\| Archivo \| SHA-256 \|\n\|---\|---\|\n(.*?)(?:\n\n|$)', texto, re.S)
+if not tabla_cab:
+    errores.append("no se encontro la tabla 'Archivo | SHA-256' de integridad")
+    filas_hash = []
+else:
+    filas_hash = re.findall(r'^\| `(Consentimiento_\d+-SUS-SGED\.docx)` \| `([0-9a-f]+)` \|', tabla_cab.group(1), re.M)
+
+if len(archivo_enc) != n_enc or len(filas_hash) != len(archivo_enc):
+    errores.append(f"{len(filas_hash)} filas en la tabla SHA-256 != {len(archivo_enc)} archivos OBTENIDO")
+else:
+    hashes = [h for _, h in filas_hash]
+    if len(set(hashes)) != len(hashes):
+        errores.append(f"hay hashes SHA-256 duplicados en la tabla de integridad ({len(hashes) - len(set(hashes))})")
+    for nombre, h in filas_hash:
+        if not re.fullmatch(r"[0-9a-f]{64}", h):
+            errores.append(f"{nombre}: hash mal formado ({h[:12]}..., esperados 64 hex)")
+    if [a for a, _ in filas_hash] != sorted(re.search(r'(Consentimiento_\d+-SUS-SGED\.docx)', a).group(1) for a in archivo_enc):
+        errores.append("la lista de archivos de la tabla SHA-256 no coincide con la de las filas OBTENIDO")
+
+if errores:
+    print("; ".join(errores[:5]))
+    sys.exit(1)
+print(f"{n_enc} hashes validos, sin duplicados, uno por fila OBTENIDO")
+PYEOF
+)
+    ec_sha=$?
     if [ "$filas" -ne "$n_resp" ]; then
         fail "$REGISTRO tiene $filas filas, deberian ser $n_resp (una por participante de respuestas.csv)"
     elif [ "$pendientes" -gt 0 ]; then
         fail "$pendientes de $filas participantes siguen en PENDIENTE en $REGISTRO"
     elif [ "$obtenidos" -eq "$filas" ]; then
-        pass "las $filas constancias de consentimiento estan marcadas OBTENIDO en $REGISTRO"
+        if [ "$ec_sha" -eq 0 ]; then
+            pass "las $filas constancias de consentimiento estan marcadas OBTENIDO en $REGISTRO, y la tabla SHA-256: $resumen_sha"
+        else
+            fail "las $filas constancias estan OBTENIDO pero la tabla de integridad no es consistente: $resumen_sha"
+        fi
     else
         fail "$REGISTRO tiene filas en un estado distinto de OBTENIDO/PENDIENTE (revisar a mano)"
     fi
@@ -662,7 +746,14 @@ section "EV-1 -- lo que publica el informe coincide con los datos crudos (SUS y 
 # datos crudos con sus derivados, pero no con lo que publica el informe".
 # Cambiar la media del SUS en main.tex, o subir una cifra de Lighthouse en
 # REPORT.md, pasaba. Aqui se recalcula desde los JSON/CSV crudos y se compara
-# con lo que dicen main.tex y docs/mediciones/lighthouse/REPORT.md.)
+# con lo que dicen main.tex y docs/mediciones/lighthouse/REPORT.md.
+#
+# Corrección 2026-09-21 (punto 3 del 22-sep): el mismo defecto quedaba en la
+# tabla LOCAL de Lighthouse del informe (tab:lighthouse, "por categoría y
+# perfil"): subir un 82,0 a un 96,0 en esa fila pasaba porque aqui solo se
+# contrastaba la tabla publica del despliegue (dashboard/inventario) y las
+# tablas Run1-3 de REPORT.md. Ahora tambien se recalculan las medias de
+# mobile-run*/desktop-run* y se comparan con las celdas de la tabla local.)
 informe_vs_datos=$(PYTHONIOENCODING=utf-8 python3 - <<'PYEOF'
 import csv, glob, json, re, statistics as st, sys
 errores = []
@@ -721,6 +812,27 @@ else:
             esperado = [celda(m["performance"]), celda(m["accessibility"]), celda(m["best-practices"], True), celda(m["seo"], True)]
             if celdas != esperado:
                 errores.append(f"main.tex Lighthouse {perfil}/{ruta}: {celdas} != JSON {esperado}")
+
+# --- Lighthouse: tabla LOCAL de main.tex (tab:lighthouse) vs JSON ---
+bloque_local = re.search(r"\\caption\{Resultados de Lighthouse por categoría y perfil\.\}.*?\\midrule\n(.*?)\\bottomrule", tex, re.S)
+if not bloque_local:
+    errores.append("main.tex: no se encontro la tabla local de Lighthouse (\\label{tab:lighthouse})")
+else:
+    nombres_local = {"Rendimiento": "performance", "Accesibilidad": "accessibility", "Buenas prácticas": "best-practices", "SEO": "seo"}
+    for linea in [l for l in bloque_local.group(1).split("\n") if l.strip()]:
+        c = [x.strip() for x in linea.strip("\\").strip().split("&")]
+        if not c or c[0] not in nombres_local:
+            continue
+        esperado_local = []
+        for prefijo in ("mobile", "desktop"):
+            vals = []
+            for r in (1, 2, 3):
+                d = json.load(open(f"docs/mediciones/lighthouse/{prefijo}-run{r}.report.json", encoding="utf-8"))
+                vals.append(d["categories"][nombres_local[c[0]]]["score"] * 100)
+            esperado_local.append(round(st.mean(vals), 1))
+        reales_local = [float(x.replace(",", ".")) for x in c[1:3]]
+        if reales_local != esperado_local:
+            errores.append(f"main.tex tabla local {c[0]}: {reales_local} != JSON {esperado_local}")
 
 # --- Lighthouse: tablas Run1-3 de REPORT.md vs mobile-run*/desktop-run* ---
 rep = open("docs/mediciones/lighthouse/REPORT.md", encoding="utf-8").read()
