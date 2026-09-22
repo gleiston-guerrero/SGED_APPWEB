@@ -69,9 +69,9 @@ una sola cifra: 70 %.
   `docs/informe-final.pdf`.
 - Versión: `CITATION.cff` → `version: 1.1.0`.
 - El `docs/informe-entrega-3.pdf` fue el informe de la tercera entrega
-  (2026-07-30), cuando el umbral exigido de esa etapa era 60 %; ese hito
-  ya fue calificado en su momento y su PDF se mantiene en el repositorio
-  solo como archivo.
+  (2026-07-30), cuando el umbral exigido de esa etapa era distinto del
+  vigente; ese hito ya fue calificado en su momento y su PDF se mantiene
+  en el repositorio solo como archivo.
 
 **Postura del equipo:** los hechos quedan expuestos tal cual; la decisión
 de si ese PDF histórico forma parte del entregable del examen suspenso es
